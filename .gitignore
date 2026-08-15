@@ -55,3 +55,9 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# React / Next.js
+node_modules/
+.next/
+.env.local
+build/
