@@ -61,3 +61,15 @@ node_modules/
 .next/
 .env.local
 build/
+
+# Local application configuration
+src/server/appsettings.Development.json
+src/server/appsettings*.Local.json
+src/server/appsettings*.json
+
+# User-specific IDE settings
+.vs/
+.vscode/
+
+# Client
+src/client/
