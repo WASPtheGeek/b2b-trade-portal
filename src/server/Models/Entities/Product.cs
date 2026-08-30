@@ -32,9 +32,9 @@ public class Product
     /// </summary>
     public string? Description { get; set; }
 
-    /// <summary>Gets or sets the price without VAT, per single piece. Never sent to
-    /// anonymous callers — see PricingService / the price-visibility rule in
-    /// claude/api-design.md §4.4.</summary>
+    /// <summary>
+    /// Gets or sets the price without VAT, per single piece.
+    /// </summary>
     public decimal BasePrice { get; set; }
 
     /// <summary>
@@ -97,14 +97,29 @@ public class Product
     /// </summary>
     public DateTimeOffset UpdatedAt { get; set; }
 
+    /// <summary>
+    /// Gets or sets the collection of categories the product belongs to.
+    /// </summary>
     public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+
+    /// <summary>
+    /// Gets or sets the collection of images associated with the product.
+    /// </summary>
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
+    /// <summary>
+    /// Gets or sets the collection of attribute values associated with the product.
+    /// </summary>
     public ICollection<ProductAttributeValue> AttributeValues { get; set; } = new List<ProductAttributeValue>();
 
-    /// <summary>True if this product can be ordered at all in the given
-    /// packaging unit. Mirrors the import-time validation rule in
-    /// claude/api-design.md §5 (a product with SoldByPiece=false and no
-    /// pack/box multiplier can never be ordered).</summary>
+    /// <summary>
+    /// Verifies whether the product supports ordering in the specified packaging unit.
+    /// </summary>
+    /// <param name="unit">The packaging unit to check.</param>
+    /// <returns>True if the product supports ordering in the specified packaging unit; otherwise, false.</returns>
+    /// <remarks>
+    /// True if this product can be ordered at all in the given packaging unit.
+    /// </remarks>
     public bool SupportsUnit(PackagingUnit unit) => unit switch
     {
         PackagingUnit.Piece => SoldByPiece,
@@ -113,6 +128,11 @@ public class Product
         _ => false,
     };
 
+    /// <summary>
+    /// Calculates the number of individual pieces contained in a given packaging unit.
+    /// </summary>
+    /// <param name="unit">The packaging unit to calculate pieces for.</param>
+    /// <returns>The number of individual pieces contained in the specified packaging unit.</returns>
     public int PiecesPerUnit(PackagingUnit unit) => unit switch
     {
         PackagingUnit.Piece => 1,

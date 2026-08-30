@@ -56,3 +56,21 @@ public sealed class ResourceNotFoundException : ApiException
     public ResourceNotFoundException(string detail, string? title = null)
         : base(StatusCodes.Status404NotFound, detail, title) { }
 }
+
+/// <summary>
+/// 400 — the request is malformed or fails a validation rule.
+/// </summary>
+public sealed class BadRequestException : ApiException
+{
+    public BadRequestException(string detail, string? title = null)
+        : base(StatusCodes.Status400BadRequest, detail, title) { }
+}
+
+/// <summary>
+/// 409 — the request conflicts with the current state of a resource (e.g. a duplicate key).
+/// </summary>
+public sealed class ConflictException : ApiException
+{
+    public ConflictException(string detail, string? title = null)
+        : base(StatusCodes.Status409Conflict, detail, title) { }
+}

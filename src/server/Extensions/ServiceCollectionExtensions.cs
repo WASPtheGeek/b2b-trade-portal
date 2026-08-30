@@ -19,8 +19,8 @@ namespace Elkaro.Server.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    /// <summary>R
-    /// egisters the OpenAPI document and its JWT Bearer security scheme,
+    /// <summary>
+    /// Registers the OpenAPI document and its JWT Bearer security scheme,
     /// so Scalar shows a single document-wide "Authorize" control instead of requiring
     /// the token to be re-entered on every endpoint's Test Request panel.
     /// </summary>

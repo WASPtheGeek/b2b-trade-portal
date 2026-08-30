@@ -56,10 +56,7 @@ public class AuthController : ControllerBase
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         if (await _db.Users.AnyAsync(u => u.Email == normalizedEmail, ct))
         {
-            return Conflict(MakeProblem(
-                title: "E-pasts jau reģistrēts",
-                detail: "Konts ar šo e-pasta adresi jau pastāv.",
-                statusCode: StatusCodes.Status409Conflict));
+            throw new ConflictException("Konts ar šo e-pasta adresi jau pastāv.", "E-pasts jau reģistrēts");
         }
 
         var businessRoleId = await _db.Roles
@@ -140,7 +137,6 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// <summary>
     /// Retrieves the details of the currently authenticated user.
     /// </summary>
     /// <param name="ct">The cancellation token.</param>
@@ -153,7 +149,7 @@ public class AuthController : ControllerBase
 
         if (userId is null)
         {
-            return Unauthorized();
+            throw new UnauthorizedException("Nav autentificēts.");
         }
 
         var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == userId, ct);
@@ -175,18 +171,4 @@ public class AuthController : ControllerBase
         user.Id, user.FirstName, user.LastName, user.Email,
         user.BusinessName, user.RegistrationNumber, user.VatNumber, user.Phone, user.IsVatExempt,
         user.Role?.Name ?? "", user.Status.ToString(), user.CreatedAt);
-
-    /// <summary>
-    /// Creates a <see cref="ProblemDetails"/> object with the specified details.
-    /// </summary>
-    /// <param name="detail">The detail message of the problem.</param>
-    /// <param name="title">The title of the problem.</param>
-    /// <param name="statusCode">The HTTP status code of the problem.</param>
-    /// <returns>A <see cref="ProblemDetails"/> object representing the problem.</returns>
-    private static ProblemDetails MakeProblem(string detail, string? title = null, int statusCode = 400) => new()
-    {
-        Title = title ?? "Pieprasījums neizdevās",
-        Detail = detail,
-        Status = statusCode,
-    };
 }
