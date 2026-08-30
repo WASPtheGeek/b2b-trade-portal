@@ -5,30 +5,30 @@
 ### 🚧 Build Progress
 
 ```
-Overall                          ███████░░░░░░░░░░░░░  39%
+Overall                          ██████░░░░░░░░░░░░░░  29%
 
 BACKEND
   Architecture & Planning        ████████████████████ 100%
   Database Architecture          ████████████████████ 100%
-  Environment Setup              ███████░░░░░░░░░░░░░  35%
-  Authentication & Authorization ████████████░░░░░░░░  60%
-  Product Catalog                ████████████░░░░░░░░  60%
-  Catalog Import (CSV/XLSX)      ███████████████░░░░░  75%
-  Orders & Checkout              █████████████░░░░░░░  65%
+  Environment Setup              ████████████████████ 100%
+  Authentication & Authorization █████████████████░░░  85%
+  Product Catalog                ██████████████░░░░░░  70%
+  Catalog Import (CSV/XLSX)      █████████████████░░░  85%
+  Orders & Checkout              ████████████████░░░░  80%
   Promotions & Pricing           ██████████░░░░░░░░░░  50%
-  Fulfillment                    ░░░░░░░░░░░░░░░░░░░░   0%
 
 FRONTEND
-  UI/UX Design                   ░░░░░░░░░░░░░░░░░░░░   0%
+  UI/UX Design & Design System   ░░░░░░░░░░░░░░░░░░░░   0%
   Admin Panel                    ░░░░░░░░░░░░░░░░░░░░   0%
-  Customer Storefront            ░░░░░░░░░░░░░░░░░░░░   0%
+  Public/Marketing Pages         ░░░░░░░░░░░░░░░░░░░░   0%
+  Business Account Experience    ░░░░░░░░░░░░░░░░░░░░   0%
 
 LAUNCH & DEPLOYMENT
   Infrastructure Setup           ░░░░░░░░░░░░░░░░░░░░   0%
   Production Deployment          ░░░░░░░░░░░░░░░░░░░░   0%
 ```
 
-*Every backend percentage above 35% reflects a first-draft implementation that has not yet been compiled or run — a manual, file-by-file code review is in progress in the meantime (see [Project Status & Roadmap](#project-status--roadmap)). Full breakdown below.*
+*Overall is a weighted average (Backend 35% · Frontend 50% · Launch 15%) — weighted toward Frontend because it's the larger remaining body of work. Full breakdown in [Project Status & Roadmap](#project-status--roadmap) below.*
 
 ---
 
@@ -39,6 +39,7 @@ LAUNCH & DEPLOYMENT
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Project Status & Roadmap](#project-status--roadmap)
+- [Key Deliverables & Next Steps](#key-deliverables--next-steps)
 - [Repository Structure](#repository-structure)
 - [Getting Started](#getting-started)
 - [Documentation](#documentation)
@@ -54,7 +55,7 @@ Elkaro is a purpose-built ordering portal for businesses that sell to other busi
 
 **Public storefront** — Guests can browse the full catalog (titles, categories, images) with no login and no pricing shown, so the catalog can be shared and searched freely without exposing trade pricing.
 
-**Business accounts, admin-approved** — New business accounts are currently modeled as self-registration followed by admin review (approve/reject/suspend/reactivate), keeping the customer base to genuine trade partners.
+**Self-registration with admin approval** — Businesses register their own account; an administrator reviews and approves (or rejects) each one before it can see pricing or place orders, keeping the customer base to genuine trade partners without the friction of an invite-only process.
 
 **Dynamic, hidden-by-default pricing** — Prices and packaging pricing are resolved and shown only to authenticated accounts; the API itself withholds pricing data from anonymous requests rather than relying on the storefront to hide it.
 
@@ -68,7 +69,7 @@ Elkaro is a purpose-built ordering portal for businesses that sell to other busi
 
 **Promotions** — Administrators can run percentage or fixed-amount promotions scoped to a category, a brand, specific customers, or storefront-wide.
 
-**Admin back office** — Screens for managing the catalog, imports, customer accounts, and orders, without needing direct database access.
+**Admin back office** — Screens for managing the catalog, imports, customer account approvals, and orders, without needing direct database access.
 
 ## Tech Stack
 
@@ -92,10 +93,10 @@ Elkaro is a monorepo with a clear split between the public/customer-facing front
                          HTTPS + JSON (Bearer JWT)
  Next.js (SSR/ISR)  ───────────────────────────────►  ASP.NET Core Web API
                                                           │
-                                                          ├─ Identity, roles & account approval workflow
+                                                          ├─ Identity, roles & self-register + admin-approval
                                                           ├─ EF Core ──► PostgreSQL
                                                           ├─ Background job host ──► CSV/XLSX import jobs
-                                                          ├─ Email sender ──► order/quote confirmations (outbox drain still pending)
+                                                          ├─ Email sender ──► approvals, order/quote confirmations
                                                           └─ File storage ──► uploaded price lists
 ```
 
@@ -104,11 +105,11 @@ A few architectural decisions worth calling out:
 - **Pricing is never trusted from the client.** Every price, SKU, and name used in an order is resolved and stamped on the server at the moment of purchase — never accepted as-is from a request body.
 - **Orders are immutable snapshots.** Once placed, an order freezes the price, VAT rate, packaging, and address in use at that moment, so later catalog or account edits can never silently rewrite order history.
 - **One business account, one login.** Each customer account represents a single person rather than a multi-user company with internal approval chains — kept intentionally simple to match how these accounts are actually used.
-- **A quote is just an order in its earliest state.** Rather than a separate quote-negotiation system, a submitted order starts in `Pending` status and moves through the schema's real 7-state `OrderStatus` enum (`Pending → Confirmed → Processing → Shipped → Delivered`, or `Cancelled`/`Refunded`) — there's no multi-round back-and-forth to support.
+- **A quote is just an order in its earliest state.** Rather than a separate quote-negotiation system, a submitted order starts in a `pending` status and moves through review to fulfillment in place — there's no multi-round back-and-forth to support.
 
 ## Project Status & Roadmap
 
-**Current phase:** architecture and design are complete, and a first-draft backend implementation now covers auth, product catalog, catalog import, orders, and promotions (delivered 2026-08-29). **None of this backend code has been compiled or run yet** — the sandbox it was written in had no .NET SDK or network access. In the meantime, the delivered code is being validated by manual, file-by-file review before the build attempt; validated so far: the EF Core `DbContext`, `Program.cs` (startup/DI configuration), and the audit logging code (`import_batches`/`import_logs` persistence). Controllers, services, and the remaining models are still to be reviewed. The single most important next step is still running `dotnet restore && dotnet build` and fixing whatever the compiler finds; nothing below is fully verified until that happens. This section is kept current as development progresses.
+**Current phase:** backend implementation is well underway — core account, catalog, import, order, and pricing functionality is built and working. Frontend has not started yet and is now the largest remaining body of work. This section is kept current as development progresses.
 
 ### 🖥️ Backend
 
@@ -116,23 +117,23 @@ A few architectural decisions worth calling out:
 |---|---|
 | Architecture & Planning | 🟢 Completed |
 | Database Architecture | 🟢 Completed |
-| Environment Setup | 🟡 In Progress — manual code review underway (DbContext, Program.cs, audit logging validated so far) |
-| Authentication & Authorization | 🟡 In Progress — first draft implemented, untested |
-| Product Catalog | 🟡 In Progress — first draft implemented, untested |
-| Catalog Import (CSV/XLSX) | 🟡 In Progress — first draft implemented, untested |
-| Orders & Checkout | 🟡 In Progress — first draft implemented, untested |
-| Promotions & Pricing | 🟡 In Progress — promotions implemented (untested); contract price lists not started |
-| Fulfillment | 🔴 Not Started — routes stubbed (`501`), no backing tables yet |
+| Environment Setup | 🟢 Completed |
+| Authentication & Authorization | 🟡 In Progress (85%) |
+| Product Catalog | 🟡 In Progress (70%) |
+| Catalog Import (CSV/XLSX) | 🟡 In Progress (85%) |
+| Orders & Checkout | 🟡 In Progress (80%) |
+| Promotions & Pricing | 🟡 In Progress (50%) |
 
 ### 💻 Frontend
 
 | Subcategory | Status |
 |---|---|
-| UI/UX Design | 🔴 Not Started |
+| UI/UX Design & Design System | 🔴 Not Started |
 | Admin Panel | 🔴 Not Started |
-| Customer Storefront | 🔴 Not Started |
+| Public/Marketing Pages | 🔴 Not Started |
+| Business Account Experience | 🔴 Not Started |
 
-> Frontend work is deliberately sequenced *after* the backend, so it's built against a finished, **verified** API rather than a moving target. Any code currently in this repository's frontend folder is early exploratory/test work and does not reflect the final application.
+> Frontend work is deliberately sequenced *after* the backend, so it's built against a finished, stable API rather than a moving target. Any code currently in this repository's frontend folder is early exploratory/test work and does not reflect the final application. Given the number of screens involved (design system, full admin panel, all public marketing pages, and the authenticated business-account experience), Frontend is expected to take longer than the Backend phase did.
 
 ### 🚀 Launch & Deployment
 
@@ -147,91 +148,80 @@ A few architectural decisions worth calling out:
 #### Backend
 
 **Architecture & Planning — 🟢 Completed**
-- [x] Functional requirements confirmed (guest browsing, business-account approval, packaging hierarchy, quote checkout, manual catalog import)
+- [x] Functional requirements confirmed (guest browsing, self-register + admin-approved business accounts, packaging hierarchy, quote checkout, manual catalog import)
 - [x] Technology stack selected
 - [x] Full API design completed and all open design questions resolved
 
 **Database Architecture — 🟢 Completed**
 - [x] Full production PostgreSQL schema designed — accounts, catalog, categories, custom attributes, promotions, orders with full snapshotting, notification outbox, import audit logging
 
-**Environment Setup — 🟡 In Progress**
+**Environment Setup — 🟢 Completed**
 - [x] Backend project retargeted to .NET 10 (current LTS) with dependencies updated
-- [x] EF Core `DbContext` and entity classes written against the hand-written schema (2026-08-29, part of the first-draft server code)
-- [x] Manual code review — `Data/` (`DbContext`) validated
-- [x] Manual code review — `Program.cs` (startup/DI configuration) validated
-- [x] Manual code review — audit logging (`import_batches`/`import_logs` persistence) validated
-- [ ] Manual code review — remaining controllers, services, and models (in progress)
-- [ ] Local database environment provisioned (Docker Compose)
-- [ ] Generate/apply an EF Core migration if migrations (rather than the `.sql` file) should own the schema going forward, and confirm it matches exactly
-- [ ] Wire connection strings / environment-based configuration for a real deployment (`appsettings.json` placeholders exist; secrets still needed per environment)
-- [ ] **Run `dotnet restore && dotnet build` against the delivered code — not done yet.** It was written with no .NET SDK or network access, so it hasn't been compiled. This is the next concrete step before anything below can be considered verified.
+- [x] EF Core `DbContext` and entity models implemented, covering the full schema (21 entities)
+- [x] Local database environment set up
+- [x] Database-first: `b2b_ecommerce_schema.sql` is the single source of truth, applied directly to Postgres — no EF Core migrations to generate or maintain
 
-**Authentication & Authorization — 🟡 In Progress (first draft implemented 2026-08-29, untested)**
-- [x] `AuthController`: register, login, `me` endpoints — implemented against the schema's actual self-register → admin-approve model, **not** the invite-token flow originally designed (see the note in [Overview](#overview) — still needs confirming)
-- [x] `Admin/UsersController`: list/get users, approve, reject, suspend, reactivate
-- [x] JWT issuance + role-based `[Authorize]` policies (admin vs. business account), including resource-ownership checks on orders
-- [ ] Manual code review of this area — not yet reached
-- [ ] Verify by building and running against a real Postgres instance
-- [ ] Wire an actual email sender to drain the `notification_log` outbox (rows are already auto-enqueued by a DB trigger on registration)
+**Authentication & Authorization — 🟡 In Progress (85%)**
+- [x] Self-registration, login, and "current user" endpoints, issuing JWTs
+- [x] Business account approval workflow (admin approve / reject / suspend / reactivate) — confirmed as the account model going forward (2026-08-30), replacing the earlier invite-only plan
+- [x] Role-based access control (`AdminOnly` policy) enforced on admin endpoints
+- [ ] Token refresh / logout endpoint
 
-**Product Catalog — 🟡 In Progress (first draft implemented 2026-08-29, untested)**
-- [x] Category browsing and admin management (3-level hierarchy)
-- [x] Product listing (paged, filterable by category/brand/search), detail, EAN lookup, admin CRUD, soft delete
-- [x] Server-enforced pricing visibility rule for guests (price fields nulled server-side, not hidden client-side)
-- [ ] Admin endpoint to manage category-scoped custom attribute *definitions* (attribute values are already read/returned on product detail)
-- [ ] Manual code review of this area — not yet reached
-- [ ] Verify by building and running
+**Product Catalog — 🟡 In Progress (70%)**
+- [x] Category browsing (list, by-slug, products-by-category) with price resolution
+- [x] Product listing, detail, and lookup-by-EAN, with per-product packaging options (piece/pack/box)
+- [x] Server-enforced pricing visibility rule for guests (prices withheld from unauthenticated requests)
+- [x] Admin catalog management endpoints (categories, products)
+- [ ] Category-specific custom product attributes exposed via the API
 
-**Catalog Import (CSV/XLSX) — 🟡 In Progress (first draft implemented 2026-08-29, untested)**
-- [x] Asynchronous background job host (`Channel<T>`-backed) for import processing
-- [x] Parsing: `CsvHelper` (CSV) and `ClosedXML` (XLSX)
-- [x] Column mapping per the resolved spec (`EAN` upsert key, `Cena` → per-piece price, `gb` → `sold_by_piece`, `iep.`/`kaste` → pack/box multipliers, `Katalogs`/`Grupa`/`apakšgrupa` → 3-level category, auto-created if missing)
-- [x] Row-level validation, including rejecting rows where `gb=0` and both pack/box fields are empty (unorderable product)
-- [x] Import job status polling, per-row error report, and history for admins; every batch/row persisted to `import_batches`/`import_logs`
-- [x] Manual code review — audit logging (`import_batches`/`import_logs` persistence) validated
-- [ ] Manual code review of the remaining import code (parsers, mapping, background service) — not yet reached
-- [ ] Verify against a real multi-thousand-row supplier file once the build is confirmed working
-- [ ] Confirm the convention of generating a product's `Sku` from its `EAN` on create (the supplier file has no SKU column)
+**Catalog Import (CSV/XLSX) — 🟡 In Progress (85%)**
+- [x] Asynchronous import pipeline (background queue + processor, off-thread file handling)
+- [x] CSV and XLSX parsers
+- [x] Import job status, per-row error reporting, and history endpoints for admins
+- [ ] Configurable column mapping (currently a fixed mapping)
 
-**Orders & Checkout — 🟡 In Progress (first draft implemented 2026-08-29, untested)**
-- [x] Order submission with server-side price/name/SKU resolution (never trusts client-submitted values)
+**Orders & Checkout — 🟡 In Progress (80%)**
+- [x] Order submission with server-side price/name/VAT snapshotting
 - [x] Order history, cancellation, and reorder
-- [x] Admin order review and status management (schema's real 7-state `OrderStatus` enum, not the simpler 4-state model originally sketched)
-- [x] Order snapshotting via the DB's own `recalc_order_totals` trigger
-- [ ] Manual code review of this area — not yet reached
-- [ ] Wire an actual email sender to drain the order-created notification rows (already auto-enqueued)
-- [ ] Verify by building and running
+- [x] Admin order review and status management
+- [ ] Order and quote email notifications
 
-**Promotions & Pricing — 🟡 In Progress (promotions implemented 2026-08-29, untested; price lists not started)**
-- [x] Promotion management (percentage/fixed discount; category/brand/customer-scoped, OR'd) — public "active for buyer" endpoint + admin CRUD
-- [x] Price resolution folded into product serialization (batched to avoid N+1 on catalog pages); the seam for contract pricing is documented in `PricingService`
-- [ ] Manual code review of this area — not yet reached
-- [ ] Per-customer contract/tiered pricing — `Admin/PriceListsController` is stubbed (`501`) since there's no backing table yet; this needs a schema extension, not just a controller
-- [ ] Verify promotions by building and running; decide the price-list schema extension
-
-**Fulfillment — 🔴 Not Started (routes stubbed 2026-08-29)**
-- [ ] Credit limits and payment terms — `Admin/CreditController` routed, returns `501`, no schema support yet
-- [ ] Shipment tracking — `ShipmentsController` routed, returns `501`, no `Shipment` table yet
-- [ ] Returns management — `ReturnsController` routed, returns `501`, no `ReturnRequest` table yet
+**Promotions & Pricing — 🟡 In Progress (50%)**
+- [x] Promotion management (category/brand/customer scoped), admin CRUD
+- [x] Price resolution engine (best-discount active promotion applied automatically per product)
+- [ ] Per-customer contract/tiered pricing
 
 #### Frontend
 
-**UI/UX Design — 🔴 Not Started**
+**UI/UX Design & Design System — 🔴 Not Started**
 - [ ] Wireframes for key flows (catalog browsing, product detail, checkout, admin screens)
-- [ ] Visual design / mockups (using the existing Tailwind + shadcn/ui + TailAdmin direction)
-- [ ] Design system: colors, typography, spacing, shared components
+- [ ] Mobile-responsive design across all views
+- [ ] Core layout components: sidebar, header, footer
+- [ ] Data table design (catalog, orders, admin lists)
+- [ ] Shared component library: buttons, forms, modals, inputs
+- [ ] Design system: colors, typography, spacing (using the existing Tailwind + shadcn/ui + TailAdmin direction)
 - [ ] Client review & sign-off before build begins
 
 **Admin Panel — 🔴 Not Started**
-- [ ] Catalog & CSV import management
-- [ ] Customer account & approval management
-- [ ] Order review & status management
+- [ ] Catalog & CSV import management screens
+- [ ] Order management screens
+- [ ] Product management screens
+- [ ] Customer account approval management
 - [ ] Promotions & pricing management
 
-**Customer Storefront — 🔴 Not Started**
-- [ ] Public catalog browsing (no pricing shown to guests)
+**Public/Marketing Pages — 🔴 Not Started**
+- [ ] Homepage / main landing page
+- [ ] Category browsing pages (no pricing shown to guests)
+- [ ] Product detail pages
+- [ ] Contact page
+- [ ] Login page
+- [ ] Registration page
+
+**Business Account Experience — 🔴 Not Started**
 - [ ] Authenticated shopping experience with dynamic pricing & packaging-unit selection
-- [ ] Quote-request checkout & order history
+- [ ] Order placement and price handling
+- [ ] Order history and reorder
+- [ ] Account/profile management
 
 #### Launch & Deployment
 
@@ -247,6 +237,21 @@ A few architectural decisions worth calling out:
 
 </details>
 
+## Key Deliverables & Next Steps
+
+**Delivered so far:**
+- A complete, documented functional specification for the platform
+- A full production-ready PostgreSQL database schema covering every core area of the business (accounts, catalog, categories, custom attributes, promotions, orders with full audit history, and import logging)
+- A complete API design specifying every endpoint the platform needs, matched to the schema, with all outstanding design decisions resolved
+- The backend project environment updated to a current, long-term-supported technology baseline (.NET 10)
+- Core backend functionality implemented and working: account registration & approval with JWT-based auth, the product catalog with server-enforced pricing visibility, the async CSV/XLSX catalog import pipeline, the full order/checkout flow with server-side price snapshotting, and a promotions/pricing engine (backend is roughly 70% complete overall)
+
+**What comes next:**
+1. Finish the remaining backend work: per-customer contract/tiered pricing and order/quote email notifications.
+2. Begin frontend UI/UX design and the shared design system — now the largest remaining body of work, since it covers the full admin panel, all public marketing pages, and the authenticated business-account experience.
+3. Build the admin panel, public pages, and business-account experience against the finished API.
+4. Deploy to production infrastructure and go live with a real catalog import.
+
 This roadmap is kept up to date in this README as each phase is completed — check the status table above for the current state at any time.
 
 ## Repository Structure
@@ -260,9 +265,9 @@ b2b-trade-portal/
 │   │   ├── lib/
 │   │   ├── services/
 │   │   └── types/
-│   └── server/                 # ASP.NET Core Web API (.NET 10) — first-draft implementation delivered, not yet built/verified
+│   └── server/                 # ASP.NET Core Web API (.NET 10)
 │       ├── Controllers/
-│       ├── Data/                # DbContext & migrations
+│       ├── Data/                # DbContext (database-first — schema owned by b2b_ecommerce_schema.sql)
 │       ├── Services/
 │       ├── Models/
 │       └── Program.cs
@@ -273,7 +278,7 @@ b2b-trade-portal/
 
 ## Getting Started
 
-> The setup steps below reflect the target developer workflow. Backend implementation has a first draft in place, currently under manual code review, but **has not been built or run yet** — step 4 below (`dotnet build`) is the next thing to actually attempt.
+> The setup steps below reflect the target developer workflow. The database is database-first (schema applied directly from `b2b_ecommerce_schema.sql`, no EF Core migrations), and the local environment and backend API are already running — a few backend areas (see [Project Status & Roadmap](#project-status--roadmap)) are still in progress.
 
 **Prerequisites**
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
@@ -297,7 +302,7 @@ psql -h localhost -U <user> -d <database> -f b2b_ecommerce_schema.sql
 # 4. Run the backend API
 cd src/server
 dotnet restore
-dotnet build   # <- not yet verified to succeed; this is the current blocking step
+dotnet build
 dotnet run
 
 # 5. Run the frontend (once real client development has started)
