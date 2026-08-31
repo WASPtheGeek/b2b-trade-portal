@@ -73,3 +73,5 @@ src/server/appsettings*.json
 
 # Client
 src/client/
+
+docs/
