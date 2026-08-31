@@ -17,9 +17,8 @@ public interface IPricingService
 {
     /// <summary>
     /// Resolves the VAT-exclusive price for one piece of <paramref name="product"/>
-    /// for the given caller, applying the best currently-active promotion (if
-    /// any).
-    /// Returns product.BasePrice with no promotion applied when
+    /// for the given caller, applying the best currently-active promotion.
+    /// Returns product.BasePrice with no promotion applied when no promotions are active.
     /// </summary>
     /// <param name="product">The product to resolve the price for.</param>
     /// <param name="userId">The ID of the user for whom to resolve the price. Can be null for anonymous users.</param>

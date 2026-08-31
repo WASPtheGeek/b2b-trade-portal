@@ -149,7 +149,11 @@ public class ImportController : ControllerBase
             .OrderBy(l => l.Id)
             .Skip((paging.Page - 1) * paging.PageSize)
             .Take(paging.PageSize)
-            .Select(l => new ImportRowErrorDto(0, l.ExternalId, l.ErrorMessage ?? "Nezināma kļūda."))
+            .Select(l => new ImportRowErrorDto(
+                l.RowNumber,
+                l.ExternalId,
+                l.ErrorMessage ?? "Nezināma kļūda."
+            ))
             .ToListAsync(ct);
 
         return Ok(errors);

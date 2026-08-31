@@ -33,6 +33,11 @@ public class ImportLog
     public string? ExternalId { get; set; }
 
     /// <summary>
+    /// Gets or sets the row number of this record in the source file.
+    /// </summary>
+    public int RowNumber { get; set; }
+
+    /// <summary>
     /// Gets or sets the identifier of the corresponding record in this system, if created/updated.
     /// </summary>
     public long? InternalRecordId { get; set; }

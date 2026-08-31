@@ -9,6 +9,7 @@ using Elkaro.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Elkaro.Server.Controllers;
 
@@ -97,7 +98,6 @@ public class OrdersController : ControllerBase
 
         var order = new Order
         {
-            OrderNumber = await _orderNumbers.NextAsync(ct),
             UserId = userId,
             Status = OrderStatus.Pending,
             Notes = request.Notes,
@@ -150,13 +150,39 @@ public class OrdersController : ControllerBase
 
         _db.Orders.Add(order);
 
-        // Inserting order_items fires trg_recalc_order_totals, which
-        // rewrites orders.subtotal/vat/total — reload below rather than
-        // trusting the in-memory Order.SubtotalAmount (still 0 here).
-        await _db.SaveChangesAsync(ct);
+        // OrderNumberGenerator derives the next number from a COUNT(*), which isn't
+        // concurrency-safe: two requests can compute the same number and race to insert.
+        // Retry with a freshly generated number on a unique-constraint conflict rather than
+        // surfacing it as a 500.
+        const int maxAttempts = 5;
+
+        for (var attempt = 1; ; attempt++)
+        {
+            order.OrderNumber = await _orderNumbers.NextAsync(ct);
+
+            try
+            {
+                // Inserting order_items fires trg_recalc_order_totals, which
+                // rewrites orders.subtotal/vat/total — reload below rather than
+                // trusting the in-memory Order.SubtotalAmount (still 0 here).
+                await _db.SaveChangesAsync(ct);
+
+                break;
+            }
+            catch (DbUpdateException ex) when (attempt < maxAttempts && IsOrderNumberConflict(ex))
+            {
+                // Order stays tracked as Added after a failed save; loop around to
+                // regenerate OrderNumber and retry the insert.
+            }
+        }
+
         await _db.Entry(order).ReloadAsync(ct);
 
-        return CreatedAtAction(nameof(GetById), new { id = order.Id }, await ToDtoAsync(order.Id, ct));
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = order.Id },
+            await ToDtoAsync(order.Id, ct)
+        );
     }
 
     /// <summary>
@@ -296,6 +322,19 @@ public class OrdersController : ControllerBase
 
         return await Create(request, ct);
     }
+
+    /// <summary>
+    /// Determines whether a <see cref="DbUpdateException"/> was caused by a violation of the
+    /// unique constraint on orders.order_number.
+    /// </summary>
+    /// <param name="ex">The exception raised by a failed <c>SaveChangesAsync</c> call.</param>
+    /// <returns>True if the exception represents an order_number uniqueness conflict.</returns>
+    private static bool IsOrderNumberConflict(DbUpdateException ex) =>
+        ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: "orders_order_number_key",
+        };
 
     /// <summary>
     /// Retrieves a user-owned address by its ID, ensuring that the address belongs to the specified user.

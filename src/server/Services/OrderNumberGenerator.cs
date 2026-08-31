@@ -20,7 +20,6 @@ public class OrderNumberGenerator : IOrderNumberGenerator
         var prefix = $"ORD-{year}-";
 
         // Count the number of orders for the current year to determine the next order number.
-        // Orders placed this year + 1.
         var countThisYear = await _db.Orders
             .Where(o => o.OrderNumber.StartsWith(prefix))
             .CountAsync(ct);

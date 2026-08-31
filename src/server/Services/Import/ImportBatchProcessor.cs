@@ -90,6 +90,7 @@ public class ImportBatchProcessor
                     BatchId = batch.Id,
                     EntityType = "products",
                     ExternalId = row.Ean,
+                    RowNumber = row.RowNumber,
                     Status = result.Success ? ImportRecordStatus.Success : ImportRecordStatus.Failed,
                     ErrorMessage = result.ErrorMessage,
                 });

@@ -8,7 +8,7 @@ namespace Elkaro.Server.Dtos;
 /// </summary>
 /// <param name="Unit">The unit type (e.g., "box", "package").</param>
 /// <param name="PiecesPerUnit">The number of pieces contained in one unit.</param>
-/// <param name="Price">The price for one unit, excluding VAT; null for guests.</
+/// <param name="Price">The price for one unit, excluding VAT; null for guests.</param>
 public record ProductPackagingOptionDto(
     string Unit,
     int PiecesPerUnit,

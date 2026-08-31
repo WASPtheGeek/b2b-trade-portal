@@ -127,6 +127,25 @@ public class OrdersController : ControllerBase
             throw new BadRequestException($"Pasūtījumu ar statusu {order.Status} vairs nevar mainīt.", "Pasūtījums ir pabeigts");
         }
 
+        var isAllowedTransition = (order.Status, newStatus) switch
+        {
+            (OrderStatus.Pending, OrderStatus.Confirmed) => true,
+            (OrderStatus.Pending, OrderStatus.Cancelled) => true,
+            (OrderStatus.Confirmed, OrderStatus.Processing) => true,
+            (OrderStatus.Confirmed, OrderStatus.Cancelled) => true,
+            (OrderStatus.Processing, OrderStatus.Shipped) => true,
+            (OrderStatus.Processing, OrderStatus.Cancelled) => true,
+            (OrderStatus.Shipped, OrderStatus.Delivered) => true,
+            (OrderStatus.Shipped, OrderStatus.Refunded) => true,
+            (OrderStatus.Delivered, OrderStatus.Refunded) => true,
+            _ => false,
+        };
+
+        if (!isAllowedTransition)
+        {
+            throw new BadRequestException($"Nederīga statusa maiņa no {order.Status} uz {newStatus}.", "Nederīga statusa maiņa");
+        }
+
         order.Status = newStatus;
         await _db.SaveChangesAsync(ct);
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Elkaro.Server.Controllers;
 
 /// <summary>
-/// Controller for categories.s
+/// Controller for categories.
 /// </summary>
 [ApiController]
 [Route("api/categories")]
