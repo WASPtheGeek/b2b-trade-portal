@@ -156,6 +156,8 @@ public class OrdersController : ControllerBase
         // surfacing it as a 500.
         const int maxAttempts = 5;
 
+
+
         for (var attempt = 1; ; attempt++)
         {
             order.OrderNumber = await _orderNumbers.NextAsync(ct);
