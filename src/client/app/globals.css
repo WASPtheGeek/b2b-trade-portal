@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* Root cause of every "Tailwind silently drops this utility" issue previously worked around
+   in this codebase with inline styles and hand-written CSS classes (all since removed): the
+   repo's .gitignore excludes app/(shop), app/admin and app/dev, and Tailwind v4's automatic
+   content detection respects .gitignore - so it never scanned those three route trees for
+   class usage, silently omitting every utility used ONLY inside them (confirmed by diffing a
+   build with vs. without those .gitignore entries - the entire class of "missing" utilities
+   across the whole app, dozens of them, resolved instantly). These @source lines force those
+   directories back into the scan regardless of .gitignore, without changing what git tracks. */
+/* TODO: remove this after updating .gitignore */
+@source "./(shop)";
+@source "./admin";
+@source "./dev";
+
 /* Design tokens (src/design/tokens/*.css, copied verbatim into ./styles/tokens).
    Kept as the single source of truth for raw values; the @theme block below maps the
    commonly-used ones onto Tailwind utility namespaces by referencing these variables.
@@ -15,268 +28,268 @@
 @import "./styles/tokens/base.css" layer(base);
 
 @theme {
-  /* ---- Fonts: self-hosted Poppins (next/font, latin + latin-ext) overrides the plain
+   /* ---- Fonts: self-hosted Poppins (next/font, latin + latin-ext) overrides the plain
      "Poppins" family name from typography.css so Latvian diacritics render from a real
      @font-face rather than hoping the OS has the font installed. ---- */
-  --font-sans: var(--font-poppins), "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-poppins), "Segoe UI", system-ui, -apple-system, sans-serif;
+   --font-sans: var(--font-poppins), "Segoe UI", system-ui, -apple-system, sans-serif;
+   --font-mono: var(--font-poppins), "Segoe UI", system-ui, -apple-system, sans-serif;
 
-  /* ---- Brand orange ramp ---- */
-  --color-orange-50: var(--orange-50);
-  --color-orange-100: var(--orange-100);
-  --color-orange-200: var(--orange-200);
-  --color-orange-300: var(--orange-300);
-  --color-orange-400: var(--orange-400);
-  --color-orange-500: var(--orange-500);
-  --color-orange-600: var(--orange-600);
-  --color-orange-700: var(--orange-700);
-  --color-orange-800: var(--orange-800);
-  --color-orange-900: var(--orange-900);
-  --color-brand: var(--brand);
-  --color-brand-ink: var(--brand-ink);
+   /* ---- Brand orange ramp ---- */
+   --color-orange-50: var(--orange-50);
+   --color-orange-100: var(--orange-100);
+   --color-orange-200: var(--orange-200);
+   --color-orange-300: var(--orange-300);
+   --color-orange-400: var(--orange-400);
+   --color-orange-500: var(--orange-500);
+   --color-orange-600: var(--orange-600);
+   --color-orange-700: var(--orange-700);
+   --color-orange-800: var(--orange-800);
+   --color-orange-900: var(--orange-900);
+   --color-brand: var(--brand);
+   --color-brand-ink: var(--brand-ink);
 
-  /* ---- Warm neutrals ---- */
-  --color-neutral-0: var(--neutral-0);
-  --color-neutral-25: var(--neutral-25);
-  --color-neutral-50: var(--neutral-50);
-  --color-neutral-100: var(--neutral-100);
-  --color-neutral-200: var(--neutral-200);
-  --color-neutral-300: var(--neutral-300);
-  --color-neutral-400: var(--neutral-400);
-  --color-neutral-500: var(--neutral-500);
-  --color-neutral-600: var(--neutral-600);
-  --color-neutral-700: var(--neutral-700);
-  --color-neutral-800: var(--neutral-800);
-  --color-neutral-900: var(--neutral-900);
-  --color-neutral-950: var(--neutral-950);
+   /* ---- Warm neutrals ---- */
+   --color-neutral-0: var(--neutral-0);
+   --color-neutral-25: var(--neutral-25);
+   --color-neutral-50: var(--neutral-50);
+   --color-neutral-100: var(--neutral-100);
+   --color-neutral-200: var(--neutral-200);
+   --color-neutral-300: var(--neutral-300);
+   --color-neutral-400: var(--neutral-400);
+   --color-neutral-500: var(--neutral-500);
+   --color-neutral-600: var(--neutral-600);
+   --color-neutral-700: var(--neutral-700);
+   --color-neutral-800: var(--neutral-800);
+   --color-neutral-900: var(--neutral-900);
+   --color-neutral-950: var(--neutral-950);
 
-  /* ---- Raw semantic hues (status colors) ---- */
-  --color-red-50: var(--red-50);
-  --color-red-100: var(--red-100);
-  --color-red-500: var(--red-500);
-  --color-red-600: var(--red-600);
-  --color-red-700: var(--red-700);
-  --color-green-50: var(--green-50);
-  --color-green-100: var(--green-100);
-  --color-green-500: var(--green-500);
-  --color-green-600: var(--green-600);
-  --color-green-700: var(--green-700);
-  --color-amber-50: var(--amber-50);
-  --color-amber-100: var(--amber-100);
-  --color-amber-500: var(--amber-500);
-  --color-amber-600: var(--amber-600);
-  --color-yellow-50: var(--yellow-50);
-  --color-yellow-100: var(--yellow-100);
-  --color-yellow-600: var(--yellow-600);
-  --color-blue-50: var(--blue-50);
-  --color-blue-100: var(--blue-100);
-  --color-blue-500: var(--blue-500);
-  --color-blue-600: var(--blue-600);
-  --color-purple-50: var(--purple-50);
-  --color-purple-100: var(--purple-100);
-  --color-purple-600: var(--purple-600);
-  --color-cyan-50: var(--cyan-50);
-  --color-cyan-100: var(--cyan-100);
-  --color-cyan-600: var(--cyan-600);
+   /* ---- Raw semantic hues (status colors) ---- */
+   --color-red-50: var(--red-50);
+   --color-red-100: var(--red-100);
+   --color-red-500: var(--red-500);
+   --color-red-600: var(--red-600);
+   --color-red-700: var(--red-700);
+   --color-green-50: var(--green-50);
+   --color-green-100: var(--green-100);
+   --color-green-500: var(--green-500);
+   --color-green-600: var(--green-600);
+   --color-green-700: var(--green-700);
+   --color-amber-50: var(--amber-50);
+   --color-amber-100: var(--amber-100);
+   --color-amber-500: var(--amber-500);
+   --color-amber-600: var(--amber-600);
+   --color-yellow-50: var(--yellow-50);
+   --color-yellow-100: var(--yellow-100);
+   --color-yellow-600: var(--yellow-600);
+   --color-blue-50: var(--blue-50);
+   --color-blue-100: var(--blue-100);
+   --color-blue-500: var(--blue-500);
+   --color-blue-600: var(--blue-600);
+   --color-purple-50: var(--purple-50);
+   --color-purple-100: var(--purple-100);
+   --color-purple-600: var(--purple-600);
+   --color-cyan-50: var(--cyan-50);
+   --color-cyan-100: var(--cyan-100);
+   --color-cyan-600: var(--cyan-600);
 
-  /* ---- Storefront warm chrome ---- */
-  --color-warm-25: var(--warm-25);
-  --color-warm-50: var(--warm-50);
-  --color-warm-100: var(--warm-100);
-  --color-warm-200: var(--warm-200);
-  --color-surface-warm: var(--surface-warm);
-  --color-surface-warm-alt: var(--surface-warm-alt);
-  --color-nav-bar: var(--nav-bar);
-  --color-nav-bar-blur: var(--nav-bar-blur);
-  --color-utility-bar: var(--utility-bar);
-  --color-border-warm: var(--border-warm);
+   /* ---- Storefront warm chrome ---- */
+   --color-warm-25: var(--warm-25);
+   --color-warm-50: var(--warm-50);
+   --color-warm-100: var(--warm-100);
+   --color-warm-200: var(--warm-200);
+   --color-surface-warm: var(--surface-warm);
+   --color-surface-warm-alt: var(--surface-warm-alt);
+   --color-nav-bar: var(--nav-bar);
+   --color-nav-bar-blur: var(--nav-bar-blur);
+   --color-utility-bar: var(--utility-bar);
+   --color-border-warm: var(--border-warm);
 
-  /* ---- Semantic text ---- */
-  --color-text-strong: var(--text-strong);
-  --color-text-body: var(--text-body);
-  --color-text-muted: var(--text-muted);
-  --color-text-subtle: var(--text-subtle);
-  --color-text-disabled: var(--text-disabled);
-  --color-text-inverse: var(--text-inverse);
-  --color-text-inverse-muted: var(--text-inverse-muted);
-  --color-text-brand: var(--text-brand);
-  --color-text-danger: var(--text-danger);
-  --color-text-success: var(--text-success);
-  --color-text-link: var(--text-link);
-  --color-text-link-hover: var(--text-link-hover);
+   /* ---- Semantic text ---- */
+   --color-text-strong: var(--text-strong);
+   --color-text-body: var(--text-body);
+   --color-text-muted: var(--text-muted);
+   --color-text-subtle: var(--text-subtle);
+   --color-text-disabled: var(--text-disabled);
+   --color-text-inverse: var(--text-inverse);
+   --color-text-inverse-muted: var(--text-inverse-muted);
+   --color-text-brand: var(--text-brand);
+   --color-text-danger: var(--text-danger);
+   --color-text-success: var(--text-success);
+   --color-text-link: var(--text-link);
+   --color-text-link-hover: var(--text-link-hover);
 
-  /* ---- Semantic surfaces ---- */
-  --color-surface-page: var(--surface-page);
-  --color-surface-card: var(--surface-card);
-  --color-surface-raised: var(--surface-raised);
-  --color-surface-sunken: var(--surface-sunken);
-  --color-surface-subtle: var(--surface-subtle);
-  --color-surface-hover: var(--surface-hover);
-  --color-surface-active: var(--surface-active);
-  --color-surface-inverse: var(--surface-inverse);
-  --color-surface-inverse-hover: var(--surface-inverse-hover);
-  --color-surface-brand-tint: var(--surface-brand-tint);
-  --color-surface-media: var(--surface-media);
+   /* ---- Semantic surfaces ---- */
+   --color-surface-page: var(--surface-page);
+   --color-surface-card: var(--surface-card);
+   --color-surface-raised: var(--surface-raised);
+   --color-surface-sunken: var(--surface-sunken);
+   --color-surface-subtle: var(--surface-subtle);
+   --color-surface-hover: var(--surface-hover);
+   --color-surface-active: var(--surface-active);
+   --color-surface-inverse: var(--surface-inverse);
+   --color-surface-inverse-hover: var(--surface-inverse-hover);
+   --color-surface-brand-tint: var(--surface-brand-tint);
+   --color-surface-media: var(--surface-media);
 
-  /* ---- Semantic borders ---- */
-  --color-border-subtle: var(--border-subtle);
-  --color-border-default: var(--border-default);
-  --color-border-strong: var(--border-strong);
-  --color-border-inverse: var(--border-inverse);
-  --color-border-brand: var(--border-brand);
-  --color-border-danger: var(--border-danger);
+   /* ---- Semantic borders ---- */
+   --color-border-subtle: var(--border-subtle);
+   --color-border-default: var(--border-default);
+   --color-border-strong: var(--border-strong);
+   --color-border-inverse: var(--border-inverse);
+   --color-border-brand: var(--border-brand);
+   --color-border-danger: var(--border-danger);
 
-  /* ---- Interactive ---- */
-  --color-action-primary: var(--action-primary);
-  --color-action-primary-hover: var(--action-primary-hover);
-  --color-action-primary-active: var(--action-primary-active);
-  --color-action-primary-fg: var(--action-primary-fg);
-  --color-action-danger: var(--action-danger);
-  --color-action-danger-hover: var(--action-danger-hover);
-  --color-action-success: var(--action-success);
-  --color-action-success-hover: var(--action-success-hover);
-  --color-action-disabled-bg: var(--action-disabled-bg);
-  --color-action-disabled-fg: var(--action-disabled-fg);
-  --color-focus-ring: var(--focus-ring);
+   /* ---- Interactive ---- */
+   --color-action-primary: var(--action-primary);
+   --color-action-primary-hover: var(--action-primary-hover);
+   --color-action-primary-active: var(--action-primary-active);
+   --color-action-primary-fg: var(--action-primary-fg);
+   --color-action-danger: var(--action-danger);
+   --color-action-danger-hover: var(--action-danger-hover);
+   --color-action-success: var(--action-success);
+   --color-action-success-hover: var(--action-success-hover);
+   --color-action-disabled-bg: var(--action-disabled-bg);
+   --color-action-disabled-fg: var(--action-disabled-fg);
+   --color-focus-ring: var(--focus-ring);
 
-  /* ---- Status triples (account + order) ---- */
-  --color-status-pending-bg: var(--status-pending-bg);
-  --color-status-pending-fg: var(--status-pending-fg);
-  --color-status-pending-bd: var(--status-pending-bd);
-  --color-status-approved-bg: var(--status-approved-bg);
-  --color-status-approved-fg: var(--status-approved-fg);
-  --color-status-approved-bd: var(--status-approved-bd);
-  --color-status-rejected-bg: var(--status-rejected-bg);
-  --color-status-rejected-fg: var(--status-rejected-fg);
-  --color-status-rejected-bd: var(--status-rejected-bd);
-  --color-status-suspended-bg: var(--status-suspended-bg);
-  --color-status-suspended-fg: var(--status-suspended-fg);
-  --color-status-suspended-bd: var(--status-suspended-bd);
-  --color-status-confirmed-bg: var(--status-confirmed-bg);
-  --color-status-confirmed-fg: var(--status-confirmed-fg);
-  --color-status-confirmed-bd: var(--status-confirmed-bd);
-  --color-status-processing-bg: var(--status-processing-bg);
-  --color-status-processing-fg: var(--status-processing-fg);
-  --color-status-processing-bd: var(--status-processing-bd);
-  --color-status-shipped-bg: var(--status-shipped-bg);
-  --color-status-shipped-fg: var(--status-shipped-fg);
-  --color-status-shipped-bd: var(--status-shipped-bd);
-  --color-status-delivered-bg: var(--status-delivered-bg);
-  --color-status-delivered-fg: var(--status-delivered-fg);
-  --color-status-delivered-bd: var(--status-delivered-bd);
-  --color-status-cancelled-bg: var(--status-cancelled-bg);
-  --color-status-cancelled-fg: var(--status-cancelled-fg);
-  --color-status-cancelled-bd: var(--status-cancelled-bd);
-  --color-status-partial-bg: var(--status-partial-bg);
-  --color-status-partial-fg: var(--status-partial-fg);
-  --color-status-partial-bd: var(--status-partial-bd);
+   /* ---- Status triples (account + order) ---- */
+   --color-status-pending-bg: var(--status-pending-bg);
+   --color-status-pending-fg: var(--status-pending-fg);
+   --color-status-pending-bd: var(--status-pending-bd);
+   --color-status-approved-bg: var(--status-approved-bg);
+   --color-status-approved-fg: var(--status-approved-fg);
+   --color-status-approved-bd: var(--status-approved-bd);
+   --color-status-rejected-bg: var(--status-rejected-bg);
+   --color-status-rejected-fg: var(--status-rejected-fg);
+   --color-status-rejected-bd: var(--status-rejected-bd);
+   --color-status-suspended-bg: var(--status-suspended-bg);
+   --color-status-suspended-fg: var(--status-suspended-fg);
+   --color-status-suspended-bd: var(--status-suspended-bd);
+   --color-status-confirmed-bg: var(--status-confirmed-bg);
+   --color-status-confirmed-fg: var(--status-confirmed-fg);
+   --color-status-confirmed-bd: var(--status-confirmed-bd);
+   --color-status-processing-bg: var(--status-processing-bg);
+   --color-status-processing-fg: var(--status-processing-fg);
+   --color-status-processing-bd: var(--status-processing-bd);
+   --color-status-shipped-bg: var(--status-shipped-bg);
+   --color-status-shipped-fg: var(--status-shipped-fg);
+   --color-status-shipped-bd: var(--status-shipped-bd);
+   --color-status-delivered-bg: var(--status-delivered-bg);
+   --color-status-delivered-fg: var(--status-delivered-fg);
+   --color-status-delivered-bd: var(--status-delivered-bd);
+   --color-status-cancelled-bg: var(--status-cancelled-bg);
+   --color-status-cancelled-fg: var(--status-cancelled-fg);
+   --color-status-cancelled-bd: var(--status-cancelled-bd);
+   --color-status-partial-bg: var(--status-partial-bg);
+   --color-status-partial-fg: var(--status-partial-fg);
+   --color-status-partial-bd: var(--status-partial-bd);
 
-  /* ---- Radius: this IS the house scale, deliberately replacing Tailwind's default one.
+   /* ---- Radius: this IS the house scale, deliberately replacing Tailwind's default one.
      Inlined (not var()-referenced) because radius.css uses the identical key names. ---- */
-  --radius-xs: 3px;
-  --radius-sm: 5px;
-  --radius-md: 6px;
-  --radius-base: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-pill: 999px;
-  --radius-card: 8px;
-  --radius-control: 8px;
-  --radius-badge: 999px;
-  --radius-media: 6px;
+   --radius-xs: 3px;
+   --radius-sm: 5px;
+   --radius-md: 6px;
+   --radius-base: 8px;
+   --radius-lg: 12px;
+   --radius-xl: 16px;
+   --radius-2xl: 20px;
+   --radius-pill: 999px;
+   --radius-card: 8px;
+   --radius-control: 8px;
+   --radius-badge: 999px;
+   --radius-media: 6px;
 
-  /* ---- Shadows: flat by default, used sparingly (see design readme "Elevation"). Inlined
+   /* ---- Shadows: flat by default, used sparingly (see design readme "Elevation"). Inlined
      for the same identical-key-name reason as radius above. ---- */
-  --shadow-xs: 0 1px 1px rgba(16, 16, 16, 0.04);
-  --shadow-sm: 0 1px 2px rgba(16, 16, 16, 0.06), 0 1px 1px rgba(16, 16, 16, 0.03);
-  --shadow-md: 0 2px 4px rgba(16, 16, 16, 0.06), 0 4px 12px rgba(16, 16, 16, 0.05);
-  --shadow-lg: 0 8px 24px rgba(16, 16, 16, 0.09), 0 2px 6px rgba(16, 16, 16, 0.05);
-  --shadow-overlay: 0 24px 64px rgba(16, 16, 16, 0.22), 0 4px 12px rgba(16, 16, 16, 0.1);
+   --shadow-xs: 0 1px 1px rgba(16, 16, 16, 0.04);
+   --shadow-sm: 0 1px 2px rgba(16, 16, 16, 0.06), 0 1px 1px rgba(16, 16, 16, 0.03);
+   --shadow-md: 0 2px 4px rgba(16, 16, 16, 0.06), 0 4px 12px rgba(16, 16, 16, 0.05);
+   --shadow-lg: 0 8px 24px rgba(16, 16, 16, 0.09), 0 2px 6px rgba(16, 16, 16, 0.05);
+   --shadow-overlay: 0 24px 64px rgba(16, 16, 16, 0.22), 0 4px 12px rgba(16, 16, 16, 0.1);
 
-  /* ---- Easing: same identical-key-name reason as radius/shadow above. ---- */
-  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+   /* ---- Easing: same identical-key-name reason as radius/shadow above. ---- */
+   --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ---- Durations (Tailwind's duration-* namespace; no name collision with tokens/motion.css's
+   /* ---- Durations (Tailwind's duration-* namespace; no name collision with tokens/motion.css's
      --dur-* names, so these can safely reference them). ---- */
-  --duration-instant: var(--dur-instant);
-  --duration-fast: var(--dur-fast);
-  --duration-base: var(--dur-base);
-  --duration-slow: var(--dur-slow);
-  --duration-slower: var(--dur-slower);
+   --duration-instant: var(--dur-instant);
+   --duration-fast: var(--dur-fast);
+   --duration-base: var(--dur-base);
+   --duration-slow: var(--dur-slow);
+   --duration-slower: var(--dur-slower);
 
-  /* ---- Motion keyframes used as Tailwind animate-* utilities (see tokens/base.css for
+   /* ---- Motion keyframes used as Tailwind animate-* utilities (see tokens/base.css for
      the @keyframes themselves). ---- */
-  --animate-fade-up: elkaro-fade-up var(--dur-slow) var(--ease-out) both;
-  --animate-pop: elkaro-pop var(--dur-base) var(--ease-out) both;
-  --animate-slide-down: elkaro-slide-down var(--dur-slow) var(--ease-out) both;
+   --animate-fade-up: elkaro-fade-up var(--dur-slow) var(--ease-out) both;
+   --animate-pop: elkaro-pop var(--dur-base) var(--ease-out) both;
+   --animate-slide-down: elkaro-slide-down var(--dur-slow) var(--ease-out) both;
 
-  /* ---- Type scale: paired size/line-height/letter-spacing per Tailwind v4's font-size
+   /* ---- Type scale: paired size/line-height/letter-spacing per Tailwind v4's font-size
      namespace. Named after the design system's own scale (h1-h4, body, price, ...). ---- */
-  --text-display-l: var(--text-display-l-size);
-  --text-display-l--line-height: var(--text-display-l-lh);
-  --text-display-l--letter-spacing: var(--text-display-l-ls);
-  --text-display-m: var(--text-display-m-size);
-  --text-display-m--line-height: var(--text-display-m-lh);
-  --text-display-m--letter-spacing: var(--text-display-m-ls);
-  --text-h1: var(--text-h1-size);
-  --text-h1--line-height: var(--text-h1-lh);
-  --text-h1--letter-spacing: var(--text-h1-ls);
-  --text-h2: var(--text-h2-size);
-  --text-h2--line-height: var(--text-h2-lh);
-  --text-h2--letter-spacing: var(--text-h2-ls);
-  --text-h3: var(--text-h3-size);
-  --text-h3--line-height: var(--text-h3-lh);
-  --text-h3--letter-spacing: var(--text-h3-ls);
-  --text-h4: var(--text-h4-size);
-  --text-h4--line-height: var(--text-h4-lh);
-  --text-h4--letter-spacing: var(--text-h4-ls);
-  --text-body-l: var(--text-body-l-size);
-  --text-body-l--line-height: var(--text-body-l-lh);
-  --text-ui: var(--text-body-size);
-  --text-ui--line-height: var(--text-body-lh);
-  --text-body-s: var(--text-body-s-size);
-  --text-body-s--line-height: var(--text-body-s-lh);
-  --text-caption: var(--text-caption-size);
-  --text-caption--line-height: var(--text-caption-lh);
-  --text-micro: var(--text-micro-size);
-  --text-micro--line-height: var(--text-micro-lh);
-  --text-micro--letter-spacing: var(--text-micro-ls);
-  --text-price: var(--text-price-size);
-  --text-price--line-height: var(--text-price-lh);
-  --text-price--letter-spacing: var(--text-price-ls);
-  --text-price-s: var(--text-price-s-size);
-  --text-price-s--line-height: var(--text-price-s-lh);
-  --text-code: var(--text-code-size);
-  --text-code--line-height: var(--text-code-lh);
-  --text-code--letter-spacing: var(--text-code-ls);
+   --text-display-l: var(--text-display-l-size);
+   --text-display-l--line-height: var(--text-display-l-lh);
+   --text-display-l--letter-spacing: var(--text-display-l-ls);
+   --text-display-m: var(--text-display-m-size);
+   --text-display-m--line-height: var(--text-display-m-lh);
+   --text-display-m--letter-spacing: var(--text-display-m-ls);
+   --text-h1: var(--text-h1-size);
+   --text-h1--line-height: var(--text-h1-lh);
+   --text-h1--letter-spacing: var(--text-h1-ls);
+   --text-h2: var(--text-h2-size);
+   --text-h2--line-height: var(--text-h2-lh);
+   --text-h2--letter-spacing: var(--text-h2-ls);
+   --text-h3: var(--text-h3-size);
+   --text-h3--line-height: var(--text-h3-lh);
+   --text-h3--letter-spacing: var(--text-h3-ls);
+   --text-h4: var(--text-h4-size);
+   --text-h4--line-height: var(--text-h4-lh);
+   --text-h4--letter-spacing: var(--text-h4-ls);
+   --text-body-l: var(--text-body-l-size);
+   --text-body-l--line-height: var(--text-body-l-lh);
+   --text-ui: var(--text-body-size);
+   --text-ui--line-height: var(--text-body-lh);
+   --text-body-s: var(--text-body-s-size);
+   --text-body-s--line-height: var(--text-body-s-lh);
+   --text-caption: var(--text-caption-size);
+   --text-caption--line-height: var(--text-caption-lh);
+   --text-micro: var(--text-micro-size);
+   --text-micro--line-height: var(--text-micro-lh);
+   --text-micro--letter-spacing: var(--text-micro-ls);
+   --text-price: var(--text-price-size);
+   --text-price--line-height: var(--text-price-lh);
+   --text-price--letter-spacing: var(--text-price-ls);
+   --text-price-s: var(--text-price-s-size);
+   --text-price-s--line-height: var(--text-price-s-lh);
+   --text-code: var(--text-code-size);
+   --text-code--line-height: var(--text-code-lh);
+   --text-code--letter-spacing: var(--text-code-ls);
 
-  /* ---- Named layout/control sizes, additive to Tailwind's default numeric spacing scale
+   /* ---- Named layout/control sizes, additive to Tailwind's default numeric spacing scale
      (which the design's 2px-step ladder already aligns to 1:1, e.g. p-3.5 = 14px). ---- */
-  --spacing-control-xs: var(--control-h-xs);
-  --spacing-control-sm: var(--control-h-sm);
-  --spacing-control-md: var(--control-h-md);
-  --spacing-control-lg: var(--control-h-lg);
-  --spacing-row-compact: var(--row-h-compact);
-  --spacing-row-default: var(--row-h-default);
-  --spacing-row-relaxed: var(--row-h-relaxed);
-  --spacing-layout-max: var(--layout-max);
-  --spacing-gutter: var(--layout-gutter);
-  --spacing-gutter-sm: var(--layout-gutter-sm);
-  --spacing-sidebar: var(--sidebar-w);
-  --spacing-header: var(--header-h);
-  --spacing-admin-sidebar: var(--admin-sidebar-w);
-  --spacing-grid-gap: var(--grid-gap);
-  --spacing-card-min-w: var(--card-min-w);
-  --spacing-utility: var(--utility-h);
-  --spacing-store-header: var(--store-header-h);
-  --spacing-dept-nav: var(--dept-nav-h);
-  --spacing-section-gap: var(--section-gap);
-  --spacing-section-gap-lg: var(--section-gap-lg);
+   --spacing-control-xs: var(--control-h-xs);
+   --spacing-control-sm: var(--control-h-sm);
+   --spacing-control-md: var(--control-h-md);
+   --spacing-control-lg: var(--control-h-lg);
+   --spacing-row-compact: var(--row-h-compact);
+   --spacing-row-default: var(--row-h-default);
+   --spacing-row-relaxed: var(--row-h-relaxed);
+   --spacing-layout-max: var(--layout-max);
+   --spacing-gutter: var(--layout-gutter);
+   --spacing-gutter-sm: var(--layout-gutter-sm);
+   --spacing-sidebar: var(--sidebar-w);
+   --spacing-header: var(--header-h);
+   --spacing-admin-sidebar: var(--admin-sidebar-w);
+   --spacing-grid-gap: var(--grid-gap);
+   --spacing-card-min-w: var(--card-min-w);
+   --spacing-utility: var(--utility-h);
+   --spacing-store-header: var(--store-header-h);
+   --spacing-dept-nav: var(--dept-nav-h);
+   --spacing-section-gap: var(--section-gap);
+   --spacing-section-gap-lg: var(--section-gap-lg);
 }
 
 body {
-  background: var(--color-surface-page);
+   background: var(--color-surface-page);
 }
