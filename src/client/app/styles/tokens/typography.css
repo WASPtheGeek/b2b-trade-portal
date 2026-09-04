@@ -1,0 +1,30 @@
+:root{
+--font-sans:"Poppins","Segoe UI",system-ui,-apple-system,sans-serif;
+--font-mono:"Poppins","Segoe UI",system-ui,-apple-system,sans-serif;
+
+--weight-regular:400;--weight-text:400;--weight-medium:500;--weight-semibold:600;--weight-bold:700;
+
+/* Display — marketing / auth hero */
+--text-display-l-size:40px;--text-display-l-lh:1.08;--text-display-l-ls:-0.022em;
+--text-display-m-size:32px;--text-display-m-lh:1.14;--text-display-m-ls:-0.02em;
+
+/* Headings — page & section titles */
+--text-h1-size:26px;--text-h1-lh:1.2;--text-h1-ls:-0.016em;
+--text-h2-size:21px;--text-h2-lh:1.26;--text-h2-ls:-0.012em;
+--text-h3-size:17px;--text-h3-lh:1.32;--text-h3-ls:-0.008em;
+--text-h4-size:15px;--text-h4-lh:1.36;--text-h4-ls:-0.004em;
+
+/* Body & UI */
+--text-body-l-size:15px;--text-body-l-lh:1.55;
+--text-body-size:14px;--text-body-lh:1.5;
+--text-body-s-size:13px;--text-body-s-lh:1.46;
+--text-caption-size:12px;--text-caption-lh:1.36;
+--text-micro-size:11px;--text-micro-lh:1.28;--text-micro-ls:0.06em;
+
+/* Numeric / price */
+--text-price-size:19px;--text-price-lh:1.15;--text-price-ls:-0.014em;
+--text-price-s-size:15px;--text-price-s-lh:1.2;
+
+/* Code-ish: artikuls, EAN, reg. nr. */
+--text-code-size:12.5px;--text-code-lh:1.35;--text-code-ls:0.01em;
+}
