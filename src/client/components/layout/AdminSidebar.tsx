@@ -31,7 +31,7 @@ export function AdminSidebar({ items, logoSrc, footer, className, ...rest }: Adm
         <Logo height={ 24 } src={ logoSrc } />
         <span className="text-[10.5px] tracking-[.09em] uppercase text-white/45 font-semibold mt-0.5">Admin</span>
       </div>
-      <div className="flex-1 overflow-y-auto py-2.5 px-2 flex flex-col gap-3">
+      <div className="flex-1 elk-scroll-y py-2.5 px-2 flex flex-col gap-3 mask-b-from-[calc(100%-28px)] mask-b-to-100%">
         { items.map((group, gi) => (
           <div key={ group.title ?? gi } className="flex flex-col gap-px">
             { group.title ? (
