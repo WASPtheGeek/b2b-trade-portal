@@ -1,0 +1,20 @@
+:root{
+--layout-max:1760px;
+--layout-gutter:20px;
+--layout-gutter-sm:16px;
+--sidebar-w:264px;
+--header-h:60px;
+--subheader-h:48px;
+--admin-sidebar-w:236px;
+--grid-gap:12px;
+/* Narrowest track a ProductCard renders correctly at — measured: the CTA label clips at
+   186.5px and is clean at 201.5px. Feeds the .elk-product-grid container-query thresholds
+   (n columns need n×204 + (n−1)×12) and the no-container-query fallback. */
+--card-min-w:204px;
+--utility-h:34px;
+--store-header-h:64px;
+--dept-nav-h:44px;
+--section-gap:56px;
+--section-gap-lg:76px;
+--breakpoint-sm:640px;--breakpoint-md:900px;--breakpoint-lg:1200px;--breakpoint-xl:1600px;
+}

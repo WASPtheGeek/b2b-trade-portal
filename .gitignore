@@ -72,6 +72,16 @@ src/server/appsettings*.json
 .vscode/
 
 # Client
-src/client/
+# src/client/
 
-docs/
+project-plan.md
+master-context.md
+
+src/design/
+src/elkaroweb/
+
+*_context.md
+*_CONTEXT.md
+
+src/app_sample/
+src/client/app/dev/
