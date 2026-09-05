@@ -13,6 +13,11 @@ export interface ProductUnit {
   available?: boolean;
 }
 
+export interface ProductSpec {
+  label: string;
+  value: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -24,6 +29,9 @@ export interface Product {
   discount?: number;
   units: ProductUnit[];
   image?: string;
+  description?: string;
+  features?: string[];
+  specs?: ProductSpec[];
 }
 
 export interface DepartmentNavItem {
@@ -53,11 +61,16 @@ export interface CategoryTreeChild {
   id: string;
   label: string;
   count: number;
+  // Optional so the same shape works for the (typically 2-level) mobile drawer tree and the
+  // category sidebar's recursive department/group/subgroup tree.
+  children?: CategoryTreeChild[];
 }
 
-export interface CategoryTreeItem {
-  id: string;
-  label: string;
-  count: number;
+export interface CategoryTreeItem extends CategoryTreeChild {
   children: CategoryTreeChild[];
+}
+
+export interface Brand {
+  name: string;
+  count: number;
 }

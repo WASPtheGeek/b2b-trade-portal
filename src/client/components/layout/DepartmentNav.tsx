@@ -40,6 +40,7 @@ export function DepartmentNav({
     const onScroll = () => setScrolled(window.scrollY > 6);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -48,7 +49,11 @@ export function DepartmentNav({
   // start/stop the overflow without the list itself changing.
   useEffect(() => {
     const rail = railRef.current;
-    if (!rail) return;
+
+    if (!rail) {
+      return;
+    }
+
     const updateFade = () => {
       setFade({
         left: rail.scrollLeft > 1,
@@ -59,6 +64,7 @@ export function DepartmentNav({
     rail.addEventListener("scroll", updateFade, { passive: true });
     const ro = new ResizeObserver(updateFade);
     ro.observe(rail);
+
     return () => {
       rail.removeEventListener("scroll", updateFade);
       ro.disconnect();
@@ -84,7 +90,7 @@ export function DepartmentNav({
           type="button"
           onClick={ onDeptClick }
           onMouseEnter={ onDeptHover }
-          className="hidden md:flex flex-none items-center gap-[9px] px-[18px] border-none bg-brand text-white font-sans text-[16px] font-semibold cursor-pointer whitespace-nowrap"
+          className="hidden md:flex flex-none items-center gap-[9px] px-[18px] border-none bg-brand text-white font-sans font-semibold cursor-pointer whitespace-nowrap"
         >
           <Icon name={ deptOpen ? "x" : "menu" } size={ 15 } />
           { deptLabel }
@@ -93,13 +99,14 @@ export function DepartmentNav({
           <nav ref={ railRef } className="elk-scroll-x flex items-stretch gap-0.5">
             { items.map((it) => {
               const on = it.id === active;
+
               return (
                 <button
                   key={ it.id }
                   type="button"
                   onClick={ () => onSelect?.(it.id) }
                   className={ cn(
-                    "group relative flex items-center px-3.5 border-none bg-transparent font-sans text-[16px] cursor-pointer whitespace-nowrap transition-colors duration-fast ease-standard",
+                    "group relative flex items-center px-3.5 border-none bg-transparent font-sans cursor-pointer whitespace-nowrap transition-colors duration-fast ease-standard",
                     on ? "text-white font-semibold" : "text-white/72 font-normal hover:text-white",
                   ) }
                 >

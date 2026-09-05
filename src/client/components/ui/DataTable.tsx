@@ -30,6 +30,10 @@ export interface DataTableProps<T extends { id?: string | number }> {
   renderSelect?: (row: T, index: number) => ReactNode;
   reorderable?: boolean;
   onReorder?: (from: number, to: number) => void;
+  /** Renders the whole `<tr>` for a row (e.g. a component with its own layout/columns),
+   * bypassing the per-column cell rendering below - `columns` still drives the `<thead>`.
+   * Incompatible with `selectable`/`reorderable`, which need their own leading `<td>`. */
+  renderRow?: (row: T, index: number) => ReactNode;
   emptyState?: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -58,6 +62,7 @@ export function DataTable<T extends { id?: string | number }>({
   renderSelect,
   reorderable = false,
   onReorder,
+  renderRow,
   emptyState,
   footer,
   className,
@@ -126,6 +131,8 @@ export function DataTable<T extends { id?: string | number }>({
                 { emptyState }
               </td>
             </tr>
+          ) : renderRow ? (
+            rows.map((r, i) => renderRow(r, i))
           ) : (
             rows.map((r, i) => {
               const dragging = drag === i;
