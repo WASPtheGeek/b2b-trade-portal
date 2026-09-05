@@ -83,6 +83,5 @@ src/elkaroweb/
 *_context.md
 *_CONTEXT.md
 
-src/client/app/(shop)/
-src/client/app/admin/
+src/app_sample/
 src/client/app/dev/
