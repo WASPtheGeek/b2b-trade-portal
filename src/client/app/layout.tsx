@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Poppins } from "next/font/google";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { SiteCookieBanner } from "@/components/features/site/SiteCookieBanner";
 import "./globals.css";
 
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="lv" className={ `${poppins.variable} h-full antialiased` }>
       <body className="min-h-full flex flex-col">
-        { children }
+        <AuthProvider>{ children }</AuthProvider>
         <SiteCookieBanner
           policyHref="/privatuma-politika"
           categories={ [

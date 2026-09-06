@@ -10,7 +10,7 @@ export interface LogoProps {
 
 /* The only brand mark supplied by the client: a transparent PNG at 246x107. There is no SVG
    and no icon-only variant — see src/design/readme.md -> "Assets". */
-export function Logo({ height = 30, src = "/elkaro-logo.png", wordmarkOnly = false, className }: LogoProps) {
+export function Logo({ height = 30, src = "/logo.svg", wordmarkOnly = false, className }: LogoProps) {
   if (wordmarkOnly) {
     return (
       <span

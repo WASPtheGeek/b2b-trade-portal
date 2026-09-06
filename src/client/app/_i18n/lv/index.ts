@@ -6,6 +6,7 @@ import { brandForm } from "./brandForm";
 import { brandList } from "./brandList";
 import { categoryForm } from "./categoryForm";
 import { categoryList } from "./categoryList";
+import { guestBrowseCta } from "./guestBrowseCta";
 import { loginForm } from "./loginForm";
 import { productForm } from "./productForm";
 import { registerConfirmation } from "./registerConfirmation";
@@ -16,6 +17,7 @@ import { shopHeader } from "./shopHeader";
 export const lv: Dictionary = {
   shopHeader,
   authCard,
+  guestBrowseCta,
   loginForm,
   registerForm,
   registerConfirmation,

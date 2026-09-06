@@ -23,6 +23,22 @@ public class CategoriesController : ControllerBase
     public CategoriesController(ElkaroDbContext db) => _db = Guard.Against.Null(db, nameof(db));
 
     /// <summary>
+    /// Gets the flat list of every category, including those hidden from the storefront menu -
+    /// unlike the public endpoint, an admin picking categories for a product needs to see all of them.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The list of every category.</returns>
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<CategoryDto>>> List(CancellationToken ct)
+    {
+        var categories = await _db.Categories
+            .OrderBy(c => c.SortOrder)
+            .ToListAsync(ct);
+
+        return Ok(categories.Select(Controllers.CategoriesController.ToDto).ToList());
+    }
+
+    /// <summary>
     /// Creates a new category based on the provided request data.
     /// </summary>
     /// <param name="request">The category creation request.</param>

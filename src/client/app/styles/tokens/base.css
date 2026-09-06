@@ -1,5 +1,5 @@
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scrollbar-gutter:stable}
 body{margin:0;font-family:var(--font-sans);font-size:var(--text-body-size);line-height:var(--text-body-lh);color:var(--text-body);background:var(--surface-page);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 h1,h2,h3,h4,h5,h6,p{margin:0}
 a{color:var(--text-link);text-decoration:none}
@@ -29,6 +29,7 @@ input[type=search]::-webkit-search-cancel-button{display:none}
 @keyframes elkaro-heart{0%{transform:scale(1)}28%{transform:scale(.8)}62%{transform:scale(1.24)}100%{transform:scale(1)}}
 @keyframes elkaro-heart-burst{0%{opacity:.55;transform:scale(.7)}100%{opacity:0;transform:scale(1.9)}}
 @keyframes elkaro-status-pulse{0%{opacity:.5;transform:scale(.8)}70%{opacity:0;transform:scale(2.1)}100%{opacity:0;transform:scale(2.1)}}
+@keyframes elkaro-dot-bounce{0%,80%,100%{opacity:.5;transform:translateY(0)}40%{opacity:1;transform:translateY(-70%)}}
 .elk-scroll-x{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;-ms-overflow-style:none}
 .elk-scroll-x::-webkit-scrollbar{width:0;height:0;display:none}
 .elk-scroll-y{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scrollbar-width:none;-ms-overflow-style:none}

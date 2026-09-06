@@ -6,6 +6,7 @@ import type { CategoryListLabels } from "@/components/features/admin/categories/
 import type { ProductFormLabels } from "@/components/features/admin/products/ProductForm";
 import type { ProductListLabels } from "@/components/features/admin/products/ProductList";
 import type { AuthCardLabels } from "@/components/features/auth/AuthCard";
+import type { GuestBrowseCtaLabels } from "@/components/features/auth/GuestBrowseCta";
 import type { LoginFormLabels } from "@/components/features/auth/LoginForm";
 import type { RegisterConfirmationLabels } from "@/components/features/auth/RegisterConfirmation";
 import type { RegisterFormLabels } from "@/components/features/auth/RegisterForm";
@@ -22,6 +23,7 @@ import type { ShopHeaderLabels } from "@/components/features/shop/ShopHeader";
 export interface Dictionary {
   shopHeader: ShopHeaderLabels;
   authCard: AuthCardLabels;
+  guestBrowseCta: GuestBrowseCtaLabels;
   loginForm: LoginFormLabels;
   registerForm: RegisterFormLabels;
   registerConfirmation: RegisterConfirmationLabels;

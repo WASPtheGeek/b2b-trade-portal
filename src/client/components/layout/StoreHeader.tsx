@@ -175,21 +175,24 @@ export function StoreHeader({
       ) }
       { ...rest }
     >
-      <div className="relative max-w-layout-max mx-auto h-store-header px-gutter">
+      <div className="relative max-w-layout-max mx-auto h-store-header">
         {/* Both rows stay mounted so the swap between them can cross-fade instead of
             popping instantly - conditionally rendering one or the other would unmount/
-            remount completely different DOM, which CSS can't transition between. */}
+            remount completely different DOM, which CSS can't transition between.
+            Each row carries its own horizontal padding (rather than the parent above)
+            because `absolute inset-0` sizes itself to the parent's padding box, i.e. it
+            would otherwise ignore - and render flush through - any padding set there. */}
         <div
           aria-hidden={ searching }
           inert={ searching }
           style={ { transition: "opacity var(--dur-base) var(--ease-standard), translate var(--dur-base) var(--ease-out)" } }
           className={ cn(
-            "absolute inset-0 flex items-center gap-3 md:gap-5",
+            "absolute inset-0 flex items-center gap-3 md:gap-5 px-gutter md:px-8 lg:px-gutter",
             searching ? "opacity-0 -translate-y-1 pointer-events-none" : "opacity-100 translate-y-0",
           ) }
         >
           <Link href="/" className="flex-none flex items-center">
-            <Logo height={ 32 } src={ logoSrc } />
+            <Logo height={ 45 } src={ logoSrc } />
           </Link>
 
           <SearchField
@@ -222,7 +225,7 @@ export function StoreHeader({
           inert={ !searching }
           style={ { transition: "opacity var(--dur-base) var(--ease-standard), translate var(--dur-base) var(--ease-out)" } }
           className={ cn(
-            "absolute inset-0 flex items-center gap-3",
+            "absolute inset-0 flex items-center gap-3 px-gutter md:px-8 lg:px-gutter",
             searching ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none",
           ) }
         >
