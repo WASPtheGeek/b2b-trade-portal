@@ -127,8 +127,8 @@ export function CookieBanner({
             <Icon name="cookie" size={ 15 } />
           </span>
           <div className="min-w-0 flex-1">
-            <strong className="text-[13.5px] font-semibold text-text-strong">{ labels.title }</strong>
-            <p className="text-[12.5px] leading-[1.55] text-text-muted mt-[5px] text-balance">
+            <strong className="text-[length:var(--font-size-base)] font-semibold text-text-strong">{ labels.title }</strong>
+            <p className="text-[length:var(--font-size-base)] leading-[1.55] text-text-muted mt-[5px] text-balance">
               { renderBody(<a href={ policyHref }>{ labels.policyLinkLabel }</a>) }
             </p>
           </div>
@@ -146,11 +146,11 @@ export function CookieBanner({
                     className="mt-px"
                   />
                   <div className="min-w-0">
-                    <div className="text-[12.5px] font-semibold text-text-strong">
+                    <div className="text-[length:var(--font-size-base)] font-semibold text-text-strong">
                       { c.label }
                       { c.locked ? <span className="font-normal text-text-disabled">{ labels.lockedSuffix }</span> : null }
                     </div>
-                    <div className="text-[11.5px] leading-[1.5] text-text-subtle text-balance">{ c.description }</div>
+                    <div className="text-[length:var(--font-size-base)] leading-[1.5] text-text-subtle text-balance">{ c.description }</div>
                   </div>
                 </div>
               )) }

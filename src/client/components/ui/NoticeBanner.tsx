@@ -53,8 +53,8 @@ export function NoticeBanner({
         <Icon name={ icon || t.icon } size={ compact ? 15 : 17 } />
       </span>
       <div className="flex-1 min-w-0">
-        { title ? <p className={ cn("text-[13.5px] font-semibold mb-[3px]", t.fg) }>{ title }</p> : null }
-        <div className={ cn("leading-[1.5] text-balance", compact ? "text-[12.5px]" : "text-[13.5px]", t.fg) }>{ children }</div>
+        { title ? <p className={ cn("text-[length:var(--font-size-base)] font-semibold mb-[3px]", t.fg) }>{ title }</p> : null }
+        <div className={ cn("leading-[1.5] text-balance text-[length:var(--font-size-base)]", t.fg) }>{ children }</div>
         { actions ? <div className="flex gap-2 mt-[11px]">{ actions }</div> : null }
       </div>
       { onDismiss ? (

@@ -27,7 +27,7 @@ export function TextArea({ value, invalid = false, showCount = false, maxLength,
           rest.onBlur?.(e);
         } }
         className={ cn(
-          "w-full py-2.5 px-3 rounded-control border outline-hidden resize-y bg-white font-sans text-[13.5px] leading-normal text-text-strong",
+          "w-full py-2.5 px-3 rounded-control border outline-hidden resize-y bg-white font-sans text-[length:var(--font-size-base)] leading-normal text-text-strong",
           "transition-[border-color,box-shadow] duration-fast ease-standard",
           "disabled:bg-action-disabled-bg",
           invalid ? "border-border-danger shadow-[0_0_0_3px_rgba(220,38,38,.16)]" : focus ? "border-orange-500 shadow-[var(--focus-ring-shadow)]" : "border-border-default",
@@ -36,7 +36,7 @@ export function TextArea({ value, invalid = false, showCount = false, maxLength,
         { ...rest }
       />
       { showCount && maxLength ? (
-        <span className="absolute right-2.5 bottom-2 font-mono text-[11px] text-text-disabled">
+        <span className="absolute right-2.5 bottom-2 font-mono text-[length:var(--font-size-base)] text-text-disabled">
           { String(value ?? "").length }/{ maxLength }
         </span>
       ) : null }

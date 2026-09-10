@@ -50,7 +50,7 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
                     onMouseEnter={ () => setActiveId(d.id) }
                     onClick={ onPick }
                     className={ cn(
-                      "flex items-center w-full gap-2 py-[9px] pr-3.5 pl-0.5 border-none bg-transparent cursor-pointer text-left font-sans text-[13.5px]",
+                      "flex items-center w-full gap-2 py-[9px] pr-3.5 pl-0.5 border-none bg-transparent cursor-pointer text-left font-sans text-[length:var(--font-size-base)]",
                       d.id === activeId ? "font-semibold text-orange-700" : "font-normal text-text-body",
                     ) }
                   >
@@ -63,7 +63,7 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
             <div className="flex-1 min-w-0 py-5 pb-6 pl-[30px] grid grid-cols-3 gap-[26px]">
               { active?.groups.map((g) => (
                 <div key={ g.title }>
-                  <h4 className="font-mono text-[10.5px] font-medium tracking-[.12em] uppercase text-text-strong">{ g.title }</h4>
+                  <h4 className="font-mono text-[length:var(--font-size-base)] font-medium tracking-[.12em] uppercase text-text-strong">{ g.title }</h4>
                   <ul className="list-none m-0 mt-3 p-0 flex flex-col gap-2">
                     { g.links.map((l) => (
                       <li key={ l }>
@@ -73,7 +73,7 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
                             e.preventDefault();
                             onPick?.();
                           } }
-                          className="text-[12.5px] text-text-muted no-underline hover:text-text-body"
+                          className="text-[length:var(--font-size-base)] text-text-muted no-underline hover:text-text-body"
                         >
                           { l }
                         </a>

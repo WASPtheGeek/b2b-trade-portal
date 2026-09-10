@@ -60,24 +60,24 @@ export function Dropzone({
       >
         <Icon name="file-spreadsheet" size={ 21 } />
       </span>
-      <p className="text-sm font-semibold text-text-strong">{ title }</p>
-      { hint ? <p className="text-[12.5px] text-text-subtle mt-[5px]">{ hint }</p> : null }
+      <p className="text-[length:var(--font-size-base)] font-semibold text-text-strong">{ title }</p>
+      { hint ? <p className="text-[length:var(--font-size-base)] text-text-subtle mt-[5px]">{ hint }</p> : null }
       <Button variant="secondary" size="sm" icon="upload" className="mt-3.5">
         { browseLabel }
       </Button>
       { columns.length ? (
         <div className="mt-5 pt-4 border-t border-border-default">
-          <p className="text-[10.5px] font-semibold tracking-[.06em] uppercase text-text-subtle mb-[9px]">{ columnsLabel }</p>
+          <p className="text-[length:var(--font-size-base)] font-semibold tracking-[.06em] uppercase text-text-subtle mb-[9px]">{ columnsLabel }</p>
           <div className="flex gap-[5px] flex-wrap justify-center">
             { columns.map((c) => (
-              <code key={ c } className="font-mono text-[11.5px] py-[3px] px-2 bg-white border border-border-default rounded-sm text-text-body">
+              <code key={ c } className="font-mono text-[length:var(--font-size-base)] py-[3px] px-2 bg-white border border-border-default rounded-sm text-text-body">
                 { c }
               </code>
             )) }
           </div>
         </div>
       ) : null }
-      <p className="text-[11.5px] text-text-disabled mt-3.5">
+      <p className="text-[length:var(--font-size-base)] text-text-disabled mt-3.5">
         { formatsLabel }: { accept }
       </p>
     </div>

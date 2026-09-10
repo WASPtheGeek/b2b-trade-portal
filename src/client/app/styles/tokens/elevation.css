@@ -7,5 +7,5 @@
 --shadow-overlay:0 24px 64px rgba(16,16,16,.22),0 4px 12px rgba(16,16,16,.10);
 --shadow-inset-top:inset 0 1px 0 rgba(255,255,255,.06);
 --scrim:rgba(16,16,16,.48);
---blur-overlay:blur(2px); /* @kind other */
+--blur-overlay:blur(8px); /* @kind other */
 }

@@ -18,14 +18,14 @@ export function UtilityBar({ message, links = [], className, ...rest }: UtilityB
   return (
     <div className={ cn("hidden md:block bg-utility-bar border-b border-border-warm", className) } { ...rest }>
       <div className="max-w-layout-max mx-auto h-utility px-gutter flex items-center gap-4">
-        <span className="flex-1 min-w-0 text-xs text-text-muted overflow-hidden text-ellipsis whitespace-nowrap">{ message }</span>
+        <span className="flex-1 min-w-0 text-[length:var(--font-size-base)] text-text-muted overflow-hidden text-ellipsis whitespace-nowrap">{ message }</span>
         <nav className="hidden sm:flex items-center gap-[18px] ml-auto flex-none">
           { links.map((l) => (
             <a
               key={ l.label }
               href={ l.href || "#" }
               onClick={ l.onClick }
-              className="flex items-center gap-[5px] text-xs text-text-muted no-underline whitespace-nowrap hover:text-text-body"
+              className="flex items-center gap-[5px] text-[length:var(--font-size-base)] text-text-muted no-underline whitespace-nowrap hover:text-text-body"
             >
               { l.icon ? <Icon name={ l.icon } size={ 12 } /> : null }
               { l.label }

@@ -140,7 +140,7 @@ export function ProductTile({
           style={ { height: compact ? 116 : 152 } }
         />
         { discount ? (
-          <span className="absolute top-2.5 right-2.5 bg-brand text-white text-[11px] font-semibold py-[3px] px-[9px] rounded-pill">
+          <span className="absolute top-2.5 right-2.5 bg-brand text-white text-[length:var(--font-size-base)] font-semibold py-[3px] px-[9px] rounded-pill">
             −{ discount }%
           </span>
         ) : null }
@@ -157,25 +157,25 @@ export function ProductTile({
       />
 
       <div className={ cn("flex flex-col flex-1", compact ? "pt-[11px] px-[13px] pb-[13px]" : "pt-[13px] px-3.5 pb-3.5") }>
-        <span className="font-mono text-[10px] font-medium tracking-[.11em] uppercase text-orange-600">
+        <span className="font-mono text-[length:var(--font-size-base)] font-medium tracking-[.11em] uppercase text-orange-600">
           { product.category || product.brand }
         </span>
         <a
           href="#"
           onClick={ open }
-          className="text-[13.5px] font-semibold leading-[1.4] text-text-strong no-underline mt-[5px] text-balance line-clamp-2"
+          className="text-[length:var(--font-size-base)] font-semibold leading-[1.4] text-text-strong no-underline mt-[5px] text-balance line-clamp-2"
           style={ { minHeight: "calc(13.5px * 1.4 * 2)" } }
         >
           { product.name }
         </a>
-        <p className="text-[11.5px] text-text-subtle mt-1.5 font-mono">{ soldAs }</p>
+        <p className="text-[length:var(--font-size-base)] text-text-subtle mt-1.5 font-mono">{ soldAs }</p>
 
         <div className="mt-auto pt-[11px]">
           { masked ? (
             <a
               href="#/login"
               onClick={ open }
-              className="flex items-start gap-1.5 min-w-0 text-[12.5px] font-semibold leading-[1.35] text-orange-700 no-underline whitespace-normal text-balance"
+              className="flex items-start gap-1.5 min-w-0 text-[length:var(--font-size-base)] font-semibold leading-[1.35] text-orange-700 no-underline whitespace-normal text-balance"
             >
               <Icon name="lock" size={ 13 } className="mt-0.5 flex-none" />
               { labels.maskedCta }

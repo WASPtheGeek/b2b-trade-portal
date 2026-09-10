@@ -11,20 +11,20 @@ export interface AdminUnbuiltViewProps {
   label: string;
   /** Composes the heading from the nav item's label - a render prop rather than a plain
    * string since word order isn't the same across languages. */
-  renderTitle?: (label: string) => string;
   description?: string;
   usersActionLabel?: string;
-  importActionLabel?: string;
+  productsActionLabel?: string;
+  renderTitle?: (label: string) => string;
 }
 
 // Shared Latvian copy for every AdminUnbuiltView stub page (dashboard/orders/products/
 // brands/settings) - identical across all of them, so it's defined once here rather than
 // duplicated per page.
 export const ADMIN_UNBUILT_VIEW_LABELS = {
-  renderTitle: (label: string) => `Skats "${label}" nav izstrādāts`,
-  description: "Šis UI komplekts satur divus administratora skatus, kas bija aprakstīti darba uzdevumā. Pārējie ir apzināti atstāti tukši, nevis izdomāti.",
+  description: "Šī sadaļa vēl nav izstrādāta. Lūdzu, kontaktējieties ar administratoru.",
   usersActionLabel: "Lietotāju apstiprināšana",
-  importActionLabel: "ERP imports",
+  productsActionLabel: "Produkti",
+  renderTitle: (label: string) => `Skats "${label}" nav izstrādāts`,
 };
 
 
@@ -33,32 +33,31 @@ export const ADMIN_UNBUILT_VIEW_LABELS = {
    are empty by design, not an oversight, so this view says so rather than inventing a page. */
 export function AdminUnbuiltView({
   label,
-  renderTitle = ADMIN_UNBUILT_VIEW_LABELS.renderTitle,
   description = ADMIN_UNBUILT_VIEW_LABELS.description,
   usersActionLabel = ADMIN_UNBUILT_VIEW_LABELS.usersActionLabel,
-  importActionLabel = ADMIN_UNBUILT_VIEW_LABELS.importActionLabel,
+  productsActionLabel = ADMIN_UNBUILT_VIEW_LABELS.productsActionLabel,
+  renderTitle = ADMIN_UNBUILT_VIEW_LABELS.renderTitle,
 }: AdminUnbuiltViewProps) {
   const router = useRouter();
+
   return (
-    <div className="py-[18px] px-[22px]">
-      <Card padding={ 0 }>
-        <EmptyState
-          icon="construction"
-          title={ renderTitle(label) }
-          actions={
-            <>
-              <Button size="sm" onClick={ () => router.push("/admin/users") }>
-                { usersActionLabel }
-              </Button>
-              <Button size="sm" variant="secondary" onClick={ () => router.push("/admin/import") }>
-                { importActionLabel }
-              </Button>
-            </>
-          }
-        >
-          { description }
-        </EmptyState>
-      </Card>
-    </div>
+    <Card padding={ 0 }>
+      <EmptyState
+        icon="construction"
+        title={ renderTitle(label) }
+        actions={
+          <>
+            <Button size="sm" onClick={ () => router.push("/admin/users") }>
+              { usersActionLabel }
+            </Button>
+            <Button size="sm" variant="secondary" onClick={ () => router.push("/admin/products") }>
+              { productsActionLabel }
+            </Button>
+          </>
+        }
+      >
+        { description }
+      </EmptyState>
+    </Card>
   );
 }

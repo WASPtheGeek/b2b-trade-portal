@@ -44,7 +44,7 @@ export function StatusBadge({ tone, label, icon, size = "md", className, ...rest
         t.tint,
         t.ink,
         t.line,
-        sm ? "gap-[5px] pl-[10px] pr-[9px] py-[2px] text-[11.5px]" : "gap-1.5 pl-[12px] pr-[11px] py-[3px] text-[12.5px]",
+        sm ? "gap-[5px] pl-[10px] pr-[9px] py-[2px] text-[length:var(--font-size-base)]" : "gap-1.5 pl-[12px] pr-[11px] py-[3px] text-[length:var(--font-size-base)]",
         className,
       )}
       {...rest}

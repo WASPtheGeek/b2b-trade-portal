@@ -33,7 +33,7 @@ export function RegisterConfirmation({ result, labels: labelsProp }: RegisterCon
       <StatusBadge tone={ USER_STATUS_TONES[result.status] } label={ USER_STATUS_LABELS[result.status] } />
 
       <h1 className="mt-3.5 text-2xl font-semibold tracking-[-0.02em] text-text-strong">{ labels.heading }</h1>
-      <p className="mt-[7px] text-[13.5px] leading-[1.55] text-text-muted text-pretty">{ result.message }</p>
+      <p className="mt-[7px] text-[length:var(--font-size-base)] leading-[1.55] text-text-muted text-pretty">{ result.message }</p>
 
       <div className="flex flex-wrap gap-2 mt-[18px]">
         <Button pill onClick={ () => router.push("/") }>

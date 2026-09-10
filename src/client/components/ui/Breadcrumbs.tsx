@@ -17,7 +17,7 @@ export interface BreadcrumbsProps extends HTMLAttributes<HTMLElement> {
 
 export function Breadcrumbs({ items, onNavigate, ariaLabel = "Breadcrumb", className, ...rest }: BreadcrumbsProps) {
   return (
-    <nav aria-label={ ariaLabel } className={ cn("flex items-center gap-[7px] flex-wrap text-xs", className) } { ...rest }>
+    <nav aria-label={ ariaLabel } className={ cn("flex items-center gap-[7px] flex-wrap text-[length:var(--font-size-base)]", className) } { ...rest }>
       { items.map((it, i) => {
         const last = i === items.length - 1;
 

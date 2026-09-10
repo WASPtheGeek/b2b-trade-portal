@@ -3,7 +3,7 @@
 --layout-gutter:20px;
 --layout-gutter-sm:16px;
 --sidebar-w:264px;
---header-h:60px;
+--header-h:68px;
 --subheader-h:48px;
 --admin-sidebar-w:236px;
 --grid-gap:12px;
@@ -12,7 +12,7 @@
    (n columns need n×204 + (n−1)×12) and the no-container-query fallback. */
 --card-min-w:204px;
 --utility-h:34px;
---store-header-h:64px;
+--store-header-h:72px;
 --dept-nav-h:44px;
 --section-gap:56px;
 --section-gap-lg:76px;

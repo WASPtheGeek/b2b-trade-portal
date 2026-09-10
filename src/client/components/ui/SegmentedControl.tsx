@@ -99,7 +99,7 @@ export function SegmentedControl({
             className={ cn(
               "relative flex flex-col items-center justify-center gap-px min-w-0 rounded-sm overflow-hidden font-sans transition-colors duration-base ease-standard",
               fullWidth ? "px-1" : size === "lg" ? "px-3.5" : "px-2.5",
-              size === "lg" ? "text-[13.5px]" : "text-[12.5px]",
+              "text-[length:var(--font-size-base)]",
               on ? "font-semibold" : "font-normal",
               opt.disabled ? "text-text-disabled cursor-not-allowed" : on ? "text-text-strong cursor-pointer" : "text-text-muted cursor-pointer",
               on && !pill && "bg-white shadow-xs",
@@ -110,7 +110,7 @@ export function SegmentedControl({
             { opt.sub ? (
               <span
                 className={ cn(
-                  "max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[10.5px] font-normal",
+                  "max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[length:var(--font-size-base)] font-normal",
                   on ? "text-text-subtle" : "text-text-disabled",
                 ) }
               >

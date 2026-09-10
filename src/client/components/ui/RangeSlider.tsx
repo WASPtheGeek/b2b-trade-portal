@@ -63,7 +63,7 @@ export function RangeSlider({
           />
         )) }
       </div>
-      <div className="flex justify-between mt-2 font-mono text-xs text-text-muted [font-variant-numeric:tabular-nums]">
+      <div className="flex justify-between mt-2 font-mono text-[length:var(--font-size-base)] text-text-muted [font-variant-numeric:tabular-nums]">
         <span>
           { prefix }
           { lo }

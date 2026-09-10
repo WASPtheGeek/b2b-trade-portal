@@ -3,7 +3,7 @@
 // Product detail page
 export default function ProductPage() {
   return (
-    <div className="relative min-h-screen bg-surface-warm">
+    <div className="relative flex-1 bg-surface-warm">
     </div>
   );
 }

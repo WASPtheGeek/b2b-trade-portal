@@ -44,12 +44,12 @@ export function FilterPanel({
           open && "border-b border-border-subtle",
         ) }
       >
-        <h3 className="flex-1 text-[13px] font-semibold text-text-strong">{ title }</h3>
+        <h3 className="flex-1 text-[length:var(--font-size-base)] font-semibold text-text-strong">{ title }</h3>
         { collapsible ? <Icon name={ open ? "minus" : "plus" } size={ 14 } className="text-text-disabled" /> : null }
       </button>
       { open ? (
         <div className="pt-3 px-3.5 pb-3.5">
-          { note ? <p className="text-xs leading-normal text-text-subtle text-balance mb-2.5">{ note }</p> : null }
+          { note ? <p className="text-[length:var(--font-size-base)] leading-normal text-text-subtle text-balance mb-2.5">{ note }</p> : null }
           { children }
         </div>
       ) : null }
@@ -90,14 +90,14 @@ export function CategoryPanelList({ nodes = [], selected, onSelect, depth = 0, c
               style={ { paddingLeft: depth * 12 } }
               className={ cn(
                 "flex items-center gap-1.5 py-[5px] no-underline transition-colors duration-fast ease-standard",
-                depth === 0 ? "text-[13px]" : "text-[12.5px]",
+                "text-[length:var(--font-size-base)]",
                 on ? "font-semibold text-orange-700" : depth === 0 ? "font-medium" : "font-normal",
                 !on && (hv ? "text-text-strong" : "text-text-body"),
               ) }
             >
               <span className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{ n.label }</span>
               { n.count != null ? (
-                <span className={ cn("font-mono text-[11px]", on ? "text-orange-600" : "text-text-disabled") }>({ n.count })</span>
+                <span className={ cn("font-mono text-[length:var(--font-size-base)]", on ? "text-orange-600" : "text-text-disabled") }>({ n.count })</span>
               ) : null }
             </a>
             { kids.length && (on || kids.some((k) => k.id === selected) || depth === 0) ? (

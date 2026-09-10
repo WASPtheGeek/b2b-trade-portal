@@ -63,8 +63,8 @@ export function Badge({
     <span
       className={ cn(
         "relative inline-flex items-center align-middle whitespace-nowrap overflow-hidden border",
-        "font-sans text-[12.5px] font-medium tracking-[0.002em] leading-[1.3]",
-        sm && "gap-[5px] text-[11.5px] py-0.5",
+        "font-sans text-[length:var(--font-size-base)] font-medium tracking-[0.002em] leading-[1.3]",
+        sm && "gap-[5px] py-0.5",
         !sm && "gap-1.5 py-[3px]",
         square ? "rounded-sm" : "rounded-badge",
         showCap ? (sm ? "pl-[11px] pr-[9px]" : "pl-[13px] pr-[11px]") : sm ? "px-[9px]" : "px-[11px]",

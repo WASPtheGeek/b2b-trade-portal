@@ -31,7 +31,7 @@ export function PriceDisplay({
       <div
         className={ cn(
           "flex items-center gap-[7px] text-text-subtle leading-[1.4]",
-          size === "sm" ? "text-xs" : "text-[12.5px]",
+          "text-[length:var(--font-size-base)]",
           className,
         ) }
         { ...rest }
@@ -54,11 +54,11 @@ export function PriceDisplay({
         >
           { fmtEur(price) }
         </span>
-        { unit ? <span className={ cn("font-normal text-text-subtle", size === "sm" ? "text-xs" : "text-[13px]") }>/ { unit }</span> : null }
-        { note ? <span className="text-[11px] text-text-disabled">{ note }</span> : null }
+        { unit ? <span className="font-normal text-text-subtle text-[length:var(--font-size-base)]">/ { unit }</span> : null }
+        { note ? <span className="text-[length:var(--font-size-base)] text-text-disabled">{ note }</span> : null }
       </div>
       { total != null ? (
-        <div className="mt-1 text-[13px] text-text-body [font-variant-numeric:tabular-nums]">
+        <div className="mt-1 text-[length:var(--font-size-base)] text-text-body [font-variant-numeric:tabular-nums]">
           <span className="text-text-subtle">{ totalLabel }: </span>
           <span className="font-semibold text-orange-700">{ fmtEur(total) }</span>
         </div>

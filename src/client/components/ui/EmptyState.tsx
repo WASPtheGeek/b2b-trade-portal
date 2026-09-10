@@ -26,8 +26,8 @@ export function EmptyState({ icon = "search-x", title, children, actions, tone =
       >
         <Icon name={ icon } size={ compact ? 19 : 24 } />
       </span>
-      <h3 className={ cn("font-semibold text-text-strong tracking-[-0.008em]", compact ? "text-[14.5px]" : "text-h3") }>{ title }</h3>
-      { children ? <p className="text-[13.5px] leading-[1.55] text-text-muted mt-[7px] max-w-[400px] text-balance">{ children }</p> : null }
+      <h3 className={ cn("font-semibold text-text-strong tracking-[-0.008em]", compact ? "text-[15.5px]" : "text-h3") }>{ title }</h3>
+      { children ? <p className="text-[14.5px] leading-[1.55] text-text-muted mt-[7px] max-w-[400px] text-balance">{ children }</p> : null }
       { actions ? <div className="flex gap-2 mt-[18px] flex-wrap justify-center">{ actions }</div> : null }
     </div>
   );

@@ -25,8 +25,8 @@ export function TrustStrip({ items = [], className, ...rest }: TrustStripProps) 
             <Icon name={ it.icon } size={ 16 } />
           </span>
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-text-strong">{ it.title }</p>
-            <p className="text-xs text-text-subtle mt-0.5 text-balance">{ it.body }</p>
+            <p className="text-[length:var(--font-size-base)] font-semibold text-text-strong">{ it.title }</p>
+            <p className="text-[length:var(--font-size-base)] text-text-subtle mt-0.5 text-balance">{ it.body }</p>
           </div>
         </div>
       )) }

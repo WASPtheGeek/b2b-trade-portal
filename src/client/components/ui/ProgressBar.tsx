@@ -41,14 +41,14 @@ export function ProgressBar({
     <div className={ className } { ...rest }>
       { label || showPercent ? (
         <div className="flex items-baseline justify-between gap-3 mb-[7px]">
-          <span className="text-[13px] text-text-body [font-variant-numeric:tabular-nums]">{ label }</span>
-          { showPercent ? <span className="font-mono text-[13px] font-semibold text-text-strong">{ Math.round(pct) }%</span> : null }
+          <span className="text-[length:var(--font-size-base)] text-text-body [font-variant-numeric:tabular-nums]">{ label }</span>
+          { showPercent ? <span className="font-mono text-[length:var(--font-size-base)] font-semibold text-text-strong">{ Math.round(pct) }%</span> : null }
         </div>
       ) : null }
       <div className={ cn("rounded-pill bg-neutral-200 overflow-hidden", HEIGHT[size]) }>
         <div className={ cn("h-full rounded-pill transition-[width] duration-slow ease-out", FILL[tone]) } style={ { width: `${pct}%` } } />
       </div>
-      { sublabel ? <p className="text-xs text-text-subtle mt-[7px] [font-variant-numeric:tabular-nums]">{ sublabel }</p> : null }
+      { sublabel ? <p className="text-[length:var(--font-size-base)] text-text-subtle mt-[7px] [font-variant-numeric:tabular-nums]">{ sublabel }</p> : null }
     </div>
   );
 }

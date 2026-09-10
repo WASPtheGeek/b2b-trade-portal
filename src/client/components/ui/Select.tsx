@@ -46,7 +46,7 @@ export function Select({
         onFocus={ () => setFocus(true) }
         onBlur={ () => setFocus(false) }
         className={ cn(
-          "w-full pl-3 pr-8 border rounded-control outline-hidden appearance-none bg-white font-sans text-[13.5px] transition-[border-color,box-shadow] duration-fast ease-standard",
+          "w-full pl-3 pr-8 border rounded-control outline-hidden appearance-none bg-white font-sans text-[length:var(--font-size-base)] transition-[border-color,box-shadow] duration-fast ease-standard",
           value ? "text-text-strong" : "text-text-subtle",
           disabled ? "bg-action-disabled-bg cursor-not-allowed" : "cursor-pointer",
           invalid ? "border-border-danger" : focus ? "border-orange-500 shadow-[var(--focus-ring-shadow)]" : "border-border-default",

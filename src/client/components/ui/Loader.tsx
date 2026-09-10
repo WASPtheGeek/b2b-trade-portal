@@ -90,7 +90,7 @@ export function Loader({
         <span
           className={ cn(
             "font-mono font-medium",
-            size === "lg" ? "text-[13.5px]" : "text-[12.5px]",
+            "text-[length:var(--font-size-base)]",
             tone === "inverse" ? "text-white/82" : "text-text-muted",
           ) }
         >

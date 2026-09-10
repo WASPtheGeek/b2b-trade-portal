@@ -33,6 +33,8 @@ export interface UseCategoryFormOptions {
   /** The category being edited, or `null` when creating a new one. */
   category: Category | null;
   genericErrorMessage?: string;
+  /** Called after a successful save, instead of the default redirect to the list. */
+  onSuccess?: () => void;
 }
 
 export interface CategoryFormState {
@@ -49,6 +51,7 @@ export interface CategoryFormState {
 export function useCategoryForm({
   category,
   genericErrorMessage = DEFAULT_GENERIC_ERROR,
+  onSuccess,
 }: UseCategoryFormOptions): CategoryFormState {
   const router = useRouter();
   const [fields, setFields] = useState<CategoryFormFields>(category ? toFields(category) : EMPTY_FIELDS);
@@ -91,7 +94,11 @@ export function useCategoryForm({
 
     request
       .then(() => {
-        router.push("/admin/categories");
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push("/admin/categories");
+        }
       })
       .catch((caught: unknown) => {
         setError(resolveErrorMessage(caught, genericErrorMessage));

@@ -76,20 +76,32 @@ public record ProductDetailDto(
 /// <param name="Id">The unique identifier of the product.</param>
 /// <param name="Sku">The stock keeping unit of the product.</param>
 /// <param name="Name">The name of the product.</param>
+/// <param name="Description">The description of the product.</param>
 /// <param name="Ean">The European Article Number of the product.</param>
 /// <param name="BrandName">The name of the brand associated with the product.</param>
 /// <param name="ThumbnailFilename">The filename of the product's thumbnail image.</param>
 /// <param name="IsActive">Indicates whether the product is active.</param>
 /// <param name="BasePrice">The base price of the product, excluding VAT.</param>
+/// <param name="VatRatePercent">The VAT rate percentage applicable to the product.</param>
+/// <param name="SoldByPiece">Indicates whether the product can be ordered by the individual piece.</param>
+/// <param name="PiecesPerBox">The number of pieces per box, if the product can be ordered by the box.</param>
+/// <param name="PiecesPerPackage">The number of pieces per package, if the product can be ordered by the package.</param>
+/// <param name="CategoryNames">The names of the categories the product belongs to.</param>
 public record ProductAdminListItemDto(
     long Id,
     string Sku,
     string Name,
+    string? Description,
     string? Ean,
     string? BrandName,
     string? ThumbnailFilename,
     bool IsActive,
-    decimal BasePrice);
+    decimal BasePrice,
+    decimal VatRatePercent,
+    bool SoldByPiece,
+    int? PiecesPerBox,
+    int? PiecesPerPackage,
+    IReadOnlyList<string> CategoryNames);
 
 /// <summary>
 /// This DTO represents the full admin-editable details of a product, mirroring

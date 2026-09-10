@@ -96,14 +96,14 @@ export function ProductRow({
         { wishlist(stacked ? 26 : 24) }
       </div>
       <div className="min-w-0">
-        <div className="flex items-center gap-1.5 text-[10.5px] text-text-disabled">
+        <div className="flex items-center gap-1.5 text-[length:var(--font-size-base)] text-text-disabled">
           <span className="font-semibold tracking-[.05em] uppercase text-text-subtle">{ product.brand }</span>
           <span className="font-mono">{ product.sku }</span>
           { product.ean ? <span className="font-mono">· { product.ean }</span> : null }
         </div>
         <div
           className={ cn(
-            "text-[13.5px] font-semibold text-text-strong leading-[1.35] mt-0.5 overflow-hidden text-ellipsis",
+            "text-[length:var(--font-size-base)] font-semibold text-text-strong leading-[1.35] mt-0.5 overflow-hidden text-ellipsis",
             stacked ? "whitespace-normal" : "whitespace-nowrap",
           ) }
         >
@@ -181,7 +181,7 @@ export function ProductRow({
       </td>
       <td className="py-[9px] px-[var(--cell-pad-x)]">
         { masked ? (
-          <span className="text-[12.5px] text-text-disabled">—</span>
+          <span className="text-[length:var(--font-size-base)] text-text-disabled">—</span>
         ) : (
           <SegmentedControl
             value={ unit }
@@ -195,14 +195,14 @@ export function ProductRow({
       </td>
       <td className="py-[9px] px-[var(--cell-pad-x)]">
         { masked ? (
-          <span className="text-[12.5px] text-text-disabled">—</span>
+          <span className="text-[length:var(--font-size-base)] text-text-disabled">—</span>
         ) : (
           <QuantityStepper value={ qty } onChange={ setQty } size="sm" decreaseLabel={ labels.decreaseQty } increaseLabel={ labels.increaseQty } />
         ) }
       </td>
       <td
         className={ cn(
-          "py-[9px] px-[var(--cell-pad-x)] text-right whitespace-nowrap font-sans text-sm font-semibold [font-variant-numeric:tabular-nums]",
+          "py-[9px] px-[var(--cell-pad-x)] text-right whitespace-nowrap font-sans text-[length:var(--font-size-base)] font-semibold [font-variant-numeric:tabular-nums]",
           masked ? "text-text-disabled" : "text-orange-700",
         ) }
       >

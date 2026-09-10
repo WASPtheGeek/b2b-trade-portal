@@ -76,7 +76,7 @@ export function HeroBanner({ kicker, title, body, actions, aside, className, ...
         style={ { background: "linear-gradient(105deg, rgba(23,23,26,0) 55%, rgba(245,130,10,.07) 100%)" } }
       />
       <div className="relative max-w-[520px]">
-        { kicker ? <span className="font-mono text-[11px] font-medium tracking-[.15em] uppercase text-orange-400">{ kicker }</span> : null }
+        { kicker ? <span className="font-mono text-[length:var(--font-size-base)] font-medium tracking-[.15em] uppercase text-orange-400">{ kicker }</span> : null }
         <h1 className="text-[28px] sm:text-[34px] lg:text-[40px] leading-[1.1] tracking-[-.024em] font-semibold text-white mt-[15px] text-balance">
           { title }
         </h1>

@@ -207,18 +207,28 @@
    --shadow-lg: 0 8px 24px rgba(16, 16, 16, 0.09), 0 2px 6px rgba(16, 16, 16, 0.05);
    --shadow-overlay: 0 24px 64px rgba(16, 16, 16, 0.22), 0 4px 12px rgba(16, 16, 16, 0.1);
 
+   /* ---- Modal scrim: elevation.css defines these too, but that file isn't imported above
+     (see the note on radius/shadow), so they need inlining here as well or `var(--scrim)` /
+     `var(--blur-overlay)` resolve to nothing wherever they're used inline (e.g. Modal.tsx). ---- */
+   --scrim: rgba(16, 16, 16, 0.48);
+   --blur-overlay: blur(8px);
+
    /* ---- Easing: same identical-key-name reason as radius/shadow above. ---- */
    --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
-   /* ---- Durations (Tailwind's duration-* namespace; no name collision with tokens/motion.css's
-     --dur-* names, so these can safely reference them). ---- */
-   --duration-instant: var(--dur-instant);
-   --duration-fast: var(--dur-fast);
-   --duration-base: var(--dur-base);
-   --duration-slow: var(--dur-slow);
-   --duration-slower: var(--dur-slower);
+   /* ---- Durations. Tailwind's `duration-*` utility resolves named values against the
+     `--transition-duration-*` theme namespace (confirmed in tailwindcss/dist/lib.js) — NOT
+     `--duration-*`, despite that being the intuitive guess and matching how `--ease-*` works
+     for `ease-*`. `--duration-*` silently produces no utility at all, so every `duration-fast`
+     / `duration-base` / etc. class across the app was resolving to no transition-duration
+     (i.e. an instant, un-transitioned change) until this was named correctly. ---- */
+   --transition-duration-instant: var(--dur-instant);
+   --transition-duration-fast: var(--dur-fast);
+   --transition-duration-base: var(--dur-base);
+   --transition-duration-slow: var(--dur-slow);
+   --transition-duration-slower: var(--dur-slower);
 
    /* ---- Motion keyframes used as Tailwind animate-* utilities (see tokens/base.css for
      the @keyframes themselves). ---- */
@@ -288,6 +298,25 @@
    --spacing-dept-nav: var(--dept-nav-h);
    --spacing-section-gap: var(--section-gap);
    --spacing-section-gap-lg: var(--section-gap-lg);
+}
+
+/* Mobile compaction: control heights and header heights were sized up earlier for a more
+   comfortable desktop/admin feel, but the same fixed values read as oversized on a phone
+   screen below the `md` breakpoint (900px, see --breakpoint-md in layout.css - hardcoded here
+   since media queries can't reference theme variables). Overriding the underlying raw tokens
+   (not the `--spacing-*` aliases above) is enough: every `h-control-*`/`w-control-*`/
+   `h-header`/`h-store-header` utility resolves through these at used-value time regardless of
+   where in the cascade they're set. Text sizes are untouched - the --font-size-base floor
+   stays 14px everywhere, this is a spacing-only change. */
+@media (max-width: 899px) {
+  :root {
+    --control-h-xs: 26px;
+    --control-h-sm: 30px;
+    --control-h-md: 34px;
+    --control-h-lg: 40px;
+    --header-h: 52px;
+    --store-header-h: 56px;
+  }
 }
 
 body {

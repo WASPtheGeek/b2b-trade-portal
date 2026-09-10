@@ -45,6 +45,8 @@ export interface UseProductFormOptions {
   /** The product being edited, or `null` when creating a new one. */
   product: ProductAdminDetail | null;
   genericErrorMessage?: string;
+  /** Called after a successful save, instead of the default redirect to the list. */
+  onSuccess?: () => void;
 }
 
 export interface ProductFormState {
@@ -60,6 +62,7 @@ export interface ProductFormState {
 export function useProductForm({
   product,
   genericErrorMessage = DEFAULT_GENERIC_ERROR,
+  onSuccess,
 }: UseProductFormOptions): ProductFormState {
   const router = useRouter();
   const [fields, setFields] = useState<ProductFormFields>(product ? toFields(product) : EMPTY_FIELDS);
@@ -98,7 +101,11 @@ export function useProductForm({
 
     request
       .then(() => {
-        router.push("/admin/products");
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push("/admin/products");
+        }
       })
       .catch((caught: unknown) => {
         setError(resolveErrorMessage(caught, genericErrorMessage));

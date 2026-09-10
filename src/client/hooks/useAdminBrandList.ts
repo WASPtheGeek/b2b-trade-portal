@@ -17,6 +17,7 @@ export interface AdminBrandListState {
   isLoading: boolean;
   error: string | null;
   deleteBrand(id: number): Promise<void>;
+  refresh(): void;
 }
 
 /**
@@ -64,5 +65,9 @@ export function useAdminBrandList({
     setReloadToken((current) => current + 1);
   }, []);
 
-  return { brands, isLoading, error, deleteBrand };
+  const refresh = useCallback((): void => {
+    setReloadToken((current) => current + 1);
+  }, []);
+
+  return { brands, isLoading, error, deleteBrand, refresh };
 }

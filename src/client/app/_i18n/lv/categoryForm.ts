@@ -16,5 +16,4 @@ export const categoryForm: CategoryFormLabels = {
   submittingLabel: "Saglabā…",
   cancelLabel: "Atcelt",
   genericErrorMessage: "Neizdevās saglabāt kategoriju. Lūdzu, mēģiniet vēlreiz.",
-  notFoundMessage: "Šī kategorija netika atrasta.",
 };

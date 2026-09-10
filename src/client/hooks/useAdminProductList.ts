@@ -20,6 +20,7 @@ export interface AdminProductListState {
   search: string;
   setSearch(value: string): void;
   setProductStatus(id: number, isActive: boolean): Promise<void>;
+  refresh(): void;
 }
 
 /** Owns the admin product list's data fetching, debounced search, and status-toggle action. */
@@ -70,5 +71,9 @@ export function useAdminProductList({
     setReloadToken((current) => current + 1);
   }, []);
 
-  return { products, isLoading, error, search, setSearch, setProductStatus };
+  const refresh = useCallback((): void => {
+    setReloadToken((current) => current + 1);
+  }, []);
+
+  return { products, isLoading, error, search, setSearch, setProductStatus, refresh };
 }

@@ -37,7 +37,7 @@ export function Tabs({ tabs = [], value, onChange, variant = "underline", classN
             aria-selected={ on }
             onClick={ () => onChange?.(tab.value) }
             className={ cn(
-              "flex items-center gap-[7px] font-sans text-[13.5px] whitespace-nowrap cursor-pointer transition-colors duration-fast ease-standard",
+              "flex items-center gap-[7px] font-sans text-[length:var(--font-size-base)] whitespace-nowrap cursor-pointer transition-colors duration-fast ease-standard",
               on ? "font-semibold" : "font-normal",
               pill
                 ? cn(

@@ -50,7 +50,7 @@ export function SearchInput({
         autoFocus={ autoFocus }
         onFocus={ () => setFocus(true) }
         onBlur={ () => setFocus(false) }
-        className="flex-1 min-w-0 h-full px-2 border-none outline-hidden bg-transparent font-sans text-[13.5px] text-text-strong"
+        className="flex-1 min-w-0 h-full px-2 border-none outline-hidden bg-transparent font-sans text-[length:var(--font-size-base)] text-text-strong"
       />
       { value ? (
         <button

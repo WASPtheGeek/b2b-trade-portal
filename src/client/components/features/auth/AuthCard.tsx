@@ -46,7 +46,7 @@ export function AuthCard({ activeTab, children, hideTabs = false, labels: labels
   const tabLabel = (tab: AuthTab): string => (tab === "login" ? labels.loginTab : labels.registerTab);
 
   return (
-    <div className="bg-surface-card border border-border-warm rounded-xl shadow-sm pt-[26px] px-[30px] pb-[30px] animate-fade-up">
+    <div className="bg-surface-card border border-border-warm rounded-xl shadow-sm pt-[18px] px-[18px] pb-[18px] md:pt-[26px] md:px-[30px] md:pb-[30px] animate-fade-up">
       { hideTabs ? null : (
         <div className="relative flex gap-1 p-1 bg-warm-100 rounded-pill">
           <div
@@ -63,7 +63,7 @@ export function AuthCard({ activeTab, children, hideTabs = false, labels: labels
               type="button"
               onClick={ () => onTabChange(tab) }
               className={ cn(
-                "relative z-10 flex-1 h-10 border-none rounded-pill bg-transparent font-sans text-[13.5px] cursor-pointer",
+                "relative z-10 flex-1 h-10 border-none rounded-pill bg-transparent font-sans text-[length:var(--font-size-base)] cursor-pointer",
                 "transition-colors duration-base ease-standard",
                 tab === activeTab ? "text-text-strong font-semibold" : "text-text-subtle font-normal",
               ) }

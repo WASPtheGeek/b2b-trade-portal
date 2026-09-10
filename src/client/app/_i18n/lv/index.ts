@@ -1,6 +1,7 @@
 import type { Dictionary } from "../Dictionary";
+import { adminNav } from "./adminNav";
 import { adminProductList } from "./adminProductList";
-import { adminSidebarFooter } from "./adminSidebarFooter";
+import { adminSidebar } from "./adminSidebar";
 import { authCard } from "./authCard";
 import { brandForm } from "./brandForm";
 import { brandList } from "./brandList";
@@ -21,7 +22,8 @@ export const lv: Dictionary = {
   loginForm,
   registerForm,
   registerConfirmation,
-  adminSidebarFooter,
+  adminSidebar,
+  adminNav,
   adminProductList,
   productForm,
   categoryList,

@@ -8,5 +8,4 @@ export const brandForm: BrandFormLabels = {
   submittingLabel: "Saglabā…",
   cancelLabel: "Atcelt",
   genericErrorMessage: "Neizdevās saglabāt zīmolu. Lūdzu, mēģiniet vēlreiz.",
-  notFoundMessage: "Šis zīmols netika atrasts.",
 };

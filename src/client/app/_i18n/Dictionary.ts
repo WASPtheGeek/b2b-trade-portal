@@ -1,4 +1,4 @@
-import type { AdminSidebarFooterLabels } from "@/components/features/admin/AdminSidebarFooter";
+import type { AdminNavLabels } from "@/app/admin/adminNav";
 import type { BrandFormLabels } from "@/components/features/admin/brands/BrandForm";
 import type { BrandListLabels } from "@/components/features/admin/brands/BrandList";
 import type { CategoryFormLabels } from "@/components/features/admin/categories/CategoryForm";
@@ -11,6 +11,7 @@ import type { LoginFormLabels } from "@/components/features/auth/LoginForm";
 import type { RegisterConfirmationLabels } from "@/components/features/auth/RegisterConfirmation";
 import type { RegisterFormLabels } from "@/components/features/auth/RegisterForm";
 import type { ShopHeaderLabels } from "@/components/features/shop/ShopHeader";
+import type { AdminSidebarLabels } from "@/components/layout/AdminSidebar";
 
 /**
  * Every localizable string used across the app, grouped by the feature
@@ -27,7 +28,8 @@ export interface Dictionary {
   loginForm: LoginFormLabels;
   registerForm: RegisterFormLabels;
   registerConfirmation: RegisterConfirmationLabels;
-  adminSidebarFooter: AdminSidebarFooterLabels;
+  adminSidebar: AdminSidebarLabels;
+  adminNav: AdminNavLabels;
   adminProductList: ProductListLabels;
   productForm: ProductFormLabels;
   categoryList: CategoryListLabels;

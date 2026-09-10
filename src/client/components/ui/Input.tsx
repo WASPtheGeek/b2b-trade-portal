@@ -56,13 +56,13 @@ export function Input({
         } }
         className={ cn(
           "flex-1 min-w-0 h-full px-3 border-none outline-hidden bg-transparent",
-          "font-sans text-[13.5px] text-text-strong disabled:text-text-disabled disabled:cursor-not-allowed",
+          "font-sans text-[length:var(--font-size-base)] text-text-strong disabled:text-text-disabled disabled:cursor-not-allowed",
           mono ? "font-mono tabular-nums" : undefined,
           size === "lg" ? "text-[14.5px]" : undefined,
         ) }
         { ...rest }
       />
-      { suffix ? <span className="pr-[11px] text-[12.5px] text-text-subtle flex-none">{ suffix }</span> : null }
+      { suffix ? <span className="pr-[11px] text-[length:var(--font-size-base)] text-text-subtle flex-none">{ suffix }</span> : null }
     </div>
   );
 }

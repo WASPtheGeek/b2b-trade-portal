@@ -24,21 +24,21 @@ export function Card({
   subtitle,
   actions,
   padding = 16,
-  elevation = "flat",
+  elevation = "lg",
   bodyClassName,
   className,
   ...rest
 }: CardProps) {
   return (
     <section
-      className={ cn("bg-surface-card border border-border-default rounded-card overflow-hidden", SHADOW[elevation], className) }
+      className={ cn("bg-surface-card border border-border-strong rounded-card overflow-hidden", SHADOW[elevation], className) }
       { ...rest }
     >
       { title || actions ? (
         <header className="flex items-center justify-between gap-3 py-[13px] px-4 border-b border-border-subtle">
           <div className="min-w-0">
             { title ? <h3 className="text-h4 font-semibold text-text-strong">{ title }</h3> : null }
-            { subtitle ? <p className="text-[12.5px] text-text-subtle mt-[3px]">{ subtitle }</p> : null }
+            { subtitle ? <p className="text-[length:var(--font-size-base)] text-text-subtle mt-[3px]">{ subtitle }</p> : null }
           </div>
           { actions ? <div className="flex items-center gap-2 flex-none">{ actions }</div> : null }
         </header>

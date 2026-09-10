@@ -29,7 +29,7 @@ export function FilterChip({
       onMouseEnter={ () => setHover(true) }
       onMouseLeave={ () => setHover(false) }
       className={ cn(
-        "inline-flex items-center gap-1.5 h-7 rounded-pill border font-sans text-[12.5px] whitespace-nowrap animate-pop transition-[background-color,border-color,color] duration-fast ease-standard",
+        "inline-flex items-center gap-1.5 h-7 rounded-pill border font-sans text-[length:var(--font-size-base)] whitespace-nowrap animate-pop transition-[background-color,border-color,color] duration-fast ease-standard",
         onRemove ? "pl-[11px] pr-1" : "pl-[11px] pr-[11px]",
         brand ? "bg-orange-50 border-orange-200 text-orange-800" : hover ? "bg-neutral-100 border-border-default text-text-body" : "bg-neutral-50 border-border-default text-text-body",
         className,

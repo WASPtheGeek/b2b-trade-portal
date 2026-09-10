@@ -33,8 +33,8 @@ export function Checkbox({ checked = false, onChange, label, count, disabled = f
       >
         { indeterminate ? <span className="w-2 h-[1.5px] bg-white" /> : checked ? <Icon name="check" size={ 12 } className="text-white" /> : null }
       </span>
-      { label ? <span className="flex-1 min-w-0 text-[13.5px] text-text-body">{ label }</span> : null }
-      { count != null ? <span className="flex-none font-mono text-[12px] text-text-disabled">{ count }</span> : null }
+      { label ? <span className="flex-1 min-w-0 text-[length:var(--font-size-base)] text-text-body">{ label }</span> : null }
+      { count != null ? <span className="flex-none font-mono text-[length:var(--font-size-base)] text-text-disabled">{ count }</span> : null }
     </label>
   );
 }

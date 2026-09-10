@@ -45,7 +45,7 @@ export function LoginForm({ labels: labelsProp }: LoginFormProps) {
   return (
     <form onSubmit={ handleSubmit } className="mt-[26px]">
       <h1 className="text-2xl font-semibold tracking-[-0.02em] text-text-strong">{ labels.heading }</h1>
-      <p className="mt-[7px] text-[13.5px] leading-[1.6] text-text-muted text-pretty">{ labels.subheading }</p>
+      <p className="mt-[7px] text-[length:var(--font-size-base)] leading-[1.6] text-text-muted text-pretty">{ labels.subheading }</p>
 
       { error ? (
         <NoticeBanner tone="danger" className="mt-4">
@@ -80,7 +80,7 @@ export function LoginForm({ labels: labelsProp }: LoginFormProps) {
         { isSubmitting ? labels.submittingLabel : labels.submitLabel }
       </Button>
 
-      <p className="mt-4 text-[13px] text-text-subtle text-center">
+      <p className="mt-4 text-[length:var(--font-size-base)] text-text-subtle text-center">
         { labels.noAccountText }{ " " }
         <Link href="/register" className="text-orange-700 hover:text-orange-800 hover:underline">
           { labels.registerLinkLabel }

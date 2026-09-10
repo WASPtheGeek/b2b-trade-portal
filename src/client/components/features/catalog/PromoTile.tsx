@@ -38,13 +38,13 @@ export function PromoTile({ kicker, title, body, cta, tone = "warm", onClick, cl
       ) }
       { ...rest }
     >
-      { kicker ? <span className={ cn("font-mono text-[10px] font-medium tracking-[.12em] uppercase", t.kick) }>{ kicker }</span> : null }
+      { kicker ? <span className={ cn("font-mono text-[length:var(--font-size-base)] font-medium tracking-[.12em] uppercase", t.kick) }>{ kicker }</span> : null }
       <h3 className={ cn("text-[15.5px] font-semibold leading-[1.3] mt-[7px] text-balance", t.fg) }>{ title }</h3>
-      { body ? <p className={ cn("text-[12.5px] leading-[1.5] mt-[5px] text-balance", t.sub) }>{ body }</p> : null }
+      { body ? <p className={ cn("text-[length:var(--font-size-base)] leading-[1.5] mt-[5px] text-balance", t.sub) }>{ body }</p> : null }
       { cta ? (
         <span
           className={ cn(
-            "flex items-center gap-1.5 mt-auto pt-3.5 text-[12.5px] font-semibold",
+            "flex items-center gap-1.5 mt-auto pt-3.5 text-[length:var(--font-size-base)] font-semibold",
             tone === "dark" ? "text-orange-400" : "text-orange-700",
           ) }
         >

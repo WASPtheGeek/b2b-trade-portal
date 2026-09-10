@@ -47,7 +47,11 @@ public class ProductsController : ControllerBase
     {
         var query = _db.Products
             .Include(p => p.Brand)
+            .Include(p => p.VatRate)
             .Include(p => p.Images)
+            .Include(p => p.ProductCategories)
+                .ThenInclude(pc => pc.Category)
+            .AsSplitQuery()
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(category))
@@ -286,11 +290,17 @@ public class ProductsController : ControllerBase
         p.Id,
         p.Sku,
         p.Name,
+        p.Description,
         p.Ean,
         p.Brand?.Name,
         p.Images.OrderBy(i => i.SortOrder).Select(i => i.Filename).FirstOrDefault(),
         p.IsActive,
-        p.BasePrice);
+        p.BasePrice,
+        p.VatRate.Rate,
+        p.SoldByPiece,
+        p.PiecesPerBox,
+        p.PiecesPerPackage,
+        p.ProductCategories.OrderByDescending(pc => pc.IsPrimary).Select(pc => pc.Category.Name).ToList());
 
     /// <summary>
     /// Converts a <see cref="Product"/> entity to a <see cref="ProductAdminDetailDto"/>.

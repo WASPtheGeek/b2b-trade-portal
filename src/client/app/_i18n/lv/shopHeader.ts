@@ -11,4 +11,8 @@ export const shopHeader: ShopHeaderLabels = {
   openMenu: "Kategoriju izvēlne",
   closeMenu: "Aizvērt izvēlni",
   signOut: "Iziet",
+  adminPanel: "Administrēšana",
+  utilityMessage: "Vairumtirdzniecība apstiprinātiem uzņēmumu kontiem — piegāde visā Latvijā",
+  orderHelp: "Kā notiek pasūtīšana",
+  supportPhone: "+371 20000000",
 };

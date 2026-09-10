@@ -3,7 +3,7 @@
 // Category page component.
 export default function CategoryPage() {
   return (
-    <div className="relative min-h-screen bg-surface-warm">
+    <div className="relative flex-1 bg-surface-warm">
 
     </div>
   );

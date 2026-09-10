@@ -49,6 +49,7 @@ export interface StoreHeaderProps extends HTMLAttributes<HTMLDivElement> {
   onLogin?: () => void;
   onCart?: () => void;
   right?: ReactNode;
+  left?: ReactNode;
   menuOpen?: boolean;
   onMenuToggle?: () => void;
   labels?: Partial<StoreHeaderLabels>;
@@ -89,24 +90,34 @@ function SearchField({
         onSearchSubmit?.();
       } }
       className={ cn(
-        "min-w-0 flex items-center h-10 rounded-pill overflow-hidden border transition-[border-color,box-shadow] duration-fast ease-standard bg-warm-50",
+        "min-w-0 flex items-center h-9 md:h-10 rounded-pill overflow-hidden border transition-[border-color,box-shadow] duration-fast ease-standard bg-warm-50",
         focus ? "border-orange-500 shadow-[var(--focus-ring-shadow)]" : "border-border-warm",
         className,
       ) }
     >
       <input
         ref={ inputRef }
+        type="search"
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={ false }
+        // Mobile Safari restores a field's previous value from before a reload (separate
+        // from - and not prevented by - autoComplete="off"), so the live DOM can legitimately
+        // differ from the server-rendered markup right at hydration. That's expected here,
+        // not a bug: this input is fully controlled by `value`/`onChange`, so it resyncs to
+        // `search` immediately after.
+        suppressHydrationWarning
         value={ search }
         onChange={ onSearchChange }
         onFocus={ () => setFocus(true) }
         onBlur={ () => setFocus(false) }
         placeholder={ placeholder }
-        className="flex-1 min-w-0 h-[38px] pl-[18px] pr-1.5 border-none outline-hidden bg-transparent font-sans text-[13.5px] text-text-strong"
+        className="flex-1 min-w-0 h-[34px] md:h-[38px] pl-[14px] md:pl-[18px] pr-1.5 border-none outline-hidden bg-transparent font-sans text-[length:var(--font-size-base)] text-text-strong"
       />
       <button
         type="submit"
         aria-label={ submitLabel }
-        className="flex-none flex items-center justify-center w-[52px] h-[38px] border-none bg-brand text-white cursor-pointer"
+        className="flex-none flex items-center justify-center w-[44px] h-[34px] md:w-[52px] md:h-[38px] border-none bg-brand text-white cursor-pointer"
       >
         <Icon name="search" size={ 16 } />
       </button>
@@ -134,6 +145,7 @@ export function StoreHeader({
   onLogin,
   onCart,
   right,
+  left,
   menuOpen = false,
   onMenuToggle,
   labels: labelsProp,
@@ -153,13 +165,14 @@ export function StoreHeader({
 
   const accountAction = user ? (
     <button onClick={ onCart } className="flex items-center gap-[9px] h-10 pl-3 pr-1.5 bg-transparent border-none cursor-pointer text-left">
+      <Icon name="shopping-cart" size={ 18 } className="flex-none text-text-strong md:hidden" />
       <span className="hidden md:flex flex-col leading-[1.25]">
-        <span className="text-[12.5px] font-semibold text-text-strong whitespace-nowrap">{ user.name }</span>
-        <span className="text-[11px] text-text-subtle whitespace-nowrap">{ cartTotal }</span>
+        <span className="text-[length:var(--font-size-base)] font-semibold text-text-strong whitespace-nowrap">{ user.name }</span>
+        <span className="text-[length:var(--font-size-base)] text-text-subtle whitespace-nowrap">{ cartTotal }</span>
       </span>
     </button>
   ) : (
-    <Button variant="primary" pill size="md" icon="user" onClick={ onLogin } className="px-3 md:px-4">
+    <Button variant="primary" pill size="md" icon="user" onClick={ onLogin } className="w-control-md px-0 md:w-auto md:px-4">
       <span className="hidden md:inline">{ labels.account }</span>
     </Button>
   );
@@ -176,7 +189,8 @@ export function StoreHeader({
       { ...rest }
     >
       <div className="relative max-w-layout-max mx-auto h-store-header">
-        {/* Both rows stay mounted so the swap between them can cross-fade instead of
+        {
+          /* Both rows stay mounted so the swap between them can cross-fade instead of
             popping instantly - conditionally rendering one or the other would unmount/
             remount completely different DOM, which CSS can't transition between.
             Each row carries its own horizontal padding (rather than the parent above)
@@ -187,12 +201,12 @@ export function StoreHeader({
           inert={ searching }
           style={ { transition: "opacity var(--dur-base) var(--ease-standard), translate var(--dur-base) var(--ease-out)" } }
           className={ cn(
-            "absolute inset-0 flex items-center gap-3 md:gap-5 px-gutter md:px-8 lg:px-gutter",
+            "absolute inset-0 flex items-center gap-2 md:gap-5 px-4 md:px-8 lg:px-gutter",
             searching ? "opacity-0 -translate-y-1 pointer-events-none" : "opacity-100 translate-y-0",
           ) }
         >
           <Link href="/" className="flex-none flex items-center">
-            <Logo height={ 45 } src={ logoSrc } />
+            <Logo src={ logoSrc } className="h-10 w-auto md:h-[50px] md:w-auto" />
           </Link>
 
           <SearchField
@@ -204,12 +218,13 @@ export function StoreHeader({
             className="hidden md:flex flex-1 max-w-[720px]"
           />
 
-          <div className="flex items-center gap-1.5 md:gap-2.5 ml-auto flex-none">
-            { right }
+          <div className="flex items-center gap-1.5 md:gap-3 ml-auto flex-none">
+            { left }
             <IconButton icon="search" label={ labels.searchIcon } size="md" className="md:hidden" onClick={ () => setSearching(true) } />
-            <IconButton icon="heart" label={ labels.saved } size="md" badge={ savedCount || undefined } onClick={ onSaved } />
-            <IconButton icon="shopping-cart" label={ labels.cart } size="md" badge={ cartCount || undefined } onClick={ onCart } />
+            <IconButton icon="heart" label={ labels.saved } size="md" badge={ savedCount || undefined } onClick={ onSaved } className="hidden md:inline-flex" />
+            <IconButton icon="shopping-cart" label={ labels.cart } size="md" badge={ cartCount || undefined } onClick={ onCart } className="hidden md:inline-flex" />
             { accountAction }
+            { right }
             <IconButton
               icon={ menuOpen ? "x" : "menu" }
               label={ menuOpen ? labels.closeMenu : labels.openMenu }
@@ -225,7 +240,7 @@ export function StoreHeader({
           inert={ !searching }
           style={ { transition: "opacity var(--dur-base) var(--ease-standard), translate var(--dur-base) var(--ease-out)" } }
           className={ cn(
-            "absolute inset-0 flex items-center gap-3 px-gutter md:px-8 lg:px-gutter",
+            "absolute inset-0 flex items-center gap-2 px-4 md:px-8 lg:px-gutter",
             searching ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none",
           ) }
         >

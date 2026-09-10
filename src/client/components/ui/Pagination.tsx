@@ -80,7 +80,7 @@ export function Pagination({
   return (
     <div className={ cn("flex items-center justify-between gap-4 flex-wrap", className) } { ...rest }>
       { total != null ? (
-        <span className="text-[12.5px] text-text-subtle [font-variant-numeric:tabular-nums]">
+        <span className="text-[length:var(--font-size-base)] text-text-subtle [font-variant-numeric:tabular-nums]">
           { renderSummary((page - 1) * (pageSize ?? 0) + 1, Math.min(page * (pageSize ?? 0), total), total) }
         </span>
       ) : (
@@ -90,7 +90,7 @@ export function Pagination({
         <NavButton icon="chevron-left" target={ page - 1 } label={ prevLabel } pageCount={ pageCount } onPageChange={ onPageChange } />
         { nums.map((n, i) =>
           n === "…" ? (
-            <span key={ `e${i}` } className="w-5 text-center text-text-disabled text-[13px]">
+            <span key={ `e${i}` } className="w-5 text-center text-text-disabled text-[length:var(--font-size-base)]">
               …
             </span>
           ) : (
@@ -99,7 +99,7 @@ export function Pagination({
               type="button"
               onClick={ () => onPageChange?.(n) }
               className={ cn(
-                "min-w-8 h-8 px-1.5 rounded-sm border font-sans text-[13px] cursor-pointer [font-variant-numeric:tabular-nums]",
+                "min-w-8 h-8 px-1.5 rounded-sm border font-sans text-[length:var(--font-size-base)] cursor-pointer [font-variant-numeric:tabular-nums]",
                 n === page ? "border-transparent bg-neutral-900 text-white font-semibold" : "border-border-default bg-white text-text-body font-normal",
               ) }
             >

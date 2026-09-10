@@ -13,6 +13,8 @@ export interface UseBrandFormOptions {
   /** The brand being edited, or `null` when creating a new one. */
   brand: Brand | null;
   genericErrorMessage?: string;
+  /** Called after a successful save, instead of the default redirect to the list. */
+  onSuccess?: () => void;
 }
 
 export interface BrandFormState {
@@ -24,7 +26,7 @@ export interface BrandFormState {
 }
 
 /** Owns the brand create/edit form's field state, submission, and error handling. */
-export function useBrandForm({ brand, genericErrorMessage = DEFAULT_GENERIC_ERROR }: UseBrandFormOptions): BrandFormState {
+export function useBrandForm({ brand, genericErrorMessage = DEFAULT_GENERIC_ERROR, onSuccess }: UseBrandFormOptions): BrandFormState {
   const router = useRouter();
   const [name, setName] = useState(brand?.name ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,11 @@ export function useBrandForm({ brand, genericErrorMessage = DEFAULT_GENERIC_ERRO
 
     request
       .then(() => {
-        router.push("/admin/brands");
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push("/admin/brands");
+        }
       })
       .catch((caught: unknown) => {
         setError(resolveErrorMessage(caught, genericErrorMessage));

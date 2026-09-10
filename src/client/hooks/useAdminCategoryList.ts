@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { tokenStorage } from "@/lib/auth/tokenStorageInstance";
 import { resolveErrorMessage } from "@/lib/http/resolveErrorMessage";
 import { categoryService } from "@/services/categoryServiceInstance";
-import type { Category } from "@/types/category";
+import type { Category, CategoryUpsertPayload } from "@/types/category";
 
 const DEFAULT_GENERIC_ERROR = "Failed to load categories. Please try again.";
 
@@ -17,6 +17,9 @@ export interface AdminCategoryListState {
   isLoading: boolean;
   error: string | null;
   deleteCategory(id: number): Promise<void>;
+  /** Persists new `sortOrder` values (e.g. after a drag-and-drop reorder) for the given categories. */
+  reorderCategories(updates: { id: number; sortOrder: number }[]): Promise<void>;
+  refresh(): void;
 }
 
 /**
@@ -64,5 +67,41 @@ export function useAdminCategoryList({
     setReloadToken((current) => current + 1);
   }, []);
 
-  return { categories, isLoading, error, deleteCategory };
+  const reorderCategories = useCallback(async (updates: { id: number; sortOrder: number }[]): Promise<void> => {
+    const token = tokenStorage.getToken();
+
+    if (!token) {
+      return;
+    }
+
+    await Promise.all(
+      updates.map(({ id, sortOrder }) => {
+        const category = categories.find((c) => c.id === id);
+
+        if (!category) {
+          return Promise.resolve();
+        }
+
+        const payload: CategoryUpsertPayload = {
+          parentId: category.parentId ?? undefined,
+          name: category.name,
+          slug: category.slug,
+          description: category.description ?? undefined,
+          sortOrder,
+          isCustom: category.isCustom,
+          showInMenu: category.showInMenu,
+        };
+
+        return categoryService.update(id, payload, token);
+      }),
+    );
+
+    setReloadToken((current) => current + 1);
+  }, [categories]);
+
+  const refresh = useCallback((): void => {
+    setReloadToken((current) => current + 1);
+  }, []);
+
+  return { categories, isLoading, error, deleteCategory, reorderCategories, refresh };
 }

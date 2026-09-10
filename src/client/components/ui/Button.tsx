@@ -5,27 +5,27 @@ import { Icon, type IconName } from "./Icon";
 
 const button = cva(
   [
-    "inline-flex items-center justify-center gap-[7px] min-w-0 overflow-hidden text-center",
+    "group relative isolate inline-flex items-center justify-center min-w-0 overflow-hidden text-center",
     "font-sans font-medium tracking-[-0.002em] whitespace-nowrap",
-    "transition-[background-color,border-color,color,box-shadow,transform] duration-fast ease-standard",
-    "disabled:cursor-not-allowed disabled:bg-action-disabled-bg disabled:text-action-disabled-fg disabled:border disabled:border-border-subtle disabled:hover:translate-y-0 disabled:hover:shadow-none",
+    "transition-[background-color,border-color,color,box-shadow] duration-fast ease-standard",
+    "disabled:cursor-not-allowed disabled:bg-action-disabled-bg disabled:text-action-disabled-fg disabled:border disabled:border-border-subtle disabled:hover:shadow-none",
   ],
   {
     variants: {
       variant: {
-        primary: "bg-brand text-white border border-transparent hover:bg-orange-600 active:bg-orange-700",
-        danger: "bg-red-500 text-white border border-transparent hover:bg-red-600 active:bg-red-700",
-        success: "bg-green-500 text-white border border-transparent hover:bg-green-600 active:bg-green-700",
-        secondary: "bg-white text-text-strong border border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400",
-        ghost: "bg-transparent text-text-body border border-transparent hover:bg-neutral-100",
-        inverse: "bg-white/7 text-white border border-white/18 hover:bg-white/14",
+        primary: "bg-brand text-white border border-transparent active:bg-orange-700",
+        danger: "bg-red-500 text-white border border-transparent active:bg-red-700",
+        success: "bg-green-500 text-white border border-transparent active:bg-green-700",
+        secondary: "bg-white text-text-strong border border-neutral-300 hover:border-neutral-400",
+        ghost: "bg-transparent text-text-body border border-transparent",
+        inverse: "bg-white/7 text-white border border-white/18",
         link: "bg-transparent text-orange-700 border border-transparent p-0! hover:text-orange-800 hover:underline underline-offset-2",
       },
       size: {
-        xs: "h-control-xs min-h-control-xs px-[10px] text-[12px] gap-[5px]",
-        sm: "h-control-sm min-h-control-sm px-[12px] text-[13px]",
-        md: "h-control-md min-h-control-md px-4 text-[13.5px]",
-        lg: "h-control-lg min-h-control-lg px-5 text-[15px]",
+        xs: "h-control-xs min-h-control-xs px-[12px] text-[length:var(--font-size-base)]",
+        sm: "h-control-sm min-h-control-sm px-[16px] text-[length:var(--font-size-base)]",
+        md: "h-control-md min-h-control-md px-5 text-[length:var(--font-size-base)]",
+        lg: "h-control-lg min-h-control-lg px-6 text-[15px]",
       },
       pill: {
         true: "rounded-pill",
@@ -38,12 +38,6 @@ const button = cva(
         true: "h-auto! py-[7px] leading-[1.3] text-balance whitespace-normal",
       },
     },
-    compoundVariants: [
-      {
-        variant: ["primary", "danger", "success", "secondary"],
-        class: "hover:-translate-y-[1.5px] hover:shadow-sm active:translate-y-0 active:scale-[0.985]",
-      },
-    ],
     defaultVariants: {
       variant: "primary",
       size: "md",
@@ -51,6 +45,18 @@ const button = cva(
     },
   },
 );
+
+// The hover fill for each variant, revealed via a scaled overlay rather than a background-color
+// transition - it grows in from the bottom edge on hover and recedes back down on hover-out,
+// instead of fading or nudging the button out of place. "link" has no fill to reveal (text-only).
+const OVERLAY_COLOR: Partial<Record<NonNullable<ButtonProps["variant"]>, string>> = {
+  primary: "bg-orange-600",
+  danger: "bg-red-600",
+  success: "bg-green-600",
+  secondary: "bg-neutral-50",
+  ghost: "bg-neutral-100",
+  inverse: "bg-white/14",
+};
 
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">,
@@ -75,17 +81,29 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const iconSize = size === "lg" ? 17 : size === "xs" ? 13 : 15;
+  const overlayColor = OVERLAY_COLOR[variant ?? "primary"];
 
   return (
     <button
       type={ type }
       disabled={ disabled }
-      className={ cn(button({ variant, size, pill, fullWidth, wrap }), className) }
+      className={ cn(button({ variant, size, pill, fullWidth, wrap }), overlayColor ? "hover:shadow-md" : undefined, className) }
       { ...rest }
     >
-      { icon ? <Icon name={ icon } size={ iconSize } /> : null }
-      { children }
-      { iconAfter ? <Icon name={ iconAfter } size={ iconSize } /> : null }
+      { overlayColor ? (
+        <span
+          aria-hidden
+          className={ cn(
+            "absolute inset-0 origin-bottom scale-y-0 transition-transform duration-fast ease-standard group-hover:scale-y-100",
+            overlayColor,
+          ) }
+        />
+      ) : null }
+      <span className={ cn("relative inline-flex items-center justify-center min-w-0", size === "xs" ? "gap-[5px]" : "gap-[7px]") }>
+        { icon ? <Icon name={ icon } size={ iconSize } /> : null }
+        { children }
+        { iconAfter ? <Icon name={ iconAfter } size={ iconSize } /> : null }
+      </span>
     </button>
   );
 }

@@ -22,7 +22,7 @@ export function SectionLabel({ children, align = "center", tone = "brand", rules
   return (
     <div className={ cn("flex items-center gap-4", className) } { ...rest }>
       { rules && align !== "left" ? rule : null }
-      <span className={ cn("font-mono text-[11px] font-medium tracking-[.15em] uppercase whitespace-nowrap", TONE_CLASS[tone]) }>
+      <span className={ cn("font-mono text-[length:var(--font-size-base)] font-medium tracking-[.15em] uppercase whitespace-nowrap", TONE_CLASS[tone]) }>
         { children }
       </span>
       { rules ? rule : null }

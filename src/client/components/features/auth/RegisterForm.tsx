@@ -63,7 +63,7 @@ export function RegisterForm({ onSuccess, labels: labelsProp }: RegisterFormProp
   return (
     <form onSubmit={ handleSubmit } className="mt-[26px]">
       <h1 className="text-2xl font-semibold tracking-[-0.02em] text-text-strong">{ labels.heading }</h1>
-      <p className="mt-[7px] text-[13.5px] leading-[1.6] text-text-muted text-pretty">{ labels.subheading }</p>
+      <p className="mt-[7px] text-[length:var(--font-size-base)] leading-[1.6] text-text-muted text-pretty">{ labels.subheading }</p>
 
       { error ? (
         <NoticeBanner tone="danger" className="mt-4">
@@ -151,7 +151,7 @@ export function RegisterForm({ onSuccess, labels: labelsProp }: RegisterFormProp
         { isSubmitting ? labels.submittingLabel : labels.submitLabel }
       </Button>
 
-      <p className="mt-3.5 text-[13px] text-text-subtle text-center">
+      <p className="mt-3.5 text-[length:var(--font-size-base)] text-text-subtle text-center">
         { labels.alreadyApprovedText }{ " " }
         <Link href="/login" className="text-orange-700 hover:text-orange-800 hover:underline">
           { labels.loginLinkLabel }

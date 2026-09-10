@@ -3,11 +3,17 @@ export interface ProductAdminListItem {
   id: number;
   sku: string;
   name: string;
+  description: string | null;
   ean: string | null;
   brandName: string | null;
   thumbnailFilename: string | null;
   isActive: boolean;
   basePrice: number;
+  vatRatePercent: number;
+  soldByPiece: boolean;
+  piecesPerBox: number | null;
+  piecesPerPackage: number | null;
+  categoryNames: string[];
 }
 
 /**

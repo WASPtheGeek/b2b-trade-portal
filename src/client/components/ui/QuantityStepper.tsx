@@ -69,11 +69,11 @@ export function QuantityStepper({
         }}
         className={cn(
           "h-full text-center border-x border-border-subtle outline-hidden bg-transparent",
-          "font-mono text-[13px] font-medium text-text-strong [font-variant-numeric:tabular-nums]",
+          "font-mono text-[length:var(--font-size-base)] font-medium text-text-strong [font-variant-numeric:tabular-nums]",
         )}
         style={{ width: unitLabel ? 58 : 42 }}
       />
-      {unitLabel ? <span className="px-2 text-[11.5px] text-text-subtle whitespace-nowrap">{unitLabel}</span> : null}
+      {unitLabel ? <span className="px-2 text-[length:var(--font-size-base)] text-text-subtle whitespace-nowrap">{unitLabel}</span> : null}
       <button
         type="button"
         aria-label={increaseLabel}
