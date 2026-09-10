@@ -2,10 +2,10 @@ import type { BrandListLabels } from "@/components/features/admin/brands/BrandLi
 
 export const brandList: BrandListLabels = {
   heading: "Zīmoli",
-  addBrandLabel: "Pievienot zīmolu",
+  addBrandLabel: "Pievienot",
   columnName: "Nosaukums",
   columnActions: "",
-  stickyActionsLabel: "Rādīt darbību kolonnu vienmēr redzamu",
+  stickyActionsLabel: "Piespraust darbību kolonnu",
   editLabel: "Rediģēt",
   deleteLabel: "Dzēst",
   deleteConfirmTitle: "Dzēst zīmolu?",

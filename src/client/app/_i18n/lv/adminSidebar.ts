@@ -5,4 +5,5 @@ export const adminSidebar: AdminSidebarLabels = {
   closeMenu: "Aizvērt izvēlni",
   collapseMenu: "Sakļaut izvēlni",
   expandMenu: "Izvērst izvēlni",
+  goToStore: "Uz veikalu",
 };

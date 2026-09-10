@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <AdminGuard>
       <div className="flex flex-col md:flex-row min-h-screen bg-white">
         <AdminSidebar items={ buildAdminNavGroups(dictionary.adminNav) } labels={ dictionary.adminSidebar } footer={ <AdminSidebarFooter /> } />
-        <main className="flex-1 min-w-0 elk-scroll-y py-[18px] px-[22px]">{ children }</main>
+        <main className="flex-1 min-w-0 elk-scroll-y py-[18px] px-[10px] md:px-[22px]">{ children }</main>
       </div>
     </AdminGuard>
   );

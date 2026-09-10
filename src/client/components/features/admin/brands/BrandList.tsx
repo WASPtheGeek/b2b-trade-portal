@@ -36,7 +36,7 @@ const DEFAULT_LABELS: BrandListLabels = {
   addBrandLabel: "Add brand",
   columnName: "Name",
   columnActions: "",
-  stickyActionsLabel: "Keep actions column visible",
+  stickyActionsLabel: "Pin actions column",
   editLabel: "Edit",
   deleteLabel: "Delete",
   deleteConfirmTitle: "Delete brand?",
@@ -103,14 +103,11 @@ export function BrandList({ labels: labelsProp, formLabels }: BrandListProps) {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <h1 className="text-h1 font-semibold text-text-strong">{ labels.heading }</h1>
-        <div className="flex items-center gap-4">
-          <Checkbox label={ labels.stickyActionsLabel } checked={ stickyActions } onChange={ (event) => setStickyActions(event.target.checked) } />
-          <Button pill icon="plus" onClick={ () => setFormTarget("new") }>
-            { labels.addBrandLabel }
-          </Button>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h1 className="text-h1 font-semibold text-text-strong truncate">{ labels.heading }</h1>
+        <Button pill icon="plus" className="shrink-0" onClick={ () => setFormTarget("new") }>
+          { labels.addBrandLabel }
+        </Button>
       </div>
 
       { error ? (
@@ -118,6 +115,10 @@ export function BrandList({ labels: labelsProp, formLabels }: BrandListProps) {
           { error }
         </NoticeBanner>
       ) : null }
+
+      <div className="flex justify-end mb-2">
+        <Checkbox label={ labels.stickyActionsLabel } checked={ stickyActions } onChange={ (event) => setStickyActions(event.target.checked) } />
+      </div>
 
       <Card padding={ 0 }>
         <DataTable

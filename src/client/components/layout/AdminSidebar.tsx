@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
@@ -14,6 +14,7 @@ export interface AdminSidebarLabels {
   closeMenu: string;
   collapseMenu: string;
   expandMenu: string;
+  goToStore: string;
 }
 
 const DEFAULT_LABELS: AdminSidebarLabels = {
@@ -21,6 +22,7 @@ const DEFAULT_LABELS: AdminSidebarLabels = {
   closeMenu: "Close menu",
   collapseMenu: "Collapse menu",
   expandMenu: "Expand menu",
+  goToStore: "Go to store",
 };
 
 const COLLAPSED_STORAGE_KEY = "elkaro-admin-sidebar-collapsed";
@@ -42,6 +44,7 @@ export interface AdminSidebarProps extends HTMLAttributes<HTMLElement> {
 export function AdminSidebar({ items, logoSrc, footer, labels: labelsProp, className, ...rest }: AdminSidebarProps) {
   const labels = { ...DEFAULT_LABELS, ...labelsProp };
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -179,7 +182,10 @@ export function AdminSidebar({ items, logoSrc, footer, labels: labelsProp, class
         ) }
       >
         { navGroups }
-        { footer ? <div className="flex-none p-3.5 md:p-5 border-t border-border-inverse">{ footer }</div> : null }
+        <div className="flex-none p-3.5 border-t border-border-inverse flex items-center justify-between gap-2">
+          { footer ? <div className="min-w-0 flex-1">{ footer }</div> : null }
+          <IconButton icon="home" label={ labels.goToStore } variant="inverse" className="flex-none" onClick={ () => router.push("/") } />
+        </div>
       </nav>
 
       <nav
@@ -206,12 +212,15 @@ export function AdminSidebar({ items, logoSrc, footer, labels: labelsProp, class
           ) }
         >
           { collapsed ? null : <div className="min-w-0 flex-1">{ footer }</div> }
-          <IconButton
-            icon={ collapsed ? "chevron-right" : "chevron-left" }
-            label={ collapsed ? labels.expandMenu : labels.collapseMenu }
-            variant="inverse"
-            onClick={ toggleCollapsed }
-          />
+          <div className="flex items-center gap-1.5 flex-none">
+            <IconButton icon="home" label={ labels.goToStore } variant="inverse" onClick={ () => router.push("/") } />
+            <IconButton
+              icon={ collapsed ? "chevron-right" : "chevron-left" }
+              label={ collapsed ? labels.expandMenu : labels.collapseMenu }
+              variant="inverse"
+              onClick={ toggleCollapsed }
+            />
+          </div>
         </div>
       </nav>
     </>

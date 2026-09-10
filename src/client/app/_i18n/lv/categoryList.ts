@@ -2,14 +2,14 @@ import type { CategoryListLabels } from "@/components/features/admin/categories/
 
 export const categoryList: CategoryListLabels = {
   heading: "Kategorijas",
-  addCategoryLabel: "Pievienot kategoriju",
+  addCategoryLabel: "Pievienot",
   columnName: "Nosaukums",
   columnSlug: "Slug",
   columnParent: "Vecākkategorija",
   columnDescription: "Apraksts",
   columnVisibility: "Redzamība",
   columnActions: "",
-  stickyActionsLabel: "Rādīt darbību kolonnu vienmēr redzamu",
+  stickyActionsLabel: "Piespraust darbību kolonnu",
   visibleLabel: "Izvēlnē",
   hiddenLabel: "Slēpta",
   editLabel: "Rediģēt",

@@ -63,7 +63,8 @@ export function AuthCard({ activeTab, children, hideTabs = false, labels: labels
               type="button"
               onClick={ () => onTabChange(tab) }
               className={ cn(
-                "relative z-10 flex-1 h-10 border-none rounded-pill bg-transparent font-sans text-[length:var(--font-size-base)] cursor-pointer",
+                "relative z-10 flex-1 min-h-10 flex items-center justify-center px-1.5 py-1.5",
+                "border-none rounded-pill bg-transparent font-sans text-[13px] sm:text-[length:var(--font-size-base)] text-center leading-tight cursor-pointer",
                 "transition-colors duration-base ease-standard",
                 tab === activeTab ? "text-text-strong font-semibold" : "text-text-subtle font-normal",
               ) }

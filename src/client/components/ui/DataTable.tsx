@@ -100,17 +100,23 @@ export function DataTable<T extends { id?: string | number }>({
   const [armed, setArmed] = useState<number | null>(null);
   const [hasHiddenContent, setHasHiddenContent] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  // A 1x1 marker pinned to the true right edge of the table's own box (which, unlike the sticky
-  // action column, keeps its real layout position there even while its paint position is stuck) -
-  // watching whether *it* is scrolled into view sidesteps every scrollWidth/clientWidth rounding
-  // and stale-measurement issue that come with computing this by hand from scroll geometry.
-  const endSentinelRef = useRef<HTMLDivElement>(null);
+  // The last non-pinned column's header cell doubles as the "is everything scrolled into view"
+  // marker: once it's fully visible, nothing is left hidden behind the sticky column (which,
+  // unlike an injected sentinel, we can't just drop a plain <div> into - a <div> isn't valid
+  // <table> content, and while React's DOM APIs will render it fine on the client, the
+  // server-rendered HTML gets parsed by the browser's normal HTML parser, which foster-parents
+  // it out from under <table> entirely, causing a hydration mismatch). A real header cell needs
+  // no extra markup and is always present regardless of loading state.
+  const endSentinelRef = useRef<HTMLTableCellElement>(null);
+  const lastNonStickyIndex = columns.reduce((acc, c, i) => (c.sticky !== "right" ? i : acc), -1);
 
   useEffect(() => {
     const root = containerRef.current;
     const sentinel = endSentinelRef.current;
 
     if (!root || !sentinel) {
+      setHasHiddenContent(false);
+
       return;
     }
 
@@ -122,7 +128,7 @@ export function DataTable<T extends { id?: string | number }>({
     observer.observe(sentinel);
 
     return () => observer.disconnect();
-  }, [rows.length, columns.length]);
+  }, [rows.length, columns.length, lastNonStickyIndex]);
 
   const move = (from: number, to: number) => {
     if (from !== to) {
@@ -139,19 +145,19 @@ export function DataTable<T extends { id?: string | number }>({
         column would silently scroll along with everything else instead of staying pinned.
         Separate borders only paint on cells, not rows, so each row's bottom border moves from
         the <tr> onto its <td>s below. */ }
-      <table className="relative w-full border-separate border-spacing-0 font-sans text-[14px]">
-        <div ref={ endSentinelRef } aria-hidden className="absolute top-0 right-0 w-px h-px pointer-events-none" />
+      <table className="w-full border-separate border-spacing-0 font-sans text-[14px]">
         <thead>
           <tr>
             { reorderable ? <th className="w-[38px] bg-surface-subtle border-b border-border-default sticky top-0" /> : null }
             { selectable ? <th className="w-10 bg-surface-subtle border-b border-border-default sticky top-0" /> : null }
-            { columns.map((c) => {
+            { columns.map((c, i) => {
               const on = sort?.key === c.key;
               const sortable = c.sortable !== false && !!onSortChange;
 
               return (
                 <th
                   key={ c.key }
+                  ref={ i === lastNonStickyIndex ? endSentinelRef : undefined }
                   className={ cn(
                     "h-[38px] px-[var(--cell-pad-x)] bg-surface-subtle border-b border-border-default sticky top-0 z-[1] whitespace-nowrap",
                     c.sticky === "right" && cn(STICKY_RIGHT, "z-[2]", hasHiddenContent && STICKY_RIGHT_EDGE),

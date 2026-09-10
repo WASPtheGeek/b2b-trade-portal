@@ -2,7 +2,7 @@ import type { ProductListLabels } from "@/components/features/admin/products/Pro
 
 export const adminProductList: ProductListLabels = {
   heading: "Produkti",
-  addProductLabel: "Pievienot produktu",
+  addProductLabel: "Pievienot",
   searchPlaceholder: "Meklēt pēc nosaukuma vai EAN…",
   columnName: "Nosaukums",
   columnSku: "SKU",
@@ -17,7 +17,7 @@ export const adminProductList: ProductListLabels = {
   columnSoldByPiece: "Pārdod gb",
   columnStatus: "Statuss",
   columnActions: "",
-  stickyActionsLabel: "Rādīt darbību kolonnu vienmēr redzamu",
+  stickyActionsLabel: "Piespraust darbību kolonnu",
   activeLabel: "Aktīvs",
   inactiveLabel: "Neaktīvs",
   activateLabel: "Aktivizēt",

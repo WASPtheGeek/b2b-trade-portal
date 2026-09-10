@@ -67,7 +67,7 @@ const DEFAULT_LABELS: ProductListLabels = {
   columnSoldByPiece: "Sold by piece",
   columnStatus: "Status",
   columnActions: "",
-  stickyActionsLabel: "Keep actions column visible",
+  stickyActionsLabel: "Pin actions column",
   activeLabel: "Active",
   inactiveLabel: "Inactive",
   activateLabel: "Activate",
@@ -213,9 +213,9 @@ export function ProductList({ labels: labelsProp, formLabels }: ProductListProps
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <h1 className="text-h1 font-semibold text-text-strong">{ labels.heading }</h1>
-        <Button pill icon="plus" onClick={ () => setFormTarget("new") }>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h1 className="text-h1 font-semibold text-text-strong truncate">{ labels.heading }</h1>
+        <Button pill icon="plus" className="shrink-0" onClick={ () => setFormTarget("new") }>
           { labels.addProductLabel }
         </Button>
       </div>
@@ -226,10 +226,11 @@ export function ProductList({ labels: labelsProp, formLabels }: ProductListProps
         </NoticeBanner>
       ) : null }
 
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="max-w-[360px] flex-1">
-          <SearchInput value={ search } onChange={ (event) => setSearch(event.target.value) } onClear={ () => setSearch("") } placeholder={ labels.searchPlaceholder } />
-        </div>
+      <div className="max-w-[360px] mb-4">
+        <SearchInput value={ search } onChange={ (event) => setSearch(event.target.value) } onClear={ () => setSearch("") } placeholder={ labels.searchPlaceholder } />
+      </div>
+
+      <div className="flex justify-end mb-2">
         <Checkbox label={ labels.stickyActionsLabel } checked={ stickyActions } onChange={ (event) => setStickyActions(event.target.checked) } />
       </div>
 

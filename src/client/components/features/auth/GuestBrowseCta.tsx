@@ -23,9 +23,9 @@ export function GuestBrowseCta({ labels: labelsProp }: GuestBrowseCtaProps) {
   const router = useRouter();
 
   return (
-    <div className="flex items-center gap-2.5 mt-[22px]">
-      <span className="text-[length:var(--font-size-base)] text-text-subtle">{ labels.prompt }</span>
-      <Button variant="secondary" pill size="sm" iconAfter="arrow-right" onClick={ () => router.push("/") }>
+    <div className="flex flex-col items-center sm:flex-row sm:justify-center gap-2 sm:gap-2.5 mt-[22px]">
+      <span className="text-[length:var(--font-size-base)] text-text-subtle text-center">{ labels.prompt }</span>
+      <Button variant="secondary" pill size="sm" iconAfter="arrow-right" className="shrink-0" onClick={ () => router.push("/") }>
         { labels.browseAsGuestLabel }
       </Button>
     </div>
