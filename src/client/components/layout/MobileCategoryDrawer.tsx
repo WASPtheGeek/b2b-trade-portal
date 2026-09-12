@@ -4,8 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
-import type { CategoryTreeItem } from "@/types/catalog";
+import type { CategoryTreeChild, CategoryTreeItem } from "@/types/catalog";
 
 export interface MobileCategoryDrawerUser {
   name: string;
@@ -14,8 +13,6 @@ export interface MobileCategoryDrawerUser {
 export interface MobileCategoryDrawerLabels {
   /** aria-label for the dialog itself. */
   dialogLabel: string;
-  /** Visible header text. */
-  title: string;
   orders: string;
   saved: string;
   cart: string;
@@ -26,7 +23,6 @@ export interface MobileCategoryDrawerLabels {
 
 const DEFAULT_LABELS: MobileCategoryDrawerLabels = {
   dialogLabel: "Category menu",
-  title: "Categories",
   orders: "Orders",
   saved: "Saved",
   cart: "Cart",
@@ -89,6 +85,21 @@ export function MobileCategoryDrawer({
 }: MobileCategoryDrawerProps) {
   const labels = { ...DEFAULT_LABELS, ...labelsProp };
   const [openId, setOpenId] = useState<string | undefined>(tree[0]?.id);
+  // Every category below the top level toggles independently (a category tree can run
+  // arbitrarily deep, so a single "one open at a time" id - fine for the top level's small,
+  // fixed list of departments - doesn't generalize below it).
+  const [openDescendantIds, setOpenDescendantIds] = useState<ReadonlySet<string>>(new Set());
+  const toggleDescendant = (id: string): void => {
+    setOpenDescendantIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  // The account row at the very bottom expands in place to reveal every account-scoped
+  // action (orders, wishlist, cart, admin, sign-out) - kept out of the primary view so the
+  // menu a reader opens to browse categories isn't dominated by account chrome.
+  const [accountOpen, setAccountOpen] = useState(false);
 
   return (
     <>
@@ -124,9 +135,6 @@ export function MobileCategoryDrawer({
           className,
         ) }
       >
-        <div className="flex flex-none items-center border-b border-border-warm bg-surface-card px-4 py-2.5">
-          <strong className="text-[15px] font-semibold text-text-strong">{ labels.title }</strong>
-        </div>
         <div className="elk-scroll-y min-h-0 flex-1 px-2.5 pt-2 pb-1">
           { tree.map((group) => {
             const isOpen = openId === group.id;
@@ -140,7 +148,9 @@ export function MobileCategoryDrawer({
                   className="flex min-h-[52px] w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-2 text-left font-sans text-[14.5px] font-semibold text-text-strong"
                 >
                   <span className="min-w-0 flex-1">{ group.label }</span>
-                  <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ group.count }</span>
+                  { group.count != null ? (
+                    <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ group.count }</span>
+                  ) : null }
                   <Icon
                     name="chevron-down"
                     size={ 16 }
@@ -150,18 +160,13 @@ export function MobileCategoryDrawer({
                 <div className={ cn("grid transition-[grid-template-rows] duration-slow ease-out", isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]") }>
                   <div className="overflow-hidden">
                     <div className="flex flex-col pb-2">
-                      { group.children.map((c) => (
-                        <button
-                          key={ c.id }
-                          type="button"
-                          onClick={ () => onPick?.(c.id) }
-                          className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 border-none bg-transparent pr-2 pl-4 text-left font-sans text-[length:var(--font-size-base)] text-text-body"
-                        >
-                          <span className="min-w-0 flex-1">{ c.label }</span>
-                          <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ c.count }</span>
-                          <Icon name="chevron-right" size={ 14 } className="text-text-muted" />
-                        </button>
-                      )) }
+                      <CategoryChildren
+                        items={ group.children }
+                        depth={ 1 }
+                        openIds={ openDescendantIds }
+                        onToggle={ toggleDescendant }
+                        onPick={ onPick }
+                      />
                     </div>
                   </div>
                 </div>
@@ -169,40 +174,131 @@ export function MobileCategoryDrawer({
             );
           }) }
         </div>
-        <div className="flex flex-none flex-col gap-2.5 border-t border-border-warm bg-surface-card px-3 py-3">
-          { isAdmin ? (
-            <Button size="lg" variant="secondary" icon="shield-check" className="w-full" onClick={ onAdminPanel }>
-              { labels.adminPanel }
-            </Button>
-          ) : null }
-
-          { user ? (
-            <div className="flex items-center justify-between gap-3 px-1">
-              <div className="min-w-0">
+        { user ? (
+          <div className="flex-none border-t border-border-warm bg-surface-card">
+            <button
+              type="button"
+              aria-expanded={ accountOpen }
+              onClick={ () => setAccountOpen((o) => !o) }
+              className="flex min-h-[64px] w-full cursor-pointer items-center gap-3 border-none bg-transparent px-3 text-left"
+            >
+              <div className="min-w-0 flex-1">
                 <div className="text-[15px] font-semibold text-text-strong truncate">{ user.name }</div>
                 { cartTotal ? <div className="text-[length:var(--font-size-base)] text-text-subtle truncate">{ cartTotal }</div> : null }
               </div>
-              <IconButton icon="log-out" label={ labels.signOut } variant="secondary" onClick={ onLogout } />
+              <Icon
+                name="chevron-down"
+                size={ 16 }
+                className={ cn("flex-none text-text-muted transition-transform duration-base ease-out", accountOpen && "rotate-180") }
+              />
+            </button>
+            <div className={ cn("grid transition-[grid-template-rows] duration-slow ease-out", accountOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]") }>
+              <div className="overflow-hidden">
+                <div className="flex flex-col gap-2 px-3 pb-3">
+                  { isAdmin ? (
+                    <Button size="lg" variant="secondary" icon="shield-check" className="w-full" onClick={ onAdminPanel }>
+                      { labels.adminPanel }
+                    </Button>
+                  ) : null }
+                  <Button size="lg" variant="secondary" icon="package" className="w-full" onClick={ onClose }>
+                    { labels.orders }
+                  </Button>
+                  <Button size="lg" variant="secondary" icon="heart" className="w-full" onClick={ onSaved }>
+                    { labels.saved }{ savedCount ? ` (${ savedCount })` : "" }
+                  </Button>
+                  <Button size="lg" variant="secondary" icon="shopping-cart" className="w-full" onClick={ onCart }>
+                    { labels.cart }{ cartCount ? ` (${ cartCount })` : "" }
+                  </Button>
+                  <Button size="lg" variant="secondary" icon="log-out" className="w-full" onClick={ onLogout }>
+                    { labels.signOut }
+                  </Button>
+                </div>
+              </div>
             </div>
-          ) : (
+          </div>
+        ) : (
+          <div className="flex-none border-t border-border-warm bg-surface-card px-3 py-3">
             <Button size="lg" icon="user" className="w-full" onClick={ onLogin }>
               { labels.account }
             </Button>
-          ) }
-
-          <div className="flex gap-1.5">
-            <Button size="lg" variant="secondary" icon="package" className="min-w-0 flex-1" onClick={ onClose }>
-              { labels.orders }
-            </Button>
-            <Button size="lg" variant="secondary" icon="heart" className="min-w-0 flex-1" onClick={ onSaved }>
-              { labels.saved }{ savedCount ? ` (${ savedCount })` : "" }
-            </Button>
-            <Button size="lg" variant="secondary" icon="shopping-cart" className="min-w-0 flex-1" onClick={ onCart }>
-              { labels.cart }{ cartCount ? ` (${ cartCount })` : "" }
-            </Button>
           </div>
-        </div>
+        ) }
       </div>
+    </>
+  );
+}
+
+/* Recurses over a category subtree to arbitrary depth: a node with children toggles its own
+   nested list open/closed (independently of its siblings - see `openDescendantIds`), a leaf
+   node just picks. Indentation grows with `depth` via inline style since Tailwind has no
+   fixed set of step classes to pick from at an unbounded depth. */
+function CategoryChildren({
+  items,
+  depth,
+  openIds,
+  onToggle,
+  onPick,
+}: {
+  items: CategoryTreeChild[];
+  depth: number;
+  openIds: ReadonlySet<string>;
+  onToggle: (id: string) => void;
+  onPick?: (childId: string) => void;
+}) {
+  const paddingLeft = 16 + depth * 12;
+
+  return (
+    <>
+      { items.map((item) => {
+        if (!item.children?.length) {
+          return (
+            <button
+              key={ item.id }
+              type="button"
+              onClick={ () => onPick?.(item.id) }
+              style={ { paddingLeft } }
+              className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 border-none bg-transparent pr-2 text-left font-sans text-[length:var(--font-size-base)] text-text-muted"
+            >
+              <span className="min-w-0 flex-1">{ item.label }</span>
+              { item.count != null ? (
+                <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ item.count }</span>
+              ) : null }
+              <Icon name="chevron-right" size={ 14 } className="text-text-muted" />
+            </button>
+          );
+        }
+
+        const isOpen = openIds.has(item.id);
+
+        return (
+          <div key={ item.id }>
+            <button
+              type="button"
+              aria-expanded={ isOpen }
+              onClick={ () => onToggle(item.id) }
+              style={ { paddingLeft } }
+              className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 border-none bg-transparent pr-2 text-left font-sans text-[length:var(--font-size-base)] text-text-body"
+            >
+              <span className="min-w-0 flex-1">{ item.label }</span>
+              { item.count != null ? (
+                <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ item.count }</span>
+              ) : null }
+              <Icon
+                name="chevron-down"
+                size={ 14 }
+                className={ cn("text-text-muted transition-transform duration-base ease-out", isOpen && "rotate-180") }
+              />
+            </button>
+            <div className={ cn("grid transition-[grid-template-rows] duration-slow ease-out", isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]") }>
+              <div className="overflow-hidden">
+                <div className="flex flex-col pb-1">
+                  <CategoryChildren items={ item.children } depth={ depth + 1 } openIds={ openIds } onToggle={ onToggle } onPick={ onPick } />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }) }
     </>
   );
 }

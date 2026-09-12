@@ -165,8 +165,8 @@ export function StoreHeader({
 
   const accountAction = user ? (
     <button onClick={ onCart } className="flex items-center gap-[9px] h-10 pl-3 pr-1.5 bg-transparent border-none cursor-pointer text-left">
-      <Icon name="shopping-cart" size={ 18 } className="flex-none text-brand lg:hidden" />
-      <span className="hidden lg:flex flex-col leading-[1.25]">
+      <Icon name="shopping-cart" size={ 18 } className="flex-none text-text-muted md:hidden" />
+      <span className="hidden md:flex flex-col leading-[1.25]">
         <span className="text-[length:var(--font-size-base)] font-semibold text-text-strong whitespace-nowrap">{ user.name }</span>
         <span className="text-[length:var(--font-size-base)] text-text-subtle whitespace-nowrap">{ cartTotal }</span>
       </span>

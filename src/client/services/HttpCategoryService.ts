@@ -10,6 +10,10 @@ export class HttpCategoryService implements CategoryService {
     return this.http.get<Category[]>("/api/admin/categories", { token });
   }
 
+  async listPublic(): Promise<Category[]> {
+    return this.http.get<Category[]>("/api/categories");
+  }
+
   async create(payload: CategoryUpsertPayload, token: string): Promise<void> {
     await this.http.post<void>("/api/admin/categories", payload, { token });
   }

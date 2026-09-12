@@ -6,4 +6,6 @@ export interface CategoryService {
   create(payload: CategoryUpsertPayload, token: string): Promise<void>;
   update(id: number, payload: CategoryUpsertPayload, token: string): Promise<void>;
   delete(id: number, token: string): Promise<void>;
+  /** Anonymous storefront lookup: menu-visible categories, ordered for display. */
+  listPublic(): Promise<Category[]>;
 }

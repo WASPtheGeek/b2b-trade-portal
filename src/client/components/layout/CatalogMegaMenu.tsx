@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { Icon } from "@/components/ui/Icon";
-import type { CatalogMenuDepartment } from "@/types/catalog";
+import type { CatalogMenuDepartment, CategoryTreeChild } from "@/types/catalog";
 
 export interface CatalogMegaMenuProps {
   open: boolean;
@@ -61,25 +61,14 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
               )) }
             </ul>
             <div className="flex-1 min-w-0 py-5 pb-6 pl-[30px] grid grid-cols-3 gap-[26px]">
-              { active?.groups.map((g) => (
-                <div key={ g.title }>
-                  <h4 className="font-mono text-[length:var(--font-size-base)] font-medium tracking-[.12em] uppercase text-text-strong">{ g.title }</h4>
-                  <ul className="list-none m-0 mt-3 p-0 flex flex-col gap-2">
-                    { g.links.map((l) => (
-                      <li key={ l }>
-                        <a
-                          href="#"
-                          onClick={ (e) => {
-                            e.preventDefault();
-                            onPick?.();
-                          } }
-                          className="text-[length:var(--font-size-base)] text-text-muted no-underline hover:text-text-body"
-                        >
-                          { l }
-                        </a>
-                      </li>
-                    )) }
-                  </ul>
+              { active?.groups.map((g, i) => (
+                <div key={ g.title || `_${ i }` }>
+                  { g.title ? (
+                    <h4 className="font-mono text-[length:var(--font-size-base)] font-medium tracking-[.12em] uppercase text-text-strong">{ g.title }</h4>
+                  ) : null }
+                  <div className={ g.title ? "mt-3" : "mt-0" }>
+                    <CatalogMenuItemList items={ g.items } depth={ 0 } onPick={ onPick } />
+                  </div>
                 </div>
               )) }
             </div>
@@ -87,5 +76,32 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
         </div>
       </div>
     </>
+  );
+}
+
+/* Recurses over a column's items to arbitrary depth - the mega-menu's columns aren't
+   collapsible the way the mobile drawer's rows are (it's a hover preview, everything shows
+   at once), so a deeper category just nests further indented in the same column instead of
+   needing its own toggle. */
+function CatalogMenuItemList({ items, depth, onPick }: { items: CategoryTreeChild[]; depth: number; onPick?: () => void }) {
+  return (
+    <ul className={ cn("list-none m-0 p-0 flex flex-col gap-2", depth > 0 && "mt-2") }>
+      { items.map((item) => (
+        <li key={ item.id }>
+          <a
+            href="#"
+            onClick={ (e) => {
+              e.preventDefault();
+              onPick?.();
+            } }
+            style={ { paddingLeft: depth * 14 } }
+            className="block text-[length:var(--font-size-base)] text-text-muted no-underline hover:text-text-body"
+          >
+            { item.label }
+          </a>
+          { item.children?.length ? <CatalogMenuItemList items={ item.children } depth={ depth + 1 } onPick={ onPick } /> : null }
+        </li>
+      )) }
+    </ul>
   );
 }

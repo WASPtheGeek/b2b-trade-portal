@@ -34,15 +34,18 @@ public class CategoriesController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the flat list of categories that are visible in the menu.
+    /// Gets the flat list of categories that are visible in the menu, plus any custom
+    /// navigation nodes (e.g. temporary promotions) even when hidden from the regular menu -
+    /// the storefront's department shortcut bar surfaces those regardless of menu visibility.
     /// </summary>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of categories.</returns>
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<CategoryDto>>> List(CancellationToken ct)
     {
+        // exclude items that are not visible in the menu and are not custom navigation nodes
         var categories = await _db.Categories
-            .Where(c => c.ShowInMenu)
+            .Where(c => c.ShowInMenu || c.IsCustom)
             .OrderBy(c => c.SortOrder)
             .ToListAsync(ct);
 

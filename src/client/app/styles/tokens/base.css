@@ -1,5 +1,5 @@
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scrollbar-gutter:stable;font-size:var(--font-size-base)}
+html{-webkit-text-size-adjust:100%;font-size:var(--font-size-base)}
 body{margin:0;font-family:var(--font-sans);font-size:var(--text-body-size);line-height:var(--text-body-lh);color:var(--text-body);background:var(--surface-page);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 h1,h2,h3,h4,h5,h6,p{margin:0}
 a{color:var(--text-link);text-decoration:none}
