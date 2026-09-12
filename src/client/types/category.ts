@@ -8,6 +8,7 @@ export interface Category {
   sortOrder: number;
   isCustom: boolean;
   showInMenu: boolean;
+  productCount?: number | null;
 }
 
 /** Mirrors the server's `CategoryUpsertRequest`, sent to create or update a category. */

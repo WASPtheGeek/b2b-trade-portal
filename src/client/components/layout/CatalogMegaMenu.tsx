@@ -54,7 +54,10 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
                       d.id === activeId ? "font-semibold text-orange-700" : "font-normal text-text-body",
                     ) }
                   >
-                    <span className="flex-1">{ d.label }</span>
+                    <span className="flex-1">
+                      { d.label }
+                      { d.count != null && d.groups.length === 0 ? <span className="ml-1 font-mono text-text-disabled">({ d.count })</span> : null }
+                    </span>
                     <Icon name="chevron-right" size={ 14 } className={ d.id === activeId ? "text-orange-600" : "text-text-disabled" } />
                   </button>
                 </li>
@@ -98,6 +101,7 @@ function CatalogMenuItemList({ items, depth, onPick }: { items: CategoryTreeChil
             className="block text-[length:var(--font-size-base)] text-text-muted no-underline hover:text-text-body"
           >
             { item.label }
+            { item.count != null && !item.children?.length ? <span className="ml-1 font-mono text-text-disabled">({ item.count })</span> : null }
           </a>
           { item.children?.length ? <CatalogMenuItemList items={ item.children } depth={ depth + 1 } onPick={ onPick } /> : null }
         </li>

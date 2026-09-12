@@ -10,7 +10,10 @@ export function buildCategoryTree(categories: Category[]): CategoryTreeItem[] {
   const childrenByParentId = new Map<number, Category[]>();
 
   for (const category of categories) {
-    if (category.parentId == null) continue;
+    if (category.parentId == null) {
+      continue;
+    }
+
     const siblings = childrenByParentId.get(category.parentId) ?? [];
     siblings.push(category);
     childrenByParentId.set(category.parentId, siblings);
@@ -22,6 +25,7 @@ export function buildCategoryTree(categories: Category[]): CategoryTreeItem[] {
     return {
       id: category.slug,
       label: category.name,
+      count: category.productCount ?? undefined,
       isCustom: category.isCustom,
       showInMenu: category.showInMenu,
       ...(children.length ? { children } : {}),

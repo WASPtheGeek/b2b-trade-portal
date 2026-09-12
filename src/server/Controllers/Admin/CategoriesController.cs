@@ -35,7 +35,7 @@ public class CategoriesController : ControllerBase
             .OrderBy(c => c.SortOrder)
             .ToListAsync(ct);
 
-        return Ok(categories.Select(Controllers.CategoriesController.ToDto).ToList());
+        return Ok(categories.Select(c => Controllers.CategoriesController.ToDto(c)).ToList());
     }
 
     /// <summary>

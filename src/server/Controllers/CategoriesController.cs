@@ -49,7 +49,14 @@ public class CategoriesController : ControllerBase
             .OrderBy(c => c.SortOrder)
             .ToListAsync(ct);
 
-        return Ok(categories.Select(ToDto).ToList());
+        var categoryIds = categories.Select(c => c.Id).ToList();
+        var counts = await _db.ProductCategories
+            .Where(pc => categoryIds.Contains(pc.CategoryId) && pc.Product.IsActive)
+            .GroupBy(pc => pc.CategoryId)
+            .Select(g => new { CategoryId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(g => g.CategoryId, g => g.Count, ct);
+
+        return Ok(categories.Select(c => ToDto(c, counts.GetValueOrDefault(c.Id))).ToList());
     }
 
     /// <summary>
@@ -63,9 +70,15 @@ public class CategoriesController : ControllerBase
     {
         var category = await _db.Categories.FirstOrDefaultAsync(c => c.Slug == slug, ct);
 
-        return category is null
-            ? throw new ResourceNotFoundException($"Kategorija ar slug '{slug}' nav atrasta.")
-            : Ok(ToDto(category));
+        if (category is null)
+        {
+            throw new ResourceNotFoundException($"Kategorija ar slug '{slug}' nav atrasta.");
+        }
+
+        var count = await _db.ProductCategories
+            .CountAsync(pc => pc.CategoryId == category.Id && pc.Product.IsActive, ct);
+
+        return Ok(ToDto(category, count));
     }
 
     /// <summary>
@@ -114,7 +127,8 @@ public class CategoriesController : ControllerBase
     /// Converts a <see cref="Category"/> entity to a <see cref="CategoryDto"/>.
     /// </summary>
     /// <param name="c">The category entity to convert.</param>
+    /// <param name="productCount">The number of active products assigned to the category, if computed by the caller.</param>
     /// <returns>The corresponding category DTO.</returns>
-    internal static CategoryDto ToDto(Category c) =>
-        new(c.Id, c.ParentId, c.Name, c.Slug, c.Description, c.SortOrder, c.IsCustom, c.ShowInMenu);
+    internal static CategoryDto ToDto(Category c, int? productCount = null) =>
+        new(c.Id, c.ParentId, c.Name, c.Slug, c.Description, c.SortOrder, c.IsCustom, c.ShowInMenu, productCount);
 }
