@@ -4,7 +4,6 @@ export const productPage: ProductPageLabels = {
   home: "Sākums",
   sku: "Artikuls",
   ean: "EAN",
-  inStock: "Noliktavā",
   signInTitle: "Ienāciet, lai redzētu savu cenu",
   signInBody: "Vairumtirdzniecības cenas tiek rādītas tikai apstiprinātiem uzņēmumu kontiem.",
   signInCta: "Ienākt sistēmā",

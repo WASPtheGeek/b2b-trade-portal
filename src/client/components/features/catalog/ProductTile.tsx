@@ -202,7 +202,7 @@ export function ProductTile({
                       onChange={ setQty }
                       decreaseLabel={ labels.decreaseQty }
                       increaseLabel={ labels.increaseQty }
-                      className="flex-none"
+                      className="flex-none max-sm:[&_button]:w-6! max-sm:[&_input]:w-8!"
                     />
                     <Button
                       fullWidth
@@ -212,7 +212,7 @@ export function ProductTile({
                       variant={ added ? "success" : "primary" }
                       icon={ added ? "check" : "plus" }
                       iconAfter={ added ? undefined : "shopping-cart" }
-                      className="flex-1 min-w-11 p-0! gap-[3px]"
+                      className="flex-1 min-w-11 p-0! gap-[3px] max-sm:h-control-md! max-sm:min-h-control-md!"
                       onClick={ addToCart }
                     />
                   </div>
