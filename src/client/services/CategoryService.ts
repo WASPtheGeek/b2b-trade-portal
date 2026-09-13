@@ -8,4 +8,7 @@ export interface CategoryService {
   delete(id: number, token: string): Promise<void>;
   /** Anonymous storefront lookup: menu-visible categories, ordered for display. */
   listPublic(): Promise<Category[]>;
+  /** Anonymous storefront lookup of a single category by its slug (the storefront's
+   * `/category/[id]` route param), for the category page's title/breadcrumb. */
+  getBySlug(slug: string): Promise<Category>;
 }

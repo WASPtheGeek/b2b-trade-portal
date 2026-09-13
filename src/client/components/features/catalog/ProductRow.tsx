@@ -39,6 +39,8 @@ export interface ProductRowProps extends Omit<HTMLAttributes<HTMLElement>, "onCh
   product: Product;
   masked?: boolean;
   onAdd?: (payload: AddToCartPayload) => void;
+  onOpen?: (product: Product) => void;
+  onSignIn?: () => void;
   onWishlist?: (payload: { product: Product; saved: boolean }) => void;
   wishlisted?: boolean;
   layout?: "table" | "mobile";
@@ -53,6 +55,8 @@ export function ProductRow({
   product,
   masked = false,
   onAdd,
+  onOpen,
+  onSignIn,
   onWishlist,
   wishlisted = false,
   layout = "table",
@@ -89,10 +93,17 @@ export function ProductRow({
     />
   );
 
+  const open = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    onOpen?.(product);
+  };
+
   const identity = (
     <div className="flex items-center gap-[11px] min-w-0">
       <div className="relative flex-none">
-        <ProductMedia src={ product.image } alt={ product.name } style={ { width: stacked ? 52 : 42 } } />
+        <a href="#" onClick={ open } className="block no-underline">
+          <ProductMedia src={ product.image } alt={ product.name } style={ { width: stacked ? 52 : 42 } } />
+        </a>
         { wishlist(stacked ? 26 : 24) }
       </div>
       <div className="min-w-0">
@@ -101,14 +112,16 @@ export function ProductRow({
           <span className="font-mono">{ product.sku }</span>
           { product.ean ? <span className="font-mono">· { product.ean }</span> : null }
         </div>
-        <div
+        <a
+          href="#"
+          onClick={ open }
           className={ cn(
-            "text-[length:var(--font-size-base)] font-semibold text-text-strong leading-[1.35] mt-0.5 overflow-hidden text-ellipsis",
+            "block text-[length:var(--font-size-base)] font-semibold text-text-strong leading-[1.35] mt-0.5 overflow-hidden text-ellipsis no-underline",
             stacked ? "whitespace-normal" : "whitespace-nowrap",
           ) }
         >
           { product.name }
-        </div>
+        </a>
       </div>
     </div>
   );
@@ -133,7 +146,7 @@ export function ProductRow({
           ) : null }
         </div>
         { masked ? (
-          <Button variant="secondary" pill size="md" fullWidth wrap icon="lock-open" className="mt-2.5">
+          <Button variant="secondary" pill size="md" fullWidth wrap icon="lock-open" className="mt-2.5" onClick={ onSignIn }>
             { labels.maskedCta }
           </Button>
         ) : (
@@ -210,7 +223,7 @@ export function ProductRow({
       </td>
       <td className="py-[9px] px-[var(--cell-pad-x)] text-right">
         { masked ? (
-          <Button variant="secondary" pill size="sm" icon="lock-open">
+          <Button variant="secondary" pill size="sm" icon="lock-open" onClick={ onSignIn }>
             { labels.maskedCta }
           </Button>
         ) : (

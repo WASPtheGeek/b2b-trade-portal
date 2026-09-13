@@ -19,7 +19,7 @@ export default function StorefrontLayout({ children }: { children: ReactNode }) 
     <WishlistProvider>
       <ShopHeader labels={ dictionary.shopHeader } />
       { children }
-      <StoreFooter blurb={ dictionary.storeFooter.blurb } legal={ dictionary.storeFooter.legal } />
+      <StoreFooter labels={ dictionary.storeFooter } />
     </WishlistProvider>
   );
 }

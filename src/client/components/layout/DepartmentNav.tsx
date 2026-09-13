@@ -11,7 +11,6 @@ export interface DepartmentNavProps extends Omit<HTMLAttributes<HTMLDivElement>,
   onSelect?: (id: string) => void;
   deptLabel?: string;
   onDeptClick?: MouseEventHandler<HTMLButtonElement>;
-  onDeptHover?: MouseEventHandler<HTMLButtonElement>;
   deptOpen?: boolean;
   scrollLeftLabel?: string;
   scrollRightLabel?: string;
@@ -25,7 +24,6 @@ export function DepartmentNav({
   onSelect,
   deptLabel = "Catalog",
   onDeptClick,
-  onDeptHover,
   deptOpen = false,
   scrollLeftLabel = "Scroll list left",
   scrollRightLabel = "Scroll list right",
@@ -89,7 +87,6 @@ export function DepartmentNav({
         <button
           type="button"
           onClick={ onDeptClick }
-          onMouseEnter={ onDeptHover }
           className="hidden md:flex flex-none items-center gap-[9px] px-[18px] border-none bg-brand text-white font-sans font-semibold cursor-pointer whitespace-nowrap"
         >
           <Icon name={ deptOpen ? "x" : "menu" } size={ 15 } />

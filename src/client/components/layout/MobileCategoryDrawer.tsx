@@ -137,6 +137,22 @@ export function MobileCategoryDrawer({
       >
         <div className="elk-scroll-y min-h-0 flex-1 px-2.5 pt-2 pb-1">
           { tree.map((group) => {
+            if (!group.children.length) {
+              return (
+                <button
+                  key={ group.id }
+                  type="button"
+                  onClick={ () => onPick?.(group.id) }
+                  className="flex min-h-[52px] w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-2 text-left font-sans text-[14.5px] font-semibold text-text-strong border-b border-border-subtle"
+                >
+                  <span className="min-w-0 flex-1">{ group.label }</span>
+                  { group.count != null ? (
+                    <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ group.count }</span>
+                  ) : null }
+                </button>
+              );
+            }
+
             const isOpen = openId === group.id;
 
             return (
@@ -148,9 +164,6 @@ export function MobileCategoryDrawer({
                   className="flex min-h-[52px] w-full cursor-pointer items-center gap-2.5 border-none bg-transparent px-2 text-left font-sans text-[14.5px] font-semibold text-text-strong"
                 >
                   <span className="min-w-0 flex-1">{ group.label }</span>
-                  { group.count != null && group.children.length === 0 ? (
-                    <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ group.count }</span>
-                  ) : null }
                   <Icon
                     name="chevron-down"
                     size={ 16 }
@@ -263,7 +276,6 @@ function CategoryChildren({
               { item.count != null ? (
                 <span className="font-mono text-[length:var(--font-size-base)] text-text-disabled">{ item.count }</span>
               ) : null }
-              <Icon name="chevron-right" size={ 14 } className="text-text-muted" />
             </button>
           );
         }

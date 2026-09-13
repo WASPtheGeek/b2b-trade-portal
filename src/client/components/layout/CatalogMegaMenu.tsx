@@ -9,7 +9,8 @@ export interface CatalogMegaMenuProps {
   open: boolean;
   departments: CatalogMenuDepartment[];
   onClose?: () => void;
-  onPick?: () => void;
+  /** Fired with the picked department/category's slug (`id`), for the caller to navigate to. */
+  onPick?: (id: string) => void;
   className?: string;
 }
 
@@ -48,7 +49,7 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
                   <button
                     type="button"
                     onMouseEnter={ () => setActiveId(d.id) }
-                    onClick={ onPick }
+                    onClick={ () => onPick?.(d.id) }
                     className={ cn(
                       "flex items-center w-full gap-2 py-[9px] pr-3.5 pl-0.5 border-none bg-transparent cursor-pointer text-left font-sans text-[length:var(--font-size-base)]",
                       d.id === activeId ? "font-semibold text-orange-700" : "font-normal text-text-body",
@@ -86,7 +87,7 @@ export function CatalogMegaMenu({ open, departments, onClose, onPick, className 
    collapsible the way the mobile drawer's rows are (it's a hover preview, everything shows
    at once), so a deeper category just nests further indented in the same column instead of
    needing its own toggle. */
-function CatalogMenuItemList({ items, depth, onPick }: { items: CategoryTreeChild[]; depth: number; onPick?: () => void }) {
+function CatalogMenuItemList({ items, depth, onPick }: { items: CategoryTreeChild[]; depth: number; onPick?: (id: string) => void }) {
   return (
     <ul className={ cn("list-none m-0 p-0 flex flex-col gap-2", depth > 0 && "mt-2") }>
       { items.map((item) => (
@@ -95,7 +96,7 @@ function CatalogMenuItemList({ items, depth, onPick }: { items: CategoryTreeChil
             href="#"
             onClick={ (e) => {
               e.preventDefault();
-              onPick?.();
+              onPick?.(item.id);
             } }
             style={ { paddingLeft: depth * 14 } }
             className="block text-[length:var(--font-size-base)] text-text-muted no-underline hover:text-text-body"

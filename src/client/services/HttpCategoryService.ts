@@ -14,6 +14,10 @@ export class HttpCategoryService implements CategoryService {
     return this.http.get<Category[]>("/api/categories");
   }
 
+  async getBySlug(slug: string): Promise<Category> {
+    return this.http.get<Category>(`/api/categories/${encodeURIComponent(slug)}`);
+  }
+
   async create(payload: CategoryUpsertPayload, token: string): Promise<void> {
     await this.http.post<void>("/api/admin/categories", payload, { token });
   }

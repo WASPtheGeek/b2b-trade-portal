@@ -1,7 +1,7 @@
 "use client";
 
 import { notFound, useParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { dictionary } from "@/app/_i18n";
 import { AuthCard, type AuthTab } from "@/components/features/auth/AuthCard";
 import { LoginForm } from "@/components/features/auth/LoginForm";
@@ -27,6 +27,17 @@ function isAuthTab(value: string): value is AuthTab {
  * Next's router) so the URL stays accurate and shareable.
  */
 export default function AuthPage() {
+  return (
+    <Suspense fallback={ null }>
+      <AuthPageContent />
+    </Suspense>
+  );
+}
+
+/* Split out from the default export so `useSearchParams` (via `useRedirectAuthenticatedAway`
+   and `LoginForm`'s returnTo handling) has the `Suspense` boundary it needs - a static build
+   fails without one wrapping every client component that reads it. */
+function AuthPageContent() {
   useRedirectAuthenticatedAway();
 
   const { tab: initialTab } = useParams<{ tab: string }>();

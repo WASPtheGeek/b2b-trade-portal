@@ -96,7 +96,7 @@ export function CategoryPanelList({ nodes = [], selected, onSelect, depth = 0, c
               ) }
             >
               <span className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{ n.label }</span>
-              { n.count != null ? (
+              { n.count != null && kids.length === 0 ? (
                 <span className={ cn("font-mono text-[length:var(--font-size-base)]", on ? "text-orange-600" : "text-text-disabled") }>({ n.count })</span>
               ) : null }
             </a>

@@ -1,6 +1,6 @@
 import { appConfig } from "@/lib/config/env";
 import { ApiError } from "./ApiError";
-import type { HttpClient, HttpRequestOptions } from "./HttpClient";
+import type { HttpClient, HttpPagedResponse, HttpRequestOptions } from "./HttpClient";
 import type { ProblemDetails } from "./ProblemDetails";
 
 /** `HttpClient` implementation backed by the standard `fetch` API. */
@@ -9,6 +9,14 @@ export class FetchHttpClient implements HttpClient {
 
   async get<TResponse>(path: string, options?: HttpRequestOptions): Promise<TResponse> {
     return this.request<TResponse>("GET", path, undefined, options);
+  }
+
+  async getPaged<TResponse extends unknown[]>(path: string, options?: HttpRequestOptions): Promise<HttpPagedResponse<TResponse>> {
+    const response = await this.send("GET", path, undefined, options);
+    const data = (response.status === 204 ? [] : await response.json()) as TResponse;
+    const totalHeader = response.headers.get("X-Total-Count");
+
+    return { data, total: totalHeader != null ? Number(totalHeader) : data.length };
   }
 
   async post<TResponse, TBody = unknown>(path: string, body?: TBody, options?: HttpRequestOptions): Promise<TResponse> {
@@ -28,7 +36,7 @@ export class FetchHttpClient implements HttpClient {
   }
 
   /**
-   * Executes a single HTTP request against the configured API base URL.
+   * Executes a single HTTP request against the configured API base URL and parses its JSON body.
    *
    * @param method The HTTP method to use.
    * @param path The request path, relative to the API base URL.
@@ -42,6 +50,32 @@ export class FetchHttpClient implements HttpClient {
     body: unknown,
     options?: HttpRequestOptions,
   ): Promise<TResponse> {
+    const response = await this.send(method, path, body, options);
+
+    if (response.status === 204) {
+      return undefined as TResponse;
+    }
+
+    return (await response.json()) as TResponse;
+  }
+
+  /**
+   * Executes a single HTTP request against the configured API base URL, without parsing the
+   * body - shared by `request` (which parses it as JSON) and `getPaged` (which also needs the
+   * raw `Response` to read the `X-Total-Count` header).
+   *
+   * @param method The HTTP method to use.
+   * @param path The request path, relative to the API base URL.
+   * @param body The request body, serialized as JSON when present.
+   * @param options Per-request overrides (auth token, abort signal).
+   * @returns The successful, unparsed `fetch` response.
+   */
+  private async send(
+    method: string,
+    path: string,
+    body: unknown,
+    options?: HttpRequestOptions,
+  ): Promise<Response> {
     const response = await fetch(`${this.baseUrl}${path}`, {
       method,
       headers: this.buildHeaders(options?.token),
@@ -53,11 +87,7 @@ export class FetchHttpClient implements HttpClient {
       await this.throwApiError(response);
     }
 
-    if (response.status === 204) {
-      return undefined as TResponse;
-    }
-
-    return (await response.json()) as TResponse;
+    return response;
   }
 
   private buildHeaders(token?: string): HeadersInit {
