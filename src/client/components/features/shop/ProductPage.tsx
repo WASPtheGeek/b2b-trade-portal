@@ -23,7 +23,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { buildLoginUrl } from "@/lib/auth/returnTo";
 import { cn } from "@/lib/cn";
 import { findCategoryTrail } from "@/lib/catalog/findCategoryTrail";
-import { mapProductDetail, mapProductListItem } from "@/lib/catalog/mapProductDto";
+import { mapProductDetail, mapProductListItem, type PackagingUnitLabels } from "@/lib/catalog/mapProductDto";
 import type { ProductUnit } from "@/types/catalog";
 
 export interface ProductPageLabels {
@@ -52,6 +52,7 @@ export interface ProductPageLabels {
   backToShop: string;
   genericError: string;
   productTile: ProductTileLabels;
+  packagingUnits: PackagingUnitLabels;
 }
 
 export interface ProductPageProps {
@@ -74,7 +75,7 @@ export function ProductPage({ id, labels }: ProductPageProps) {
 
   const { product: dto, related, isLoading, error, notFound } = useShopProductDetail(id, { genericErrorMessage: labels.genericError });
 
-  const product = useMemo(() => (dto ? mapProductDetail(dto) : null), [dto]);
+  const product = useMemo(() => (dto ? mapProductDetail(dto, labels.packagingUnits) : null), [dto, labels.packagingUnits]);
   const primaryCategorySlug = dto?.categories[0]?.slug;
   const trail = useMemo(() => findCategoryTrail(tree, primaryCategorySlug), [tree, primaryCategorySlug]);
 
@@ -275,7 +276,7 @@ export function ProductPage({ id, labels }: ProductPageProps) {
           </ScrollReveal>
           <div className="grid mt-6" style={ { gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: "14px" } }>
             { related.map((r, i) => {
-              const relatedProduct = mapProductListItem(r, product.category);
+              const relatedProduct = mapProductListItem(r, labels.packagingUnits, product.category);
 
               return (
                 <ScrollReveal key={ relatedProduct.id } delay={ i * 55 } distance={ 12 }>

@@ -22,7 +22,7 @@ import { useShopCategoryProducts } from "@/hooks/useShopCategoryProducts";
 import { useWishlist } from "@/hooks/useWishlist";
 import { findCategoryTrail } from "@/lib/catalog/findCategoryTrail";
 import { buildLoginUrl } from "@/lib/auth/returnTo";
-import { mapProductListItem } from "@/lib/catalog/mapProductDto";
+import { mapProductListItem, type PackagingUnitLabels } from "@/lib/catalog/mapProductDto";
 
 const PAGE_SIZE = 24;
 
@@ -57,6 +57,7 @@ export interface CategoryPageLabels {
   colCart: string;
   productTile: ProductTileLabels;
   productRow: ProductRowLabels;
+  packagingUnits: PackagingUnitLabels;
 }
 
 export interface CategoryPageProps {
@@ -102,8 +103,8 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
   }, [products, sort]);
 
   const mappedProducts = useMemo(
-    () => sortedProducts.map((dto) => mapProductListItem(dto, categoryLabel)),
-    [sortedProducts, categoryLabel],
+    () => sortedProducts.map((dto) => mapProductListItem(dto, labels.packagingUnits, categoryLabel)),
+    [sortedProducts, categoryLabel, labels.packagingUnits],
   );
 
   const openProduct = (productId: string): void => router.push(`/product/${productId}`);

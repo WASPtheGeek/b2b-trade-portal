@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useWishlistProducts } from "@/hooks/useWishlistProducts";
-import { mapProductListItem } from "@/lib/catalog/mapProductDto";
+import { mapProductListItem, type PackagingUnitLabels } from "@/lib/catalog/mapProductDto";
 
 export interface WishlistPageLabels {
   title: string;
@@ -19,6 +19,7 @@ export interface WishlistPageLabels {
   browseCta: string;
   genericError: string;
   productTile: ProductTileLabels;
+  packagingUnits: PackagingUnitLabels;
 }
 
 export interface WishlistPageProps {
@@ -47,7 +48,7 @@ export function WishlistPage({ labels }: WishlistPageProps) {
     );
   }
 
-  const mappedProducts = products.map((dto) => mapProductListItem(dto));
+  const mappedProducts = products.map((dto) => mapProductListItem(dto, labels.packagingUnits));
 
   return (
     <main className="relative z-[1] max-w-layout-max mx-auto px-gutter pt-4 pb-section-gap-lg">

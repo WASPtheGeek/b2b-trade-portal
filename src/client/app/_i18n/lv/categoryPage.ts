@@ -49,4 +49,9 @@ export const categoryPage: CategoryPageLabels = {
     add: "Pievienot",
     total: "Kopā",
   },
+  packagingUnits: {
+    piece: { label: "Gab.", short: "gab." },
+    package: { label: "Iep.", short: "iep." },
+    box: { label: "Kaste", short: "kaste" },
+  },
 };

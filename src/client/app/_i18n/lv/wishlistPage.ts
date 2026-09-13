@@ -20,4 +20,9 @@ export const wishlistPage: WishlistPageLabels = {
     add: "Pievienot",
     added: "Pievienots",
   },
+  packagingUnits: {
+    piece: { label: "Gab.", short: "gab." },
+    package: { label: "Iep.", short: "iep." },
+    box: { label: "Kaste", short: "kaste" },
+  },
 };
