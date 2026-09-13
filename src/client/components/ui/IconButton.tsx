@@ -7,7 +7,7 @@ import { Icon, type IconName } from "./Icon";
 
 const iconButton = cva(
   [
-    "group relative isolate inline-flex items-center justify-center rounded-control border overflow-hidden",
+    "group relative isolate inline-flex items-center justify-center rounded-control border",
     "transition-[background-color,border-color,color,box-shadow] duration-base ease-standard hover:shadow-md",
     "disabled:cursor-not-allowed disabled:bg-action-disabled-bg disabled:text-action-disabled-fg disabled:border-border-subtle disabled:hover:shadow-none",
   ],
@@ -75,7 +75,9 @@ export function IconButton({ icon, label, variant, size = "sm", badge, disabled,
       className={ cn(iconButton({ variant, size }), className) }
       { ...rest }
     >
-      <span aria-hidden className={ cn("absolute inset-0 origin-bottom scale-y-0 transition-transform duration-base ease-standard group-hover:scale-y-100", overlayColor) } />
+      <span aria-hidden className="absolute inset-0 rounded-control overflow-hidden">
+        <span aria-hidden className={ cn("absolute inset-0 origin-bottom scale-y-0 transition-transform duration-base ease-standard group-hover:scale-y-100", overlayColor) } />
+      </span>
       <span className="relative">
         <Icon name={ icon } size={ iconSize } />
       </span>
@@ -83,8 +85,8 @@ export function IconButton({ icon, label, variant, size = "sm", badge, disabled,
         <span
           key={ bump }
           className={ cn(
-            "absolute -top-[5px] -right-[5px] min-w-[17px] h-[17px] px-1 rounded-full",
-            "bg-brand text-white text-[length:var(--font-size-base)] font-semibold flex items-center justify-center",
+            "absolute -top-[2px] -right-[2px] min-w-[19px] h-[19px] px-1 rounded-full",
+            "bg-brand text-white text-[10px] leading-none font-semibold flex items-center justify-center",
             "border-[1.5px] border-surface-card [font-variant-numeric:tabular-nums]",
             bump ? "animate-[elkaro-bump_var(--dur-slow)_var(--ease-out)]" : undefined,
           ) }

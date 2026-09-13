@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { isSafeReturnPath } from "@/lib/auth/returnTo";
 import { resolveErrorMessage } from "@/lib/http/resolveErrorMessage";
 
 const DEFAULT_GENERIC_ERROR = "Failed to sign in. Please try again.";
@@ -25,6 +26,7 @@ export interface UseLoginFormOptions {
 /** Owns the login form's field state, submission, and error handling. */
 export function useLoginForm({ genericErrorMessage = DEFAULT_GENERIC_ERROR }: UseLoginFormOptions = {}): LoginFormState {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -37,9 +39,11 @@ export function useLoginForm({ genericErrorMessage = DEFAULT_GENERIC_ERROR }: Us
     setError(null);
     setIsSubmitting(true);
 
+    const returnTo = searchParams.get("returnTo");
+
     login({ email, password })
       .then(() => {
-        router.push("/");
+        router.push(isSafeReturnPath(returnTo) ? returnTo : "/");
       })
       .catch((caught: unknown) => {
         setError(resolveErrorMessage(caught, genericErrorMessage));

@@ -10,8 +10,12 @@ import type { GuestBrowseCtaLabels } from "@/components/features/auth/GuestBrows
 import type { LoginFormLabels } from "@/components/features/auth/LoginForm";
 import type { RegisterConfirmationLabels } from "@/components/features/auth/RegisterConfirmation";
 import type { RegisterFormLabels } from "@/components/features/auth/RegisterForm";
+import type { CategoryPageLabels } from "@/components/features/shop/CategoryPage";
+import type { ProductPageLabels } from "@/components/features/shop/ProductPage";
 import type { ShopHeaderLabels } from "@/components/features/shop/ShopHeader";
+import type { WishlistPageLabels } from "@/components/features/shop/WishlistPage";
 import type { AdminSidebarLabels } from "@/components/layout/AdminSidebar";
+import type { StoreFooterLabels } from "@/components/layout/StoreFooter";
 
 /**
  * Every localizable string used across the app, grouped by the feature
@@ -23,6 +27,10 @@ import type { AdminSidebarLabels } from "@/components/layout/AdminSidebar";
  */
 export interface Dictionary {
   shopHeader: ShopHeaderLabels;
+  storeFooter: StoreFooterLabels;
+  categoryPage: CategoryPageLabels;
+  productPage: ProductPageLabels;
+  wishlistPage: WishlistPageLabels;
   authCard: AuthCardLabels;
   guestBrowseCta: GuestBrowseCtaLabels;
   loginForm: LoginFormLabels;

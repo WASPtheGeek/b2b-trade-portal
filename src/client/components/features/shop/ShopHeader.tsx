@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CatalogMegaMenu } from "@/components/layout/CatalogMegaMenu";
 import { DepartmentNav } from "@/components/layout/DepartmentNav";
 import { MobileCategoryDrawer } from "@/components/layout/MobileCategoryDrawer";
@@ -11,7 +11,9 @@ import { Icon } from "@/components/ui/Icon";
 import { IconButton } from "@/components/ui/IconButton";
 import { useAuth } from "@/hooks/useAuth";
 import { useShopCategories } from "@/hooks/useShopCategories";
+import { useWishlist } from "@/hooks/useWishlist";
 import { getAccountDisplayName, getAccountStatusLabel } from "@/lib/auth/accountDisplay";
+import { buildLoginUrl } from "@/lib/auth/returnTo";
 import { buildMegaMenuDepartments } from "@/lib/catalog/buildMegaMenuDepartments";
 import { filterVisibleCategories } from "@/lib/catalog/filterVisibleCategories";
 
@@ -63,8 +65,10 @@ export interface ShopHeaderProps {
 export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
   const labels = { ...DEFAULT_LABELS, ...labelsProp };
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout } = useAuth();
   const { tree: categoryTree } = useShopCategories();
+  const { ids: wishlistIds } = useWishlist();
   const isAdmin = user?.role === ADMIN_ROLE;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Always a defined string (never `undefined`) so the input stays a controlled component
@@ -96,7 +100,7 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
 
   const handleLogin = (): void => {
     setMobileMenuOpen(false);
-    router.push("/login");
+    router.push(buildLoginUrl(pathname));
   };
 
   const handleLogout = (): void => {
@@ -108,6 +112,18 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
   const handleAdminPanel = (): void => {
     setMobileMenuOpen(false);
     router.push("/admin");
+  };
+
+  const handleCategoryPick = (id: string): void => {
+    setActiveDept(id);
+    setMobileMenuOpen(false);
+    closeMega();
+    router.push(`/category/${id}`);
+  };
+
+  const handleSaved = (): void => {
+    setMobileMenuOpen(false);
+    router.push("/wishlist");
   };
 
   const utilityLinks: UtilityBarLink[] = [
@@ -131,6 +147,8 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
           search={ search }
           onSearchChange={ (event) => setSearch(event.target.value) }
           onLogin={ handleLogin }
+          savedCount={ wishlistIds.size }
+          onSaved={ handleSaved }
           right={ user ? <IconButton icon="log-out" label={ labels.signOut } onClick={ handleLogout } className="hidden md:inline-flex" /> : null }
           menuOpen={ mobileMenuOpen }
           onMenuToggle={ () => setMobileMenuOpen((open) => !open) }
@@ -145,19 +163,15 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
           <DepartmentNav
             items={ desktopDepartments.map((department) => ({ id: department.id, label: department.label })) }
             active={ activeDept }
-            onSelect={ (id) => {
-              setActiveDept(id);
-              closeMega();
-            } }
+            onSelect={ handleCategoryPick }
             deptOpen={ megaOpen }
             onDeptClick={ () => (megaOpen ? closeMega() : openMega()) }
-            onDeptHover={ openMega }
             deptLabel={ labels.categories }
             scrollLeftLabel={ labels.scrollDepartmentsLeft }
             scrollRightLabel={ labels.scrollDepartmentsRight }
             className="static"
           />
-          <CatalogMegaMenu open={ megaOpen } departments={ megaCatalog } onClose={ () => closeMega() } onPick={ () => closeMega() } />
+          <CatalogMegaMenu open={ megaOpen } departments={ megaCatalog } onClose={ () => closeMega() } onPick={ handleCategoryPick } />
         </div>
         { /* Mobile-only counterpart to the DepartmentNav bar above: just the branded
           "categories" trigger, opening the same drawer as StoreHeader's own hamburger
@@ -176,12 +190,15 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
         open={ mobileMenuOpen }
         tree={ categoryTree }
         onClose={ () => setMobileMenuOpen(false) }
+        onPick={ handleCategoryPick }
         user={ user ? { name: getAccountDisplayName(user) } : null }
         cartTotal={ user ? getAccountStatusLabel(user) : undefined }
         isAdmin={ isAdmin }
         onLogin={ handleLogin }
         onLogout={ handleLogout }
         onAdminPanel={ handleAdminPanel }
+        savedCount={ wishlistIds.size }
+        onSaved={ handleSaved }
         labels={ {
           dialogLabel: labels.categories,
           orders: labels.orders,

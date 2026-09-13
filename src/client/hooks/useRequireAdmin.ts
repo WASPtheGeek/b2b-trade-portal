@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { buildLoginUrl } from "@/lib/auth/returnTo";
 
 const ADMIN_ROLE = "admin";
 
@@ -22,6 +23,7 @@ export interface RequireAdminResult {
  */
 export function useRequireAdmin(): RequireAdminResult {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isLoading } = useAuth();
   const isAdmin = user?.role === ADMIN_ROLE;
 
@@ -31,7 +33,7 @@ export function useRequireAdmin(): RequireAdminResult {
     }
 
     if (!user) {
-      router.replace("/login");
+      router.replace(buildLoginUrl(pathname));
 
       return;
     }
@@ -39,7 +41,7 @@ export function useRequireAdmin(): RequireAdminResult {
     if (!isAdmin) {
       router.replace("/");
     }
-  }, [isLoading, user, isAdmin, router]);
+  }, [isLoading, user, isAdmin, router, pathname]);
 
   return { isChecking: isLoading || !isAdmin };
 }
