@@ -1,0 +1,26 @@
+import type { ProductFormLabels } from "@/components/features/admin/products/ProductForm";
+
+export const productForm: ProductFormLabels = {
+  createHeading: "Pievienot produktu",
+  editHeading: "Rediģēt produktu",
+  skuLabel: "SKU",
+  nameLabel: "Nosaukums",
+  descriptionLabel: "Apraksts",
+  basePriceLabel: "Cena (bez PVN)",
+  vatRateLabel: "PVN likme",
+  vatRatePlaceholder: "Izvēlieties PVN likmi",
+  brandLabel: "Zīmols",
+  brandPlaceholder: "Bez zīmola",
+  eanLabel: "EAN",
+  soldByPieceLabel: "Pārdod pa gabalam",
+  piecesPerBoxLabel: "Gabali kastē",
+  piecesPerPackageLabel: "Gabali iepakojumā",
+  isActiveLabel: "Aktīvs (redzams katalogā)",
+  primaryCategoryLabel: "Galvenā kategorija",
+  primaryCategoryPlaceholder: "Izvēlieties kategoriju",
+  additionalCategoriesLabel: "Papildu kategorijas",
+  submitLabel: "Saglabāt produktu",
+  submittingLabel: "Saglabā…",
+  cancelLabel: "Atcelt",
+  genericErrorMessage: "Neizdevās saglabāt produktu. Lūdzu, mēģiniet vēlreiz.",
+};

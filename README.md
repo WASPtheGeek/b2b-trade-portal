@@ -305,6 +305,8 @@ dotnet restore
 dotnet build
 dotnet run
 
+see at http://localhost:5001/scalar/
+
 # 5. Run the frontend (once real client development has started)
 cd src/client
 npm install

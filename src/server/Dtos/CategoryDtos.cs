@@ -13,6 +13,7 @@ namespace Elkaro.Server.Dtos;
 /// <param name="SortOrder">The sort order of the category.</param>
 /// <param name="IsCustom">Indicates if the category is custom.</param>
 /// <param name="ShowInMenu">Indicates if the category should be shown in the menu.</param>
+/// <param name="ProductCount">The number of active products assigned to this category, if computed for this request.</param>
 public record CategoryDto(
     long Id,
     long? ParentId,
@@ -21,7 +22,8 @@ public record CategoryDto(
     string? Description,
     int SortOrder,
     bool IsCustom,
-    bool ShowInMenu);
+    bool ShowInMenu,
+    int? ProductCount = null);
 
 /// <summary>
 /// Represents a request to create or update a category.
