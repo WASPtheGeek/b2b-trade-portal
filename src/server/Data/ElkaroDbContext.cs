@@ -92,6 +92,7 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.DataType)
                 .HasConversion<short>()
                 .HasDefaultValue(AttributeDataType.Text)
+                .HasSentinel(default(AttributeDataType))
                 .HasColumnName("data_type");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
@@ -255,6 +256,7 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasConversion<short>()
                 .HasDefaultValue(ImportStatus.Pending)
+                .HasSentinel(default(ImportStatus))
                 .HasColumnName("status");
             entity.Property(e => e.SuccessCount).HasColumnName("success_count");
             entity.Property(e => e.TotalRecords).HasColumnName("total_records");
@@ -330,6 +332,7 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasConversion<short>()
                 .HasDefaultValue(NotificationStatus.Pending)
+                .HasSentinel(default(NotificationStatus))
                 .HasColumnName("status");
 
             entity.HasOne<Order>().WithMany()
@@ -371,6 +374,7 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasConversion<short>()
                 .HasDefaultValue(OrderStatus.Pending)
+                .HasSentinel(default(OrderStatus))
                 .HasColumnName("status");
             entity.Property(e => e.SubtotalAmount)
                 .HasPrecision(12, 2)
@@ -840,6 +844,7 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasConversion<short>()
                 .HasDefaultValue(UserStatus.Pending)
+                .HasSentinel(default(UserStatus))
                 .HasColumnName("status");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")

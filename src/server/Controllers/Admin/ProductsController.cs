@@ -28,6 +28,88 @@ public class ProductsController : ControllerBase
     public ProductsController(ElkaroDbContext db) => _db = Guard.Against.Null(db, nameof(db));
 
     /// <summary>
+    /// Gets a paginated list of every product, including inactive ones, optionally
+    /// filtered by category, brand, or search term.
+    /// </summary>
+    /// <param name="category">Optional category slug or ID to filter products by.</param>
+    /// <param name="brand">Optional brand ID to filter products by.</param>
+    /// <param name="search">Optional search term to filter products by name or EAN.</param>
+    /// <param name="paging">Paging parameters (page number and page size).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A paginated list of products matching the specified filters.</returns>
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<ProductAdminListItemDto>>> List(
+        [FromQuery] string? category,
+        [FromQuery] long? brand,
+        [FromQuery] string? search,
+        [FromQuery] PagingQuery paging,
+        CancellationToken ct)
+    {
+        var query = _db.Products
+            .Include(p => p.Brand)
+            .Include(p => p.VatRate)
+            .Include(p => p.Images)
+            .Include(p => p.ProductCategories)
+                .ThenInclude(pc => pc.Category)
+            .AsSplitQuery()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            query = query.Where(p => p.ProductCategories.Any(pc =>
+                pc.Category.Slug == category || pc.CategoryId.ToString() == category));
+        }
+
+        if (brand is not null)
+        {
+            query = query.Where(p => p.BrandId == brand);
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{term}%") || (p.Ean != null && p.Ean == term));
+        }
+
+        var total = await query.CountAsync(ct);
+        Response.Headers["X-Total-Count"] = total.ToString();
+
+        var products = await query
+            .OrderBy(p => p.Name)
+            .Skip((paging.Page - 1) * paging.PageSize)
+            .Take(paging.PageSize)
+            .ToListAsync(ct);
+
+        return Ok(products.Select(ToAdminListItemDto).ToList());
+    }
+
+    /// <summary>
+    /// Gets the full admin-editable details of a product by its ID, including inactive products.
+    /// </summary>
+    /// <param name="id">The ID of the product.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The admin details of the specified product.</returns>
+    /// <exception cref="ResourceNotFoundException"></exception>
+    [HttpGet("{id:long}")]
+    public async Task<ActionResult<ProductAdminDetailDto>> GetById(long id, CancellationToken ct)
+    {
+        var product = await _db.Products
+            .Include(p => p.Brand)
+            .Include(p => p.VatRate)
+            .Include(p => p.Images)
+            .Include(p => p.ProductCategories)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+
+        if (product is null)
+        {
+            throw new ResourceNotFoundException($"Produkts ar ID {id} nav atrasts.");
+        }
+
+        return Ok(ToAdminDetailDto(product));
+    }
+
+    /// <summary>
     /// Creates a new product in the system.
     /// </summary>
     /// <param name="request">The product details to create.</param>
@@ -198,4 +280,48 @@ public class ProductsController : ControllerBase
         }
         await _db.SaveChangesAsync(ct);
     }
+
+    /// <summary>
+    /// Converts a <see cref="Product"/> entity to a <see cref="ProductAdminListItemDto"/>.
+    /// </summary>
+    /// <param name="p">The product entity to convert.</param>
+    /// <returns>The admin list item DTO representation of the product.</returns>
+    private static ProductAdminListItemDto ToAdminListItemDto(Product p) => new(
+        p.Id,
+        p.Sku,
+        p.Name,
+        p.Description,
+        p.Ean,
+        p.Brand?.Name,
+        p.Images.OrderBy(i => i.SortOrder).Select(i => i.Filename).FirstOrDefault(),
+        p.IsActive,
+        p.BasePrice,
+        p.VatRate.Rate,
+        p.SoldByPiece,
+        p.PiecesPerBox,
+        p.PiecesPerPackage,
+        p.ProductCategories.OrderByDescending(pc => pc.IsPrimary).Select(pc => pc.Category.Name).ToList());
+
+    /// <summary>
+    /// Converts a <see cref="Product"/> entity to a <see cref="ProductAdminDetailDto"/>.
+    /// </summary>
+    /// <param name="p">The product entity to convert.</param>
+    /// <returns>The admin detail DTO representation of the product.</returns>
+    private static ProductAdminDetailDto ToAdminDetailDto(Product p) => new(
+        p.Id,
+        p.Sku,
+        p.Name,
+        p.Description,
+        p.Ean,
+        p.BrandId,
+        p.Brand?.Name,
+        p.VatRateId,
+        p.VatRate.Rate,
+        p.BasePrice,
+        p.SoldByPiece,
+        p.PiecesPerBox,
+        p.PiecesPerPackage,
+        p.IsActive,
+        p.ProductCategories.OrderByDescending(pc => pc.IsPrimary).Select(pc => pc.CategoryId).ToList(),
+        p.Images.OrderBy(i => i.SortOrder).Select(i => i.Filename).ToList());
 }

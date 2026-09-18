@@ -30,7 +30,16 @@ public static class WebApplicationExtensions
     public static WebApplication UseRequestPipeline(this WebApplication app)
     {
         app.UseExceptionHandler(); // pairs with AddProblemDetails() in AddWebApi()
-        app.UseHttpsRedirection();
+
+        // Skipped in Development: the API is served over plain HTTP there (see the
+        // "http" launch profile, and the client's own local dev server also runs on
+        // HTTP), so redirecting would just bounce every request to a port nothing
+        // is listening on for the client.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseCors();
         app.UseAuthentication();
         app.UseAuthorization();

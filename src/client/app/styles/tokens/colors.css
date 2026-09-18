@@ -1,0 +1,94 @@
+:root{
+/* ---- Brand orange (primary accent) ---- */
+--orange-50:#fef6ec;--orange-100:#fde9ce;--orange-200:#fbd09b;--orange-300:#f9b463;
+--orange-400:#f79a33;--orange-500:#f5820a;--orange-600:#d66c05;--orange-700:#ad5606;
+--orange-800:#82420a;--orange-900:#5c2f09;
+--brand:#f5820a;--brand-ink:#7a3c04;
+
+/* ---- Warm-neutral greys: near-black text, soft off-white surfaces ---- */
+--neutral-0:#ffffff;--neutral-25:#fcfcfb;--neutral-50:#f7f7f5;--neutral-100:#efefec;
+--neutral-200:#e2e2de;--neutral-300:#cbcbc5;--neutral-400:#a3a39c;--neutral-500:#7a7a73;
+--neutral-600:#5a5a54;--neutral-700:#3f3f3a;--neutral-800:#2a2a26;--neutral-900:#1a1a18;
+--neutral-950:#101010;
+
+/* ---- Raw semantic hues ---- */
+--red-50:#fee2e2;--red-100:#fbc4c4;--red-500:#dc2626;--red-600:#b91c1c;--red-700:#991b1b;
+--green-50:#dcfce7;--green-100:#b6efcb;--green-500:#16a34a;--green-600:#15803d;--green-700:#166534;
+--amber-50:#fef3c7;--amber-100:#fde39a;--amber-500:#d97706;--amber-600:#92400e;
+--yellow-50:#fef9c3;--yellow-100:#fcee9a;--yellow-600:#854d0e;
+--blue-50:#dbeafe;--blue-100:#bbd5fc;--blue-500:#2563eb;--blue-600:#1d4ed8;
+--purple-50:#ede9fe;--purple-100:#d8cffc;--purple-600:#6d28d9;
+--cyan-50:#cffafe;--cyan-100:#a5eff7;--cyan-600:#0e7490;
+
+/* ---- Semantic aliases: text ---- */
+--text-strong:var(--neutral-950);
+--text-body:var(--neutral-800);
+--text-muted:var(--neutral-600);
+--text-subtle:var(--neutral-500);
+--text-disabled:var(--neutral-400);
+--text-inverse:#ffffff;
+--text-inverse-muted:rgba(255,255,255,.66);
+--text-brand:var(--orange-700);
+--text-danger:var(--red-600);
+--text-success:var(--green-600);
+--text-link:var(--orange-700);
+--text-link-hover:var(--orange-800);
+
+/* ---- Storefront chrome (see ui_kits/storefront) ---- */
+--warm-25:#fdfcfa;--warm-50:#faf8f5;--warm-100:#f5f1ea;--warm-200:#ebe5da;
+--surface-warm:var(--warm-50);
+--surface-warm-alt:var(--warm-100);
+--nav-bar:#17171a;
+--nav-bar-blur:rgba(23,23,26,.82);
+--utility-bar:var(--warm-100);
+--border-warm:var(--warm-200);
+
+/* ---- Semantic aliases: surfaces ---- */
+--surface-page:var(--neutral-50);
+--surface-card:#ffffff;
+--surface-raised:#ffffff;
+--surface-sunken:var(--neutral-100);
+--surface-subtle:var(--neutral-25);
+--surface-hover:var(--neutral-50);
+--surface-active:var(--neutral-100);
+--surface-inverse:var(--neutral-950);
+--surface-inverse-hover:#232320;
+--surface-brand-tint:var(--orange-50);
+--surface-media:#faf7f3;
+
+/* ---- Semantic aliases: borders ---- */
+--border-subtle:var(--neutral-100);
+--border-default:var(--neutral-200);
+--border-strong:var(--neutral-300);
+--border-inverse:rgba(255,255,255,.14);
+--border-brand:var(--orange-500);
+--border-danger:var(--red-500);
+
+/* ---- Interactive ---- */
+--action-primary:var(--orange-500);
+--action-primary-hover:var(--orange-600);
+--action-primary-active:var(--orange-700);
+--action-primary-fg:#ffffff;
+--action-danger:var(--red-500);
+--action-danger-hover:var(--red-600);
+--action-success:var(--green-500);
+--action-success-hover:var(--green-600);
+--action-disabled-bg:var(--neutral-100);
+--action-disabled-fg:var(--neutral-400);
+--focus-ring:var(--orange-500);
+--focus-ring-shadow:0 0 0 3px rgba(245,130,10,.28);
+
+/* ---- Status: konta apstiprinajums ---- */
+--status-pending-bg:var(--amber-50);--status-pending-fg:var(--amber-600);--status-pending-bd:var(--amber-100);
+--status-approved-bg:var(--green-50);--status-approved-fg:var(--green-600);--status-approved-bd:var(--green-100);
+--status-rejected-bg:var(--red-50);--status-rejected-fg:var(--red-600);--status-rejected-bd:var(--red-100);
+--status-suspended-bg:var(--neutral-100);--status-suspended-fg:var(--neutral-700);--status-suspended-bd:var(--neutral-200);
+
+/* ---- Status: pasutijumi ---- */
+--status-confirmed-bg:var(--blue-50);--status-confirmed-fg:var(--blue-600);--status-confirmed-bd:var(--blue-100);
+--status-processing-bg:var(--purple-50);--status-processing-fg:var(--purple-600);--status-processing-bd:var(--purple-100);
+--status-shipped-bg:var(--cyan-50);--status-shipped-fg:var(--cyan-600);--status-shipped-bd:var(--cyan-100);
+--status-delivered-bg:var(--green-50);--status-delivered-fg:var(--green-600);--status-delivered-bd:var(--green-100);
+--status-cancelled-bg:var(--red-50);--status-cancelled-fg:var(--red-600);--status-cancelled-bd:var(--red-100);
+--status-partial-bg:var(--yellow-50);--status-partial-fg:var(--yellow-600);--status-partial-bd:var(--yellow-100);
+}

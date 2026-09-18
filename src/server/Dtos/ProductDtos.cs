@@ -69,6 +69,83 @@ public record ProductDetailDto(
     IReadOnlyDictionary<string, string> Attributes);
 
 /// <summary>
+/// This DTO represents a product item in an admin list view.
+/// Unlike <see cref="ProductListItemDto"/>, this includes inactive products and omits
+/// resolved pricing/packaging (not relevant to admin browsing).
+/// </summary>
+/// <param name="Id">The unique identifier of the product.</param>
+/// <param name="Sku">The stock keeping unit of the product.</param>
+/// <param name="Name">The name of the product.</param>
+/// <param name="Description">The description of the product.</param>
+/// <param name="Ean">The European Article Number of the product.</param>
+/// <param name="BrandName">The name of the brand associated with the product.</param>
+/// <param name="ThumbnailFilename">The filename of the product's thumbnail image.</param>
+/// <param name="IsActive">Indicates whether the product is active.</param>
+/// <param name="BasePrice">The base price of the product, excluding VAT.</param>
+/// <param name="VatRatePercent">The VAT rate percentage applicable to the product.</param>
+/// <param name="SoldByPiece">Indicates whether the product can be ordered by the individual piece.</param>
+/// <param name="PiecesPerBox">The number of pieces per box, if the product can be ordered by the box.</param>
+/// <param name="PiecesPerPackage">The number of pieces per package, if the product can be ordered by the package.</param>
+/// <param name="CategoryNames">The names of the categories the product belongs to.</param>
+public record ProductAdminListItemDto(
+    long Id,
+    string Sku,
+    string Name,
+    string? Description,
+    string? Ean,
+    string? BrandName,
+    string? ThumbnailFilename,
+    bool IsActive,
+    decimal BasePrice,
+    decimal VatRatePercent,
+    bool SoldByPiece,
+    int? PiecesPerBox,
+    int? PiecesPerPackage,
+    IReadOnlyList<string> CategoryNames);
+
+/// <summary>
+/// This DTO represents the full admin-editable details of a product, mirroring
+/// <see cref="ProductUpsertRequest"/> so a client can round-trip a fetched product
+/// straight back through an update request. Unlike <see cref="ProductDetailDto"/>,
+/// this includes inactive products and the raw, editable identifiers
+/// (<see cref="BrandId"/>, <see cref="VatRateId"/>, <see cref="CategoryIds"/>) rather
+/// than only their resolved display values.
+/// </summary>
+/// <param name="Id">The unique identifier of the product.</param>
+/// <param name="Sku">The stock keeping unit of the product.</param>
+/// <param name="Name">The name of the product.</param>
+/// <param name="Description">The description of the product.</param>
+/// <param name="Ean">The European Article Number of the product.</param>
+/// <param name="BrandId">The identifier of the product's brand, if any.</param>
+/// <param name="BrandName">The name of the brand associated with the product, if any.</param>
+/// <param name="VatRateId">The identifier of the VAT rate applied to the product.</param>
+/// <param name="VatRatePercent">The VAT rate percentage applicable to the product.</param>
+/// <param name="BasePrice">The base price of the product, excluding VAT.</param>
+/// <param name="SoldByPiece">Indicates whether the product can be ordered by the individual piece.</param>
+/// <param name="PiecesPerBox">The number of pieces per box, if the product can be ordered by the box.</param>
+/// <param name="PiecesPerPackage">The number of pieces per package, if the product can be ordered by the package.</param>
+/// <param name="IsActive">Indicates whether the product is active.</param>
+/// <param name="CategoryIds">The IDs of the categories the product belongs to; the first entry is the primary category.</param>
+/// <param name="ImageFilenames">The list of image filenames for the product.</param>
+public record ProductAdminDetailDto(
+    long Id,
+    string Sku,
+    string Name,
+    string? Description,
+    string? Ean,
+    long? BrandId,
+    string? BrandName,
+    short VatRateId,
+    decimal VatRatePercent,
+    decimal BasePrice,
+    bool SoldByPiece,
+    int? PiecesPerBox,
+    int? PiecesPerPackage,
+    bool IsActive,
+    IReadOnlyList<long> CategoryIds,
+    IReadOnlyList<string> ImageFilenames);
+
+/// <summary>
 /// This DTO represents the request payload for creating or updating a product.
 /// </summary>
 public record ProductUpsertRequest
