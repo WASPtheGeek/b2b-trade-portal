@@ -17,6 +17,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Select } from "@/components/ui/Select";
 import { useAuth } from "@/hooks/useAuth";
+import { useCategoryViewMode, type CategoryViewMode } from "@/hooks/useCategoryViewMode";
 import { useShopCategories } from "@/hooks/useShopCategories";
 import { useShopCategoryProducts } from "@/hooks/useShopCategoryProducts";
 import { useWishlist } from "@/hooks/useWishlist";
@@ -27,7 +28,6 @@ import { mapProductListItem, type PackagingUnitLabels } from "@/lib/catalog/mapP
 const PAGE_SIZE = 24;
 
 type SortKey = "recommended" | "name-asc" | "name-desc";
-type ViewMode = "grid" | "list";
 
 export interface CategoryPageLabels {
   home: string;
@@ -79,7 +79,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
   const { isWishlisted, toggle: toggleWishlist } = useWishlist();
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortKey>("recommended");
-  const [view, setView] = useState<ViewMode>("grid");
+  const [view, setView] = useCategoryViewMode();
 
   const { category, products, total, isLoading, error, notFound } = useShopCategoryProducts(id, {
     page,
@@ -166,7 +166,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
               />
               <SegmentedControl
                 value={ view }
-                onChange={ (v) => setView(v as ViewMode) }
+                onChange={ (v) => setView(v as CategoryViewMode) }
                 options={ [
                   { value: "grid", label: labels.gridView },
                   { value: "list", label: labels.listView },
