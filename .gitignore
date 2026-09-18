@@ -61,3 +61,28 @@ node_modules/
 .next/
 .env.local
 build/
+
+# Local application configuration
+src/server/appsettings.Development.json
+src/server/appsettings*.Local.json
+src/server/appsettings*.json
+
+# User-specific IDE settings
+.vs/
+.vscode/
+
+# Client
+# src/client/
+
+project-plan.md
+master-context.md
+
+src/design/
+src/elkaroweb/
+
+*_context.md
+*_CONTEXT.md
+
+src/app_sample/
+src/client/app/dev/
+*.tsbuildinfo
