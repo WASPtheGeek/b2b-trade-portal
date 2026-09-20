@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { dictionary } from "@/app/_i18n";
 import { ShopHeader } from "@/components/features/shop/ShopHeader";
 import { StoreFooter } from "@/components/layout/StoreFooter";
+import { CartProvider } from "@/components/providers/CartProvider";
 import { WishlistProvider } from "@/components/providers/WishlistProvider";
 
 /**
@@ -17,9 +18,11 @@ import { WishlistProvider } from "@/components/providers/WishlistProvider";
 export default function StorefrontLayout({ children }: { children: ReactNode }) {
   return (
     <WishlistProvider>
-      <ShopHeader labels={ dictionary.shopHeader } />
-      { children }
-      <StoreFooter labels={ dictionary.storeFooter } />
+      <CartProvider>
+        <ShopHeader labels={ dictionary.shopHeader } />
+        { children }
+        <StoreFooter labels={ dictionary.storeFooter } />
+      </CartProvider>
     </WishlistProvider>
   );
 }

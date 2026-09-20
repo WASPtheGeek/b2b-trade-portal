@@ -17,6 +17,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Select } from "@/components/ui/Select";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { useCategoryViewMode, type CategoryViewMode } from "@/hooks/useCategoryViewMode";
 import { useShopCategories } from "@/hooks/useShopCategories";
 import { useShopCategoryProducts } from "@/hooks/useShopCategoryProducts";
@@ -77,6 +78,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
   const masked = !user;
   const { tree } = useShopCategories();
   const { isWishlisted, toggle: toggleWishlist } = useWishlist();
+  const cart = useCart();
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortKey>("recommended");
   const [view, setView] = useCategoryViewMode();
@@ -200,6 +202,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
                     masked={ masked }
                     labels={ labels.productTile }
                     onOpen={ (prod) => openProduct(prod.id) }
+                    onAdd={ cart.add }
                     wishlisted={ isWishlisted(p.id) }
                     onWishlist={ ({ product }) => toggleWishlist(product.id) }
                     className="h-full"
@@ -227,6 +230,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
                     masked={ masked }
                     labels={ labels.productRow }
                     onOpen={ (prod) => openProduct(prod.id) }
+                    onAdd={ cart.add }
                     onSignIn={ signIn }
                     wishlisted={ isWishlisted(p.id) }
                     onWishlist={ ({ product }) => toggleWishlist(product.id) }

@@ -1,0 +1,45 @@
+import type { OrderListLabels } from "@/components/features/admin/orders/OrderList";
+
+export const adminOrderList: OrderListLabels = {
+  heading: "Pasūtījumi",
+  tabAll: "Visi",
+  columnOrderNumber: "Pasūtījums",
+  columnCustomer: "Klients",
+  columnDate: "Datums",
+  columnStatus: "Statuss",
+  columnTotal: "Summa",
+  columnActions: "",
+  viewLabel: "Skatīt",
+  emptyTitle: "Vēl nav neviena pasūtījuma",
+  emptyDescription: "Šeit parādīsies uzņēmumu iesniegtie pasūtījumi.",
+  genericErrorMessage: "Neizdevās ielādēt pasūtījumus. Lūdzu, mēģiniet vēlreiz.",
+  detail: {
+    customerLabel: "Klients",
+    placedOn: "Iesniegts",
+    notesLabel: "Piezīmes",
+    itemsTable: {
+      columnProduct: "Produkts",
+      columnSku: "SKU",
+      columnPackaging: "Iepakojums",
+      columnQuantity: "Daudzums",
+      columnUnitPrice: "Cena par vienību",
+      columnTotal: "Summa",
+    },
+    totals: {
+      subtotal: "Starpsumma",
+      vat: "PVN",
+      total: "Kopā",
+    },
+    packagingUnits: {
+      piece: { label: "Gab.", short: "gab." },
+      package: { label: "Iep.", short: "iep." },
+      box: { label: "Kaste", short: "kaste" },
+    },
+    statusSectionLabel: "Mainīt statusu",
+    noTransitionsAvailable: "Pasūtījums ir sasniedzis gala statusu un vairs nav maināms.",
+    renderTransitionLabel: (status) => `Atzīmēt kā "${status}"`,
+    closeLabel: "Aizvērt",
+    genericErrorMessage: "Neizdevās ielādēt pasūtījumu. Lūdzu, mēģiniet vēlreiz.",
+    updateErrorMessage: "Neizdevās mainīt pasūtījuma statusu. Lūdzu, mēģiniet vēlreiz.",
+  },
+};

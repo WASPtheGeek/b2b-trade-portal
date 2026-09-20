@@ -5,6 +5,8 @@ export const loginForm: LoginFormLabels = {
   subheading: "Izmantojiet e-pastu, ar kuru reģistrējāt uzņēmumu.",
   emailLabel: "E-pasts",
   passwordLabel: "Parole",
+  showPasswordLabel: "Rādīt paroli",
+  hidePasswordLabel: "Slēpt paroli",
   submitLabel: "Ienākt sistēmā",
   submittingLabel: "Pieslēdzas…",
   noAccountText: "Vēl nav konta?",

@@ -134,6 +134,13 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash       VARCHAR(255) NOT NULL,
     is_vat_exempt       BOOLEAN NOT NULL DEFAULT false,
 
+    -- Email confirmation - separate from (and checked in addition to) the
+    -- admin-approval workflow below. email_confirmation_token is set at
+    -- registration (and on a resend) and cleared once confirmed.
+    email_confirmed                     BOOLEAN NOT NULL DEFAULT false,
+    email_confirmation_token            VARCHAR(64),
+    email_confirmation_token_expires_at TIMESTAMPTZ,
+
     -- Business account approval workflow (UserStatus: see type code reference)
     status              SMALLINT NOT NULL DEFAULT 1 CHECK (status IN (1,2,3,4)),
     approved_by         BIGINT REFERENCES users(id),
@@ -144,14 +151,38 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Additive migration (2026-09-19): the email_confirmed/email_confirmation_token* columns
+-- above are new. CREATE TABLE IF NOT EXISTS is a no-op on a database that already has a
+-- users table, so an existing database needs these explicit ALTERs instead - each is
+-- independently safe to (re-)run on its own, in any order, in any client (no DO block, since
+-- running only part of one in a GUI SQL tool leaves it half-applied).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_confirmed BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_confirmation_token VARCHAR(64);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_confirmation_token_expires_at TIMESTAMPTZ;
+
+-- One-time grandfathering, not an ongoing rule: accounts created before this feature
+-- existed never went through email confirmation, so they'd otherwise be retroactively
+-- locked out of login (including any admin account) the moment this column starts being
+-- checked at sign-in. Scoped to a fixed cutoff (rather than "every currently-unconfirmed
+-- row") so re-running this script later never touches a real post-launch registration
+-- that's legitimately still waiting to confirm.
+UPDATE users SET email_confirmed = true WHERE email_confirmed = false AND created_at < '2026-09-19';
+
 DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
 CREATE TRIGGER trg_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email_confirmation_token
+    ON users(email_confirmation_token)
+    WHERE email_confirmation_token IS NOT NULL;
+
 -- CHECK constraints can't reference other tables (e.g. roles), so this rule
--- — business accounts must carry business_name/registration_number/vat_number —
+-- — business accounts must carry business_name/registration_number —
 -- is enforced here instead of a (disallowed) subquery-based CHECK constraint.
+-- vat_number is intentionally not required here: not every registering
+-- business is a VAT payer (see RegisterRequest.VatNumber / User.VatNumber,
+-- both nullable).
 CREATE OR REPLACE FUNCTION enforce_business_required_fields()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -160,8 +191,8 @@ BEGIN
     SELECT name INTO v_role_name FROM roles WHERE id = NEW.role_id;
 
     IF v_role_name = 'business' THEN
-        IF NEW.business_name IS NULL OR NEW.registration_number IS NULL OR NEW.vat_number IS NULL THEN
-            RAISE EXCEPTION 'business_name, registration_number, and vat_number are required for business accounts';
+        IF NEW.business_name IS NULL OR NEW.registration_number IS NULL THEN
+            RAISE EXCEPTION 'business_name and registration_number are required for business accounts';
         END IF;
     END IF;
 

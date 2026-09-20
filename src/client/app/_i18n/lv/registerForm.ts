@@ -5,13 +5,15 @@ export const registerForm: RegisterFormLabels = {
   subheading: "Cenas un pasūtīšana tiek atvērtas, tiklīdz mūsu komanda izskata un apstiprina jūsu uzņēmumu.",
   businessNameLabel: "Uzņēmuma nosaukums",
   registrationNumberLabel: "Reģistrācijas numurs",
-  vatNumberLabel: "PVN maksātāja numurs",
   firstNameLabel: "Vārds",
   lastNameLabel: "Uzvārds",
   emailLabel: "Uzņēmuma e-pasts",
   phoneLabel: "Tālrunis",
   passwordLabel: "Parole",
   passwordHint: "Vismaz 8 rakstzīmes, ar burtu un ciparu",
+  confirmPasswordLabel: "Apstiprināt paroli",
+  showPasswordLabel: "Rādīt paroli",
+  hidePasswordLabel: "Slēpt paroli",
   noticeText:
     "Pēc reģistrācijas jūsu konts tiks nosūtīts administratora apstiprināšanai. Pilnu katalogu varat pārlūkot jau tagad — cenas un pasūtīšana parādīsies pēc konta aktivizēšanas.",
   submitLabel: "Reģistrēt kontu",
@@ -19,4 +21,5 @@ export const registerForm: RegisterFormLabels = {
   alreadyApprovedText: "Jau apstiprināts?",
   loginLinkLabel: "Ienākt",
   genericErrorMessage: "Neizdevās izveidot kontu. Lūdzu, mēģiniet vēlreiz.",
+  passwordMismatchMessage: "Paroles nesakrīt.",
 };
