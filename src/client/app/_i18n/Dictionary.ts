@@ -8,7 +8,6 @@ import type { ProductFormLabels } from "@/components/features/admin/products/Pro
 import type { ProductListLabels } from "@/components/features/admin/products/ProductList";
 import type { UserListLabels } from "@/components/features/admin/users/UserList";
 import type { AuthCardLabels } from "@/components/features/auth/AuthCard";
-import type { ConfirmEmailCardLabels } from "@/components/features/auth/ConfirmEmailCard";
 import type { GuestBrowseCtaLabels } from "@/components/features/auth/GuestBrowseCta";
 import type { LoginFormLabels } from "@/components/features/auth/LoginForm";
 import type { RegisterConfirmationLabels } from "@/components/features/auth/RegisterConfirmation";
@@ -47,7 +46,6 @@ export interface Dictionary {
   loginForm: LoginFormLabels;
   registerForm: RegisterFormLabels;
   registerConfirmation: RegisterConfirmationLabels;
-  confirmEmailCard: ConfirmEmailCardLabels;
   adminSidebar: AdminSidebarLabels;
   adminNav: AdminNavLabels;
   adminProductList: ProductListLabels;

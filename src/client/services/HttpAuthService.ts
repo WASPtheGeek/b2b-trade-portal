@@ -3,7 +3,6 @@ import type {
   AuthUser,
   LoginCredentials,
   LoginResult,
-  MessageResult,
   RegisterPayload,
   RegisterResult,
   UpdateProfilePayload,
@@ -24,14 +23,6 @@ export class HttpAuthService implements AuthService {
 
   async fetchCurrentUser(token: string): Promise<AuthUser> {
     return this.http.get<AuthUser>("/api/auth/me", { token });
-  }
-
-  async confirmEmail(token: string): Promise<MessageResult> {
-    return this.http.post<MessageResult>("/api/auth/confirm-email", { token });
-  }
-
-  async resendConfirmation(email: string): Promise<MessageResult> {
-    return this.http.post<MessageResult>("/api/auth/resend-confirmation", { email });
   }
 
   async updateProfile(payload: UpdateProfilePayload, token: string): Promise<AuthUser> {

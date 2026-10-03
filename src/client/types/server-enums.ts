@@ -6,6 +6,14 @@
 // what every current endpoint actually sends. Keep these string-valued and in sync with the
 // backend enums by hand until the API exposes a shared contract (e.g. OpenAPI codegen).
 
+// src/server/Models/Enums/UserRole.cs - unlike the other enums here, the wire value isn't
+// the C# enum's `.ToString()`: AuthController.ToDto sends `user.Role.Name`, the `roles.name`
+// lookup-table value (RoleNames.Admin/.Business), which is already lowercase.
+export enum UserRole {
+  Admin = "admin",
+  Business = "business",
+}
+
 // src/server/Models/Enums/UserStatus.cs - a company/user account's approval status.
 export enum UserStatus {
   Pending = "Pending",

@@ -4,10 +4,9 @@ namespace Elkaro.Server.Models.Entities;
 
 /// <summary>
 /// Durable outbox row. Rows are inserted automatically by Postgres triggers
-/// (trg_notify_admin_on_registration, trg_notify_on_order_created) — the API
-/// never inserts into this table directly. A background sender (not yet
-/// implemented, see claude/project-plan.md Phase 2/5) should poll
-/// Status == Pending, send the email, and mark it Sent/Failed.
+/// (trg_notify_admin_on_registration, trg_notify_on_order_created) or directly by
+/// AuthController for a Rejected account's resubmission. A background sender (not yet
+/// implemented) should poll Status == Pending, send the email, and mark it Sent/Failed.
 /// </summary>
 public class NotificationLog
 {

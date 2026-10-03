@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Ardalis.GuardClauses;
 using Elkaro.Server.Common;
 using Elkaro.Server.Common.Exceptions;
@@ -86,91 +85,20 @@ public class AuthController : ControllerBase
             VatNumber = string.IsNullOrWhiteSpace(request.VatNumber) ? request.RegistrationNumber.Trim() : request.VatNumber.Trim(),
             IsVatExempt = true,
             Phone = request.Phone,
-            // See EmailConfirmationEnabled: confirmation is fully implemented but currently
-            // switched off, so every new account is marked confirmed immediately and goes
-            // straight to admin review, same as before this feature existed.
-            EmailConfirmed = !EmailConfirmationEnabled,
-            EmailConfirmationToken = EmailConfirmationEnabled ? GenerateEmailConfirmationToken() : null,
-            EmailConfirmationTokenExpiresAt = EmailConfirmationEnabled
-                ? DateTimeOffset.UtcNow.AddHours(EmailConfirmationTokenLifetimeHours)
-                : null,
             Status = UserStatus.Pending,
         };
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
         _db.Users.Add(user);
         // Inserting here fires trg_notify_admin_on_registration, which
-        // enqueues a notification_log row per admin. It also gives us user.Id,
-        // needed below to enqueue the email-confirmation notification.
+        // enqueues a notification_log row per admin.
         await _db.SaveChangesAsync(ct);
-
-        if (EmailConfirmationEnabled)
-        {
-            await EnqueueEmailConfirmationNotificationAsync(user, ct);
-        }
-
-        var message = EmailConfirmationEnabled
-            ? "Reģistrācija saņemta — apstipriniet e-pasta adresi, ko nosūtījām jums, un administrators izskatīs jūsu kontu."
-            : "Reģistrācija saņemta — administrators izskatīs jūsu kontu.";
 
         return CreatedAtAction(
             nameof(Me),
             null,
-            new RegisterResponse(message, user.Id, nameof(UserStatus.Pending))
+            new RegisterResponse("Reģistrācija saņemta — administrators izskatīs jūsu kontu.", user.Id, nameof(UserStatus.Pending))
         );
-    }
-
-    /// <summary>
-    /// Confirms a user's email address using the token from the confirmation email.
-    /// </summary>
-    /// <param name="request">The confirmation request containing the token.</param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A response confirming the email address was confirmed.</returns>
-    [HttpPost("confirm-email")]
-    [AllowAnonymous]
-    public async Task<ActionResult<ConfirmEmailResponse>> ConfirmEmail(ConfirmEmailRequest request, CancellationToken ct)
-    {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.EmailConfirmationToken == request.Token, ct);
-
-        if (user is null || user.EmailConfirmationTokenExpiresAt is null || user.EmailConfirmationTokenExpiresAt < DateTimeOffset.UtcNow)
-        {
-            throw new BadRequestException("Apstiprināšanas saite ir nederīga vai tai ir beidzies derīguma termiņš.", "Nederīga saite");
-        }
-
-        user.EmailConfirmed = true;
-        user.EmailConfirmationToken = null;
-        user.EmailConfirmationTokenExpiresAt = null;
-        await _db.SaveChangesAsync(ct);
-
-        return Ok(new ConfirmEmailResponse("E-pasta adrese veiksmīgi apstiprināta. Tagad varat pieslēgties sistēmai."));
-    }
-
-    /// <summary>
-    /// Resends the email-confirmation link to an account that hasn't confirmed its email yet.
-    /// Always responds with the same generic message, whether or not a matching, unconfirmed
-    /// account exists, so this endpoint can't be used to enumerate registered email addresses.
-    /// </summary>
-    /// <param name="request">The request containing the email address to resend to.</param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A generic confirmation response.</returns>
-    [HttpPost("resend-confirmation")]
-    [AllowAnonymous]
-    public async Task<ActionResult<ResendConfirmationResponse>> ResendConfirmation(ResendConfirmationRequest request, CancellationToken ct)
-    {
-        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail, ct);
-
-        if (user is not null && !user.EmailConfirmed)
-        {
-            user.EmailConfirmationToken = GenerateEmailConfirmationToken();
-            user.EmailConfirmationTokenExpiresAt = DateTimeOffset.UtcNow.AddHours(EmailConfirmationTokenLifetimeHours);
-            await _db.SaveChangesAsync(ct);
-
-            await EnqueueEmailConfirmationNotificationAsync(user, ct);
-        }
-
-        return Ok(new ResendConfirmationResponse(
-            "Ja šī e-pasta adrese ir reģistrēta un vēl nav apstiprināta, apstiprināšanas saite tika nosūtīta atkārtoti."));
     }
 
     /// <summary>
@@ -189,11 +117,6 @@ public class AuthController : ControllerBase
         if (user is null || _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
         {
             throw new UnauthorizedException("Nepareizs e-pasts vai parole.");
-        }
-
-        if (EmailConfirmationEnabled && !user.EmailConfirmed)
-        {
-            throw new ForbiddenException("Lūdzu, vispirms apstipriniet savu e-pasta adresi — pārbaudiet savu e-pastu.");
         }
 
         // Suspended is the one status that blocks login outright - an admin actively cut off
@@ -305,47 +228,6 @@ public class AuthController : ControllerBase
         user.Id, user.FirstName, user.LastName, user.Email,
         user.BusinessName, user.RegistrationNumber, user.VatNumber, user.Phone, user.IsVatExempt,
         user.Role?.Name ?? "", user.Status.ToString(), user.CreatedAt, user.RejectionReason);
-
-    /// <summary>
-    /// Feature flag for the email-confirmation requirement. The full implementation - this
-    /// flag, <see cref="ConfirmEmail"/>, <see cref="ResendConfirmation"/>,
-    /// <c>NotificationEmailComposer</c>'s email_confirmation case, and the users table's
-    /// email_confirmed/email_confirmation_token* columns - is in place, but switched off for
-    /// now: every new registration is marked confirmed immediately and goes straight to
-    /// admin review, exactly as it worked before this feature existed. Flip this to true to
-    /// turn confirmation back on - no other code changes are needed.
-    /// </summary>
-    private static readonly bool EmailConfirmationEnabled = false;
-
-    /// <summary>
-    /// How long a generated email-confirmation token stays valid for.
-    /// </summary>
-    private const int EmailConfirmationTokenLifetimeHours = 48;
-
-    /// <summary>
-    /// Generates a cryptographically random email-confirmation token.
-    /// </summary>
-    /// <returns>A 64-character hex string, matching users.email_confirmation_token's column width.</returns>
-    private static string GenerateEmailConfirmationToken() => Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-
-    /// <summary>
-    /// Enqueues the email-confirmation notification for a user - one of the few
-    /// notification_log rows the API inserts directly rather than via a database trigger,
-    /// since the confirmation token/link is generated here (see <see cref="NotificationTypes.EmailConfirmation"/>).
-    /// </summary>
-    /// <param name="user">The user to send the confirmation link to. Must already have a non-null <see cref="User.EmailConfirmationToken"/>.</param>
-    /// <param name="ct">The cancellation token.</param>
-    private async Task EnqueueEmailConfirmationNotificationAsync(User user, CancellationToken ct)
-    {
-        _db.NotificationLogs.Add(new NotificationLog
-        {
-            NotificationType = NotificationTypes.EmailConfirmation,
-            RecipientEmail = user.Email,
-            RelatedUserId = user.Id,
-        });
-
-        await _db.SaveChangesAsync(ct);
-    }
 
     /// <summary>
     /// Enqueues an admin-alert notification for every admin when a previously-Rejected

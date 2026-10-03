@@ -12,7 +12,6 @@ import { cartPage } from "./cartPage";
 import { categoryForm } from "./categoryForm";
 import { categoryList } from "./categoryList";
 import { categoryPage } from "./categoryPage";
-import { confirmEmailCard } from "./confirmEmailCard";
 import { guestBrowseCta } from "./guestBrowseCta";
 import { homePage } from "./homePage";
 import { loginForm } from "./loginForm";
@@ -41,7 +40,6 @@ export const lv: Dictionary = {
   loginForm,
   registerForm,
   registerConfirmation,
-  confirmEmailCard,
   adminSidebar,
   adminNav,
   adminProductList,

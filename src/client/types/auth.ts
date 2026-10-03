@@ -1,4 +1,4 @@
-import type { UserStatus } from "./server-enums";
+import type { UserRole, UserStatus } from "./server-enums";
 
 /** Mirrors the server's `UserDto` (see `AuthController.ToDto`). */
 export interface AuthUser {
@@ -11,7 +11,7 @@ export interface AuthUser {
   vatNumber: string | null;
   phone: string | null;
   isVatExempt: boolean;
-  role: string;
+  role: UserRole;
   status: UserStatus;
   createdAt: string;
   /** Why the account was rejected, when `status` is `Rejected`. */
@@ -46,11 +46,6 @@ export interface RegisterResult {
   message: string;
   userId: number;
   status: UserStatus;
-}
-
-/** Response body returned by `POST /api/auth/confirm-email` and `POST /api/auth/resend-confirmation`. */
-export interface MessageResult {
-  message: string;
 }
 
 /** Fields the signed-in user can edit about their own profile, sent to `PUT /api/auth/me`.

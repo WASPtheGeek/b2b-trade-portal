@@ -17,8 +17,7 @@ import { getAccountDisplayName, getAccountStatusLabel } from "@/lib/auth/account
 import { buildLoginUrl } from "@/lib/auth/returnTo";
 import { buildMegaMenuDepartments } from "@/lib/catalog/buildMegaMenuDepartments";
 import { filterVisibleCategories } from "@/lib/catalog/filterVisibleCategories";
-
-const ADMIN_ROLE = "admin";
+import { UserRole } from "@/types/server-enums";
 
 export interface ShopHeaderLabels extends StoreHeaderLabels {
   categories: string;
@@ -71,7 +70,7 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
   const { tree: categoryTree } = useShopCategories();
   const { ids: wishlistIds } = useWishlist();
   const { totalQuantity: cartCount } = useCart();
-  const isAdmin = user?.role === ADMIN_ROLE;
+  const isAdmin = user?.role === UserRole.Admin;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Always a defined string (never `undefined`) so the input stays a controlled component
   // from the very first render - an `undefined` value here left it effectively uncontrolled,

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { isSafeReturnPath } from "@/lib/auth/returnTo";
 import { resolveErrorMessage } from "@/lib/http/resolveErrorMessage";
+import { UserRole } from "@/types/server-enums";
 
 const DEFAULT_GENERIC_ERROR = "Failed to sign in. Please try again.";
 
@@ -42,8 +43,11 @@ export function useLoginForm({ genericErrorMessage = DEFAULT_GENERIC_ERROR }: Us
     const returnTo = searchParams.get("returnTo");
 
     login({ email, password })
-      .then(() => {
-        router.push(isSafeReturnPath(returnTo) ? returnTo : "/");
+      .then((signedInUser) => {
+        // An explicit returnTo (e.g. they were bounced here from a specific page) still wins -
+        // only fall back to the role-based default when there isn't one.
+        const destination = isSafeReturnPath(returnTo) ? returnTo : signedInUser.role === UserRole.Admin ? "/admin" : "/";
+        router.push(destination);
       })
       .catch((caught: unknown) => {
         setError(resolveErrorMessage(caught, genericErrorMessage));

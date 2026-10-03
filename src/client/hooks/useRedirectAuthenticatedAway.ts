@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { isSafeReturnPath } from "@/lib/auth/returnTo";
-
-const ADMIN_ROLE = "admin";
+import { UserRole } from "@/types/server-enums";
 
 /**
  * Redirects an already-authenticated visitor away from a guest-only page
@@ -25,7 +24,7 @@ export function useRedirectAuthenticatedAway(destination?: string): void {
   const searchParams = useSearchParams();
   const { user, isLoading } = useAuth();
   const returnTo = searchParams.get("returnTo");
-  const resolvedDestination = destination ?? (user?.role === ADMIN_ROLE ? "/admin" : "/");
+  const resolvedDestination = destination ?? (user?.role === UserRole.Admin ? "/admin" : "/");
 
   useEffect(() => {
     if (isLoading) {

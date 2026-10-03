@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { buildLoginUrl } from "@/lib/auth/returnTo";
-
-const ADMIN_ROLE = "admin";
+import { UserRole } from "@/types/server-enums";
 
 export interface RequireAdminResult {
   /** True while the session is still resolving or an away-redirect is in flight. */
@@ -25,7 +24,7 @@ export function useRequireAdmin(): RequireAdminResult {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
-  const isAdmin = user?.role === ADMIN_ROLE;
+  const isAdmin = user?.role === UserRole.Admin;
 
   useEffect(() => {
     if (isLoading) {

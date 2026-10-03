@@ -237,33 +237,3 @@ public record UpdateProfileRequest : IValidatableObject
             yield return new ValidationResult("Reģistrācijas numurs nedrīkst būt tukšs.", [nameof(RegistrationNumber)]);
     }
 }
-
-/// <summary>
-/// The request body for confirming a user's email address.
-/// This DTO is used in the <see cref="AuthController.ConfirmEmail"/> endpoint.
-/// </summary>
-/// <param name="Token">The email-confirmation token from the link sent to the user.</param>
-public record ConfirmEmailRequest([Required(ErrorMessage = "Marķieris ir obligāts.")] string Token);
-
-/// <summary>
-/// The response body for a successful email confirmation.
-/// This DTO is returned by the <see cref="AuthController.ConfirmEmail"/> endpoint.
-/// </summary>
-/// <param name="Message">The success message.</param>
-public record ConfirmEmailResponse(string Message);
-
-/// <summary>
-/// The request body for resending the email-confirmation link.
-/// This DTO is used in the <see cref="AuthController.ResendConfirmation"/> endpoint.
-/// </summary>
-/// <param name="Email">The email address to resend the confirmation link to.</param>
-public record ResendConfirmationRequest([Required(ErrorMessage = "E-pasta adrese ir obligāta."), EmailAddress(ErrorMessage = "E-pasta adrese nav derīga.")] string Email);
-
-/// <summary>
-/// The response body for a resend-confirmation request.
-/// This DTO is returned by the <see cref="AuthController.ResendConfirmation"/> endpoint. It
-/// always carries the same generic message regardless of whether the account exists or is
-/// already confirmed, so the endpoint can't be used to enumerate registered email addresses.
-/// </summary>
-/// <param name="Message">The generic confirmation message.</param>
-public record ResendConfirmationResponse(string Message);
