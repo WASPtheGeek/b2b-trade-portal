@@ -20,6 +20,9 @@ export interface AddToCartPayload {
 
 export interface ProductTileLabels {
   maskedCta: string;
+  /** Shown instead of `maskedCta` when the viewer is already signed in but their account
+   * isn't Approved yet (Pending/Rejected) - "sign in" would be actively wrong there. */
+  restrictedCta: string;
   priceNote: string;
   wishlistSave: string;
   wishlistRemove: string;
@@ -34,6 +37,7 @@ export interface ProductTileLabels {
 
 const DEFAULT_LABELS: ProductTileLabels = {
   maskedCta: "Sign in to see price",
+  restrictedCta: "Price hidden until your account is approved",
   priceNote: "excl. VAT",
   wishlistSave: "Save for later",
   wishlistRemove: "Remove from saved",
@@ -49,6 +53,9 @@ const DEFAULT_LABELS: ProductTileLabels = {
 export interface ProductTileProps extends HTMLAttributes<HTMLElement> {
   product: Product;
   masked?: boolean;
+  /** When `masked`, distinguishes "signed in but not Approved yet" from a plain guest - swaps
+   * the CTA text/icon so an already-signed-in viewer isn't told to "sign in". */
+  restricted?: boolean;
   onAdd?: (payload: AddToCartPayload) => void;
   onOpen?: (product: Product) => void;
   onWishlist?: (payload: { product: Product; saved: boolean }) => void;
@@ -65,6 +72,7 @@ export interface ProductTileProps extends HTMLAttributes<HTMLElement> {
 export function ProductTile({
   product,
   masked = false,
+  restricted = false,
   onAdd,
   onOpen,
   onWishlist,
@@ -173,12 +181,12 @@ export function ProductTile({
         <div className="mt-auto pt-[11px]">
           { masked ? (
             <a
-              href="#/login"
+              href={ restricted ? "#" : "#/login" }
               onClick={ open }
               className="flex items-start gap-1.5 min-w-0 text-[length:var(--font-size-base)] font-semibold leading-[1.35] text-orange-700 no-underline whitespace-normal text-balance"
             >
-              <Icon name="lock" size={ 13 } className="mt-0.5 flex-none" />
-              { labels.maskedCta }
+              <Icon name={ restricted ? "clock" : "lock" } size={ 13 } className="mt-0.5 flex-none" />
+              { restricted ? labels.restrictedCta : labels.maskedCta }
             </a>
           ) : (
             <>

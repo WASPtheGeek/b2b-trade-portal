@@ -118,7 +118,7 @@ public class CategoriesController : ControllerBase
             .ToListAsync(ct);
 
         var prices = await pricing.ResolveUnitPricesAsync(products, _currentUser.UserId, ct);
-        var includePrices = _currentUser.IsAuthenticated;
+        var includePrices = _currentUser.IsAuthenticated && _currentUser.IsApproved;
 
         return Ok(products.Select(p => ProductsController.ToListItemDto(p, prices[p.Id], includePrices)).ToList());
     }

@@ -13,8 +13,10 @@ import type { GuestBrowseCtaLabels } from "@/components/features/auth/GuestBrows
 import type { LoginFormLabels } from "@/components/features/auth/LoginForm";
 import type { RegisterConfirmationLabels } from "@/components/features/auth/RegisterConfirmation";
 import type { RegisterFormLabels } from "@/components/features/auth/RegisterForm";
+import type { AccountPageLabels } from "@/components/features/shop/AccountPage";
 import type { CartPageLabels } from "@/components/features/shop/CartPage";
 import type { CategoryPageLabels } from "@/components/features/shop/CategoryPage";
+import type { HomePageLabels } from "@/components/features/shop/HomePage";
 import type { OrdersPageLabels } from "@/components/features/shop/OrdersPage";
 import type { ProductPageLabels } from "@/components/features/shop/ProductPage";
 import type { ShopHeaderLabels } from "@/components/features/shop/ShopHeader";
@@ -33,11 +35,13 @@ import type { StoreFooterLabels } from "@/components/layout/StoreFooter";
 export interface Dictionary {
   shopHeader: ShopHeaderLabels;
   storeFooter: StoreFooterLabels;
+  homePage: HomePageLabels;
   categoryPage: CategoryPageLabels;
   productPage: ProductPageLabels;
   wishlistPage: WishlistPageLabels;
   ordersPage: OrdersPageLabels;
   cartPage: CartPageLabels;
+  accountPage: AccountPageLabels;
   authCard: AuthCardLabels;
   guestBrowseCta: GuestBrowseCtaLabels;
   loginForm: LoginFormLabels;

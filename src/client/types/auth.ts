@@ -14,6 +14,8 @@ export interface AuthUser {
   role: string;
   status: UserStatus;
   createdAt: string;
+  /** Why the account was rejected, when `status` is `Rejected`. */
+  rejectionReason: string | null;
 }
 
 /** Credentials submitted to `POST /api/auth/login`. */
@@ -36,7 +38,6 @@ export interface RegisterPayload {
   password: string;
   businessName: string;
   registrationNumber: string;
-  vatNumber: string;
   phone?: string;
 }
 
@@ -45,4 +46,20 @@ export interface RegisterResult {
   message: string;
   userId: number;
   status: UserStatus;
+}
+
+/** Response body returned by `POST /api/auth/confirm-email` and `POST /api/auth/resend-confirmation`. */
+export interface MessageResult {
+  message: string;
+}
+
+/** Fields the signed-in user can edit about their own profile, sent to `PUT /api/auth/me`.
+ * Deliberately excludes email/password - see `UpdateProfileRequest` on the server. */
+export interface UpdateProfilePayload {
+  firstName: string;
+  lastName: string;
+  businessName: string;
+  registrationNumber: string;
+  vatNumber?: string;
+  phone?: string;
 }

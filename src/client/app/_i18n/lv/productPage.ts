@@ -27,6 +27,7 @@ export const productPage: ProductPageLabels = {
   genericError: "Neizdevās ielādēt produktu. Lūdzu, mēģiniet vēlreiz.",
   productTile: {
     maskedCta: "Ienākt, lai redzētu cenu",
+    restrictedCta: "Cena būs redzama pēc konta apstiprināšanas",
     priceNote: "bez PVN",
     wishlistSave: "Saglabāt vēlāk",
     wishlistRemove: "Noņemt no saglabātajiem",
@@ -42,5 +43,12 @@ export const productPage: ProductPageLabels = {
     piece: { label: "Gab.", short: "gab." },
     package: { label: "Iep.", short: "iep." },
     box: { label: "Kaste", short: "kaste" },
+  },
+  accountStatusNotice: {
+    pendingTitle: "Konts gaida apstiprinājumu",
+    pendingBody: "Cenas un pasūtīšana kļūs pieejamas, tiklīdz administrators apstiprinās jūsu kontu.",
+    rejectedTitle: "Pieteikums netika apstiprināts",
+    rejectedReasonLabel: "Iemesls",
+    accountLinkLabel: "Skatīt kontu",
   },
 };

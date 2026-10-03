@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Elkaro.Server.Models.Entities;
+using Elkaro.Server.Models.Enums;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Elkaro.Server.Services;
@@ -49,14 +50,18 @@ public class JwtTokenService : IJwtTokenService
     }
 
     /// <inheritdoc/>
-    public string CreateAccessToken(User user, string roleName)
+    public string CreateAccessToken(User user, UserRole role)
     {
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, roleName),
+            new(ClaimTypes.Role, role.ToRoleName()),
             new("business_name", user.BusinessName ?? string.Empty),
+            // Lets ICurrentUserService.IsApproved gate pricing/ordering without a DB round
+            // trip per request - a logged-in business account can be Pending or Rejected
+            // (see AuthController.Login's policy), not just Approved.
+            new("status", user.Status.ToString()),
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SigningKey));

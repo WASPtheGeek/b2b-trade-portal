@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useLoginForm } from "@/hooks/useLoginForm";
 
 export interface LoginFormLabels {
@@ -12,6 +13,8 @@ export interface LoginFormLabels {
   subheading: string;
   emailLabel: string;
   passwordLabel: string;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   submitLabel: string;
   submittingLabel: string;
   noAccountText: string;
@@ -24,6 +27,8 @@ const DEFAULT_LABELS: LoginFormLabels = {
   subheading: "Use the email you registered your business with.",
   emailLabel: "Email",
   passwordLabel: "Password",
+  showPasswordLabel: "Show password",
+  hidePasswordLabel: "Hide password",
   submitLabel: "Sign in",
   submittingLabel: "Signing in…",
   noAccountText: "Don't have an account yet?",
@@ -65,13 +70,15 @@ export function LoginForm({ labels: labelsProp }: LoginFormProps) {
           />
         </FormField>
         <FormField label={ labels.passwordLabel } htmlFor="login-password">
-          <Input
+          <PasswordInput
             id="login-password"
-            type="password"
             size="lg"
+            autoComplete="current-password"
             required
             value={ password }
             onChange={ (event) => setPassword(event.target.value) }
+            showPasswordLabel={ labels.showPasswordLabel }
+            hidePasswordLabel={ labels.hidePasswordLabel }
           />
         </FormField>
       </div>

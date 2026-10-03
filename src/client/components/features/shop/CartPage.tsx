@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AccountStatusNotice, type AccountStatusNoticeLabels } from "@/components/features/shop/AccountStatusNotice";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -11,15 +12,18 @@ import { ProductMedia } from "@/components/ui/ProductMedia";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { TextArea } from "@/components/ui/TextArea";
+import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { useCheckout } from "@/hooks/useCheckout";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { canSeePrices } from "@/lib/auth/canSeePrices";
 import { Money } from "@/lib/money";
 import type { CartLine } from "@/lib/cart/CartContextValue";
 
 export interface CartPageLabels {
   title: string;
   itemCount: string;
+  accountStatusNotice: AccountStatusNoticeLabels;
   clearCart: string;
   removeLabel: string;
   decreaseQty: string;
@@ -117,6 +121,7 @@ function CartRow({
  * and checkout - submitting converts the cart into a single `POST /api/orders` quote request. */
 export function CartPage({ labels }: CartPageProps) {
   const { isChecking } = useRequireAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const cart = useCart();
   const { isSubmitting, error, submit } = useCheckout({ genericErrorMessage: labels.genericError });
@@ -135,6 +140,26 @@ export function CartPage({ labels }: CartPageProps) {
     return (
       <main className="relative z-[1] max-w-layout-max mx-auto px-gutter pt-4 pb-section-gap-lg">
         <div className="h-[320px] rounded-card bg-surface-card border border-border-warm animate-pulse" />
+      </main>
+    );
+  }
+
+  // The backend rejects POST /api/orders for a non-Approved account anyway (see
+  // OrdersController.Create), but that's a bad way for a Pending/Rejected user to find out -
+  // show the restriction up front instead of letting them fill in notes just to hit a 403.
+  if (!canSeePrices(user)) {
+    return (
+      <main className="relative z-[1] max-w-layout-max mx-auto px-gutter pt-4 pb-section-gap-lg">
+        <h1 className="text-h1 font-semibold text-text-strong">{ labels.title }</h1>
+        { user ? (
+          <AccountStatusNotice
+            status={ user.status }
+            rejectionReason={ user.rejectionReason }
+            labels={ labels.accountStatusNotice }
+            onViewAccount={ () => router.push("/account") }
+            className="mt-4"
+          />
+        ) : null }
       </main>
     );
   }

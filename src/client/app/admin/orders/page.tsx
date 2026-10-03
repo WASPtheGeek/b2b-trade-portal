@@ -1,5 +1,8 @@
-import { AdminUnbuiltView } from "@/components/features/admin/AdminUnbuiltView";
+"use client";
+
+import { dictionary } from "@/app/_i18n";
+import { OrderList } from "@/components/features/admin/orders/OrderList";
 
 export default function AdminOrdersPage() {
-  return <AdminUnbuiltView label="Pasūtījumi" />;
+  return <OrderList labels={ dictionary.adminOrderList } />;
 }

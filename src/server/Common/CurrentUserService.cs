@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Ardalis.GuardClauses;
-using Elkaro.Server.Models.Constants;
+using Elkaro.Server.Models.Enums;
 
 namespace Elkaro.Server.Common;
 
@@ -20,14 +20,32 @@ public interface ICurrentUserService
     long? UserId { get; }
 
     /// <summary>
-    /// Gets the role of the currently authenticated user, or null if the user is not authenticated.
+    /// Gets the role name of the currently authenticated user (e.g. "admin"), or null if the
+    /// user is not authenticated. This is the raw JWT claim value - prefer <see cref="UserRole"/>
+    /// for a type-safe check; this remains mainly for passing through to APIs (logging,
+    /// <c>ToDto</c> projections) that still want the plain string.
     /// </summary>
     string? Role { get; }
+
+    /// <summary>
+    /// Gets the role of the currently authenticated user as a <see cref="UserRole"/>, or
+    /// null if the user is not authenticated or its role claim doesn't match a known role.
+    /// </summary>
+    UserRole? UserRole { get; }
 
     /// <summary>
     /// Gets a value indicating whether the currently authenticated user is an administrator.
     /// </summary>
     bool IsAdmin { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether the currently authenticated user's account is approved
+    /// (or an admin, for whom the concept doesn't apply). A logged-in business account can be
+    /// Pending or Rejected - see <see cref="Controllers.AuthController"/>'s login policy - and
+    /// this is what gates pricing/ordering for those restricted sessions, the same way
+    /// <see cref="IsAuthenticated"/> gates them for guests.
+    /// </summary>
+    bool IsApproved { get; }
 }
 
 /// <summary>
@@ -72,12 +90,24 @@ public class CurrentUserService : ICurrentUserService
     }
 
     /// <summary>
-    /// Gets the role of the currently authenticated user, or null if the user is not authenticated.
+    /// Gets the role name of the currently authenticated user, or null if the user is not authenticated.
     /// </summary>
     public string? Role => Principal?.FindFirstValue(ClaimTypes.Role);
 
     /// <summary>
+    /// Gets the role of the currently authenticated user as a <see cref="UserRole"/>, or null if
+    /// the user is not authenticated or its role claim doesn't match a known role.
+    /// </summary>
+    public UserRole? UserRole => UserRoleExtensions.TryParseRoleName(Role, out var role) ? role : null;
+
+    /// <summary>
     /// Gets a value indicating whether the currently authenticated user is an administrator.
     /// </summary>
-    public bool IsAdmin => string.Equals(Role, RoleNames.Admin, StringComparison.OrdinalIgnoreCase);
+    public bool IsAdmin => UserRole == Models.Enums.UserRole.Admin;
+
+    /// <summary>
+    /// Gets a value indicating whether the currently authenticated user's account is approved.
+    /// </summary>
+    public bool IsApproved =>
+        IsAdmin || string.Equals(Principal?.FindFirstValue("status"), nameof(UserStatus.Approved), StringComparison.OrdinalIgnoreCase);
 }

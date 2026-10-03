@@ -6,15 +6,16 @@ import { resolveErrorMessage } from "@/lib/http/resolveErrorMessage";
 import type { RegisterPayload, RegisterResult } from "@/types/auth";
 
 const DEFAULT_GENERIC_ERROR = "Failed to create the account. Please try again.";
+const DEFAULT_PASSWORD_MISMATCH_ERROR = "Passwords do not match.";
 
 export interface RegisterFormFields {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
+  confirmPassword: string;
   businessName: string;
   registrationNumber: string;
-  vatNumber: string;
   phone: string;
 }
 
@@ -23,9 +24,9 @@ const INITIAL_FIELDS: RegisterFormFields = {
   lastName: "",
   email: "",
   password: "",
+  confirmPassword: "",
   businessName: "",
   registrationNumber: "",
-  vatNumber: "",
   phone: "",
 };
 
@@ -42,12 +43,15 @@ export interface UseRegisterFormOptions {
   onSuccess(result: RegisterResult): void;
   /** Shown when a request fails without an API-provided detail message. */
   genericErrorMessage?: string;
+  /** Shown when the password and confirm-password fields don't match. */
+  passwordMismatchMessage?: string;
 }
 
 /** Owns the registration form's field state, submission, and error handling. */
 export function useRegisterForm({
   onSuccess,
   genericErrorMessage = DEFAULT_GENERIC_ERROR,
+  passwordMismatchMessage = DEFAULT_PASSWORD_MISMATCH_ERROR,
 }: UseRegisterFormOptions): RegisterFormState {
   const { register } = useAuth();
 
@@ -62,6 +66,13 @@ export function useRegisterForm({
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     setError(null);
+
+    if (fields.password !== fields.confirmPassword) {
+      setError(passwordMismatchMessage);
+
+      return;
+    }
+
     setIsSubmitting(true);
 
     const payload = toRegisterPayload(fields);
@@ -93,7 +104,6 @@ function toRegisterPayload(fields: RegisterFormFields): RegisterPayload {
     password: fields.password,
     businessName: fields.businessName,
     registrationNumber: fields.registrationNumber,
-    vatNumber: fields.vatNumber,
     phone: fields.phone || undefined,
   };
 }

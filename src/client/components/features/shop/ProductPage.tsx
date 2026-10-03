@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ScrollReveal } from "@/components/features/catalog/ScrollReveal";
 import { ProductTile, type ProductTileLabels } from "@/components/features/catalog/ProductTile";
+import { AccountStatusNotice, type AccountStatusNoticeLabels } from "@/components/features/shop/AccountStatusNotice";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -17,9 +18,11 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { WishlistButton } from "@/components/ui/WishlistButton";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { useShopCategories } from "@/hooks/useShopCategories";
 import { useShopProductDetail } from "@/hooks/useShopProductDetail";
 import { useWishlist } from "@/hooks/useWishlist";
+import { canSeePrices } from "@/lib/auth/canSeePrices";
 import { buildLoginUrl } from "@/lib/auth/returnTo";
 import { cn } from "@/lib/cn";
 import { findCategoryTrail } from "@/lib/catalog/findCategoryTrail";
@@ -53,6 +56,7 @@ export interface ProductPageLabels {
   genericError: string;
   productTile: ProductTileLabels;
   packagingUnits: PackagingUnitLabels;
+  accountStatusNotice: AccountStatusNoticeLabels;
 }
 
 export interface ProductPageProps {
@@ -69,9 +73,13 @@ export function ProductPage({ id, labels }: ProductPageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  const masked = !user;
+  const masked = !canSeePrices(user);
+  // Signed in but not Approved (as opposed to a plain guest) - see ProductTile's
+  // `restricted` prop.
+  const restricted = masked && !!user;
   const { tree } = useShopCategories();
   const { isWishlisted, toggle: toggleWishlist } = useWishlist();
+  const cart = useCart();
 
   const { product: dto, related, isLoading, error, notFound } = useShopProductDetail(id, { genericErrorMessage: labels.genericError });
 
@@ -131,6 +139,11 @@ export function ProductPage({ id, labels }: ProductPageProps) {
   const unitPrice = active?.price ?? product.price;
 
   const addToCart = (): void => {
+    if (!active) {
+      return;
+    }
+
+    cart.add({ product, unit: active.value, qty });
     setAdded(true);
     clearTimeout(addTimer.current);
     addTimer.current = setTimeout(() => setAdded(false), 1300);
@@ -172,25 +185,34 @@ export function ProductPage({ id, labels }: ProductPageProps) {
 
           <div className="mt-5 py-[18px] px-[18px] bg-surface-card border border-border-warm rounded-lg">
             { masked ? (
-              <>
-                <div className="flex gap-3 items-start">
-                  <span className="flex flex-none items-center justify-center w-[38px] h-[38px] rounded-md bg-orange-50 text-orange-600">
-                    <Icon name="lock" size={ 17 } />
-                  </span>
-                  <div>
-                    <p className="text-[14.5px] font-semibold text-text-strong">{ labels.signInTitle }</p>
-                    <p className="text-[13px] text-text-muted mt-1 leading-normal text-balance">{ labels.signInBody }</p>
+              user ? (
+                <AccountStatusNotice
+                  status={ user.status }
+                  rejectionReason={ user.rejectionReason }
+                  labels={ labels.accountStatusNotice }
+                  onViewAccount={ () => router.push("/account") }
+                />
+              ) : (
+                <>
+                  <div className="flex gap-3 items-start">
+                    <span className="flex flex-none items-center justify-center w-[38px] h-[38px] rounded-md bg-orange-50 text-orange-600">
+                      <Icon name="lock" size={ 17 } />
+                    </span>
+                    <div>
+                      <p className="text-[14.5px] font-semibold text-text-strong">{ labels.signInTitle }</p>
+                      <p className="text-[13px] text-text-muted mt-1 leading-normal text-balance">{ labels.signInBody }</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2.5 mt-4 flex-wrap">
-                  <Button variant="primary" pill size="lg" onClick={ () => router.push(buildLoginUrl(pathname)) }>
-                    { labels.signInCta }
-                  </Button>
-                  <Button variant="secondary" pill size="lg" onClick={ () => router.push("/register") }>
-                    { labels.registerCta }
-                  </Button>
-                </div>
-              </>
+                  <div className="flex gap-2.5 mt-4 flex-wrap">
+                    <Button variant="primary" pill size="lg" onClick={ () => router.push(buildLoginUrl(pathname)) }>
+                      { labels.signInCta }
+                    </Button>
+                    <Button variant="secondary" pill size="lg" onClick={ () => router.push("/register") }>
+                      { labels.registerCta }
+                    </Button>
+                  </div>
+                </>
+              )
             ) : (
               <>
                 <PriceDisplay price={ unitPrice } unit={ active?.short } total={ unitPrice * qty } size="lg" note={ labels.productTile.priceNote } totalLabel={ labels.totalLabel } />
@@ -284,8 +306,10 @@ export function ProductPage({ id, labels }: ProductPageProps) {
                     compact
                     product={ relatedProduct }
                     masked={ masked }
+                    restricted={ restricted }
                     labels={ labels.productTile }
                     onOpen={ (prod) => router.push(`/product/${ prod.id }`) }
+                    onAdd={ cart.add }
                     wishlisted={ isWishlisted(relatedProduct.id) }
                     onWishlist={ ({ product: p }) => toggleWishlist(p.id) }
                   />

@@ -87,7 +87,7 @@ public class ProductsController : ControllerBase
             .Take(paging.PageSize)
             .ToListAsync(ct);
 
-        var includePrices = _currentUser.IsAuthenticated;
+        var includePrices = _currentUser.IsAuthenticated && _currentUser.IsApproved;
         var prices = await _pricing.ResolveUnitPricesAsync(products, _currentUser.UserId, ct);
 
         return Ok(products.Select(p => ToListItemDto(p, prices[p.Id], includePrices)).ToList());
@@ -160,7 +160,7 @@ public class ProductsController : ControllerBase
     /// <returns>The detailed DTO representation of the product.</returns>
     private async Task<ProductDetailDto> ToDetailDtoAsync(Product p, CancellationToken ct)
     {
-        var includePrices = _currentUser.IsAuthenticated;
+        var includePrices = _currentUser.IsAuthenticated && _currentUser.IsApproved;
         var price = await _pricing.ResolveUnitPriceAsync(p, _currentUser.UserId, ct);
 
         return new ProductDetailDto(

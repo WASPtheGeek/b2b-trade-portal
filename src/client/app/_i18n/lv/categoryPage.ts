@@ -12,6 +12,13 @@ export const categoryPage: CategoryPageLabels = {
   resultsOf: "no",
   resultsProducts: "produktiem",
   guestModeNote: "Viesa režīms — cenas ir paslēptas",
+  accountStatusNotice: {
+    pendingTitle: "Konts gaida apstiprinājumu",
+    pendingBody: "Cenas un pasūtīšana kļūs pieejamas, tiklīdz administrators apstiprinās jūsu kontu.",
+    rejectedTitle: "Pieteikums netika apstiprināts",
+    rejectedReasonLabel: "Iemesls",
+    accountLinkLabel: "Skatīt kontu",
+  },
   emptyTitle: "Nav rezultātu",
   emptyBody: "Šajā kategorijā pagaidām nav neviena produkta.",
   notFoundTitle: "Kategorija nav atrasta",
@@ -28,6 +35,7 @@ export const categoryPage: CategoryPageLabels = {
   colCart: "Grozs",
   productTile: {
     maskedCta: "Ienākt, lai redzētu cenu",
+    restrictedCta: "Cena būs redzama pēc konta apstiprināšanas",
     priceNote: "bez PVN",
     wishlistSave: "Saglabāt vēlāk",
     wishlistRemove: "Noņemt no saglabātajiem",
@@ -41,6 +49,7 @@ export const categoryPage: CategoryPageLabels = {
   },
   productRow: {
     maskedCta: "Ienākt, lai redzētu cenu",
+    restrictedCta: "Cena būs redzama pēc konta apstiprināšanas",
     wishlistSave: "Saglabāt vēlāk",
     wishlistRemove: "Noņemt no saglabātajiem",
     wishlistSaved: "Saglabāts",

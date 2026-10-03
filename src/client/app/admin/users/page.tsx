@@ -1,5 +1,6 @@
-import { AdminUnbuiltView } from "@/components/features/admin/AdminUnbuiltView";
+import { dictionary } from "@/app/_i18n";
+import { UserList } from "@/components/features/admin/users/UserList";
 
 export default function AdminUsersPage() {
-  return <AdminUnbuiltView label="Lietotāji un konti" />;
+  return <UserList labels={ dictionary.adminUserList } />;
 }

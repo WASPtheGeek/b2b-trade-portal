@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useRegisterForm, type UseRegisterFormOptions } from "@/hooks/useRegisterForm";
 
 export interface RegisterFormLabels {
@@ -12,19 +13,22 @@ export interface RegisterFormLabels {
   subheading: string;
   businessNameLabel: string;
   registrationNumberLabel: string;
-  vatNumberLabel: string;
   firstNameLabel: string;
   lastNameLabel: string;
   emailLabel: string;
   phoneLabel: string;
   passwordLabel: string;
   passwordHint: string;
+  confirmPasswordLabel: string;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   noticeText: string;
   submitLabel: string;
   submittingLabel: string;
   alreadyApprovedText: string;
   loginLinkLabel: string;
   genericErrorMessage: string;
+  passwordMismatchMessage: string;
 }
 
 const DEFAULT_LABELS: RegisterFormLabels = {
@@ -32,13 +36,15 @@ const DEFAULT_LABELS: RegisterFormLabels = {
   subheading: "Pricing and ordering unlock once our team reviews and approves your business.",
   businessNameLabel: "Business name",
   registrationNumberLabel: "Registration number",
-  vatNumberLabel: "VAT number",
   firstNameLabel: "First name",
   lastNameLabel: "Last name",
   emailLabel: "Business email",
   phoneLabel: "Phone",
   passwordLabel: "Password",
   passwordHint: "At least 8 characters, with a letter and a number",
+  confirmPasswordLabel: "Confirm password",
+  showPasswordLabel: "Show password",
+  hidePasswordLabel: "Hide password",
   noticeText:
     "After registering, your account is sent for admin approval. You can already browse the full catalog — pricing and ordering appear once your account is activated.",
   submitLabel: "Create account",
@@ -46,6 +52,7 @@ const DEFAULT_LABELS: RegisterFormLabels = {
   alreadyApprovedText: "Already approved?",
   loginLinkLabel: "Sign in",
   genericErrorMessage: "Failed to create the account. Please try again.",
+  passwordMismatchMessage: "Passwords do not match.",
 };
 
 export interface RegisterFormProps extends Omit<UseRegisterFormOptions, "genericErrorMessage"> {
@@ -58,6 +65,7 @@ export function RegisterForm({ onSuccess, labels: labelsProp }: RegisterFormProp
   const { fields, error, isSubmitting, setField, handleSubmit } = useRegisterForm({
     onSuccess,
     genericErrorMessage: labels.genericErrorMessage,
+    passwordMismatchMessage: labels.passwordMismatchMessage,
   });
 
   return (
@@ -80,22 +88,13 @@ export function RegisterForm({ onSuccess, labels: labelsProp }: RegisterFormProp
             onChange={ (event) => setField("businessName", event.target.value) }
           />
         </FormField>
-        <FormField label={ labels.registrationNumberLabel } htmlFor="register-registration-number" required>
+        <FormField label={ labels.registrationNumberLabel } htmlFor="register-registration-number" required className="md:col-span-2">
           <Input
             id="register-registration-number"
             mono
             required
             value={ fields.registrationNumber }
             onChange={ (event) => setField("registrationNumber", event.target.value) }
-          />
-        </FormField>
-        <FormField label={ labels.vatNumberLabel } htmlFor="register-vat-number" required>
-          <Input
-            id="register-vat-number"
-            mono
-            required
-            value={ fields.vatNumber }
-            onChange={ (event) => setField("vatNumber", event.target.value) }
           />
         </FormField>
         <FormField label={ labels.firstNameLabel } htmlFor="register-first-name" required>
@@ -123,7 +122,7 @@ export function RegisterForm({ onSuccess, labels: labelsProp }: RegisterFormProp
             onChange={ (event) => setField("email", event.target.value) }
           />
         </FormField>
-        <FormField label={ labels.phoneLabel } htmlFor="register-phone">
+        <FormField label={ labels.phoneLabel } htmlFor="register-phone" className="md:col-span-2">
           <Input
             id="register-phone"
             mono
@@ -132,13 +131,27 @@ export function RegisterForm({ onSuccess, labels: labelsProp }: RegisterFormProp
           />
         </FormField>
         <FormField label={ labels.passwordLabel } htmlFor="register-password" required hint={ labels.passwordHint }>
-          <Input
+          <PasswordInput
             id="register-password"
-            type="password"
+            autoComplete="new-password"
             required
             minLength={ 8 }
             value={ fields.password }
             onChange={ (event) => setField("password", event.target.value) }
+            showPasswordLabel={ labels.showPasswordLabel }
+            hidePasswordLabel={ labels.hidePasswordLabel }
+          />
+        </FormField>
+        <FormField label={ labels.confirmPasswordLabel } htmlFor="register-confirm-password" required>
+          <PasswordInput
+            id="register-confirm-password"
+            autoComplete="new-password"
+            required
+            minLength={ 8 }
+            value={ fields.confirmPassword }
+            onChange={ (event) => setField("confirmPassword", event.target.value) }
+            showPasswordLabel={ labels.showPasswordLabel }
+            hidePasswordLabel={ labels.hidePasswordLabel }
           />
         </FormField>
       </div>

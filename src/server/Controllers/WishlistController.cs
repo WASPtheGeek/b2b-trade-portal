@@ -56,7 +56,10 @@ public class WishlistController : ControllerBase
 
         var prices = await _pricing.ResolveUnitPricesAsync(products, userId, ct);
 
-        return Ok(products.Select(p => ProductsController.ToListItemDto(p, prices[p.Id], includePrices: true)).ToList());
+        // [Authorize] alone used to guarantee an Approved account (login was blocked for
+        // anyone else) - now Pending/Rejected accounts can sign in too, so pricing here needs
+        // the same explicit gate every other product-price-bearing endpoint uses.
+        return Ok(products.Select(p => ProductsController.ToListItemDto(p, prices[p.Id], includePrices: _currentUser.IsApproved)).ToList());
     }
 
     /// <summary>

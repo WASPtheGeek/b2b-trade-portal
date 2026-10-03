@@ -6,6 +6,7 @@ import { ScrollReveal } from "@/components/features/catalog/ScrollReveal";
 import { ProductRow } from "@/components/features/catalog/ProductRow";
 import { ProductTile, type ProductTileLabels } from "@/components/features/catalog/ProductTile";
 import type { ProductRowLabels } from "@/components/features/catalog/ProductRow";
+import { AccountStatusNotice, type AccountStatusNoticeLabels } from "@/components/features/shop/AccountStatusNotice";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -22,6 +23,7 @@ import { useCategoryViewMode, type CategoryViewMode } from "@/hooks/useCategoryV
 import { useShopCategories } from "@/hooks/useShopCategories";
 import { useShopCategoryProducts } from "@/hooks/useShopCategoryProducts";
 import { useWishlist } from "@/hooks/useWishlist";
+import { canSeePrices } from "@/lib/auth/canSeePrices";
 import { findCategoryTrail } from "@/lib/catalog/findCategoryTrail";
 import { buildLoginUrl } from "@/lib/auth/returnTo";
 import { mapProductListItem, type PackagingUnitLabels } from "@/lib/catalog/mapProductDto";
@@ -42,6 +44,7 @@ export interface CategoryPageLabels {
   resultsOf: string;
   resultsProducts: string;
   guestModeNote: string;
+  accountStatusNotice: AccountStatusNoticeLabels;
   emptyTitle: string;
   emptyBody: string;
   notFoundTitle: string;
@@ -75,7 +78,10 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  const masked = !user;
+  const masked = !canSeePrices(user);
+  // Signed in but not Approved (as opposed to a plain guest) - see ProductTile/ProductRow's
+  // `restricted` prop.
+  const restricted = masked && !!user;
   const { tree } = useShopCategories();
   const { isWishlisted, toggle: toggleWishlist } = useWishlist();
   const cart = useCart();
@@ -110,7 +116,9 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
   );
 
   const openProduct = (productId: string): void => router.push(`/product/${productId}`);
-  const signIn = (): void => router.push(buildLoginUrl(pathname));
+  // A guest is sent to sign in; a restricted (Pending/Rejected) signed-in user is already
+  // signed in, so the equivalent action for them is viewing their account status instead.
+  const signIn = (): void => router.push(user ? "/account" : buildLoginUrl(pathname));
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   if (notFound) {
@@ -135,13 +143,24 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
 
       <div className="flex items-baseline justify-between gap-4 mt-2.5 flex-wrap">
         <h1 className="text-h1 font-semibold text-text-strong">{ categoryLabel }</h1>
-        { masked ? (
+        { masked && !user ? (
           <span className="flex items-center gap-1.5 text-[12.5px] text-orange-700">
             <Icon name="eye" size={ 13 } />
             { labels.guestModeNote }
           </span>
         ) : null }
       </div>
+
+      { masked && user ? (
+        <AccountStatusNotice
+          status={ user.status }
+          rejectionReason={ user.rejectionReason }
+          labels={ labels.accountStatusNotice }
+          onViewAccount={ () => router.push("/account") }
+          compact
+          className="mt-3"
+        />
+      ) : null }
 
       <div className="flex flex-col md:flex-row items-start gap-4 mt-4">
         <aside className="w-full md:w-[248px] flex-none flex flex-col gap-3 md:sticky" style={ { top: "calc(var(--store-header-h) + var(--dept-nav-h) + 12px)" } }>
@@ -200,6 +219,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
                   <ProductTile
                     product={ p }
                     masked={ masked }
+                    restricted={ restricted }
                     labels={ labels.productTile }
                     onOpen={ (prod) => openProduct(prod.id) }
                     onAdd={ cart.add }
@@ -228,6 +248,7 @@ export function CategoryPage({ id, labels }: CategoryPageProps) {
                     index={ i }
                     product={ p }
                     masked={ masked }
+                    restricted={ restricted }
                     labels={ labels.productRow }
                     onOpen={ (prod) => openProduct(prod.id) }
                     onAdd={ cart.add }

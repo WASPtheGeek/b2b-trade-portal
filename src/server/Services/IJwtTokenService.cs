@@ -1,4 +1,5 @@
 using Elkaro.Server.Models.Entities;
+using Elkaro.Server.Models.Enums;
 
 namespace Elkaro.Server.Services;
 
@@ -11,7 +12,7 @@ public interface IJwtTokenService
     /// Creates a JWT access token for the specified user and role.
     /// </summary>
     /// <param name="user">The user for whom the access token is being created.</param>
-    /// <param name="roleName">The role of the user.</param>
+    /// <param name="role">The role of the user.</param>
     /// <returns>The generated JWT access token.</returns>
-    string CreateAccessToken(User user, string roleName);
+    string CreateAccessToken(User user, UserRole role);
 }

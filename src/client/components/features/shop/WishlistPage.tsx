@@ -3,12 +3,16 @@
 import { useRouter } from "next/navigation";
 import { ScrollReveal } from "@/components/features/catalog/ScrollReveal";
 import { ProductTile, type ProductTileLabels } from "@/components/features/catalog/ProductTile";
+import { AccountStatusNotice, type AccountStatusNoticeLabels } from "@/components/features/shop/AccountStatusNotice";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useWishlistProducts } from "@/hooks/useWishlistProducts";
+import { canSeePrices } from "@/lib/auth/canSeePrices";
 import { mapProductListItem, type PackagingUnitLabels } from "@/lib/catalog/mapProductDto";
 
 export interface WishlistPageLabels {
@@ -20,6 +24,7 @@ export interface WishlistPageLabels {
   genericError: string;
   productTile: ProductTileLabels;
   packagingUnits: PackagingUnitLabels;
+  accountStatusNotice: AccountStatusNoticeLabels;
 }
 
 export interface WishlistPageProps {
@@ -33,7 +38,10 @@ export interface WishlistPageProps {
 export function WishlistPage({ labels }: WishlistPageProps) {
   const { isChecking } = useRequireAuth();
   const router = useRouter();
+  const { user } = useAuth();
+  const masked = !canSeePrices(user);
   const { toggle: toggleWishlist } = useWishlist();
+  const cart = useCart();
   const { products, isLoading, error, removeLocal } = useWishlistProducts({ genericErrorMessage: labels.genericError });
 
   if (isChecking) {
@@ -61,6 +69,17 @@ export function WishlistPage({ labels }: WishlistPageProps) {
         ) : null }
       </div>
 
+      { masked && user ? (
+        <AccountStatusNotice
+          status={ user.status }
+          rejectionReason={ user.rejectionReason }
+          labels={ labels.accountStatusNotice }
+          onViewAccount={ () => router.push("/account") }
+          compact
+          className="mt-3"
+        />
+      ) : null }
+
       { error ? (
         <Card padding={ 0 } className="mt-4">
           <EmptyState icon="circle-alert" tone="danger" title={ labels.genericError } compact />
@@ -83,8 +102,11 @@ export function WishlistPage({ labels }: WishlistPageProps) {
             <ScrollReveal key={ p.id } delay={ Math.min(i, 8) * 50 } distance={ 12 }>
               <ProductTile
                 product={ p }
+                masked={ masked }
+                restricted={ masked }
                 labels={ labels.productTile }
                 onOpen={ (prod) => router.push(`/product/${ prod.id }`) }
+                onAdd={ cart.add }
                 wishlisted
                 onWishlist={ ({ product }) => {
                   removeLocal(Number(product.id));

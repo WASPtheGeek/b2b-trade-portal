@@ -27,11 +27,13 @@ export function useAuthSession(): AuthContextValue {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const login = useCallback(async (credentials: LoginCredentials): Promise<void> => {
+  const login = useCallback(async (credentials: LoginCredentials): Promise<AuthUser> => {
     const result = await authService.login(credentials);
 
     tokenStorage.setToken(result.token);
     setUser(result.user);
+
+    return result.user;
   }, []);
 
   const register = useCallback(async (payload: RegisterPayload): Promise<RegisterResult> => {
@@ -43,5 +45,5 @@ export function useAuthSession(): AuthContextValue {
     setUser(null);
   }, []);
 
-  return { user, isLoading, login, register, logout };
+  return { user, isLoading, login, register, logout, setUser };
 }

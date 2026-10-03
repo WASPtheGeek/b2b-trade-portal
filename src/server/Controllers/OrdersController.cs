@@ -51,6 +51,11 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OrderDto>> Create(CreateOrderRequest request, CancellationToken ct)
     {
+        if (!_currentUser.IsApproved)
+        {
+            throw new ForbiddenException("Pasūtījumus var iesniegt tikai apstiprināti konti.");
+        }
+
         var userId = _currentUser.UserId!.Value;
 
         var productIds = request.Items
@@ -228,40 +233,9 @@ public class OrdersController : ControllerBase
         return Ok(ToDto(order));
     }
 
-    /// <summary>
-    /// Cancels a pending order for the currently authenticated user.
-    /// </summary>
-    /// <param name="id">The ID of the order to cancel.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>No content if the cancellation is successful.</returns>
-    /// <exception cref="ResourceNotFoundException"></exception>
-    /// <exception cref="ForbiddenException"></exception>
-    /// <exception cref="BadRequestException"></exception>
-    [HttpPost("{id:long}/cancel")]
-    public async Task<IActionResult> Cancel(long id, CancellationToken ct)
-    {
-        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id, ct);
-
-        if (order is null)
-        {
-            throw new ResourceNotFoundException($"Pasūtījums ar ID {id} nav atrasts.");
-        }
-
-        if (order.UserId != _currentUser.UserId)
-        {
-            throw new ForbiddenException("Šis pasūtījums jums nepieder.");
-        }
-
-        if (order.Status != OrderStatus.Pending)
-        {
-            throw new BadRequestException("Tikai gaidīšanas statusā esošu pasūtījumu var atcelt.", "Atcelšana nav iespējama");
-        }
-
-        order.Status = OrderStatus.Cancelled; // trg_order_status_log records this transition automatically
-        await _db.SaveChangesAsync(ct);
-
-        return NoContent();
-    }
+    // Self-service cancellation was removed: cancelling an order is now an admin-only action
+    // (Admin/OrdersController.UpdateStatus already allows Pending/Confirmed/Processing ->
+    // Cancelled), not something the ordering business can do to their own order.
 
     /// <summary>
     /// Reorders a previous order for the currently authenticated user, creating a new order with the same items and quantities.

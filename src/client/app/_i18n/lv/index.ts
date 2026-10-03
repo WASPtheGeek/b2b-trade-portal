@@ -1,4 +1,5 @@
 import type { Dictionary } from "../Dictionary";
+import { accountPage } from "./accountPage";
 import { adminNav } from "./adminNav";
 import { adminOrderList } from "./adminOrderList";
 import { adminProductList } from "./adminProductList";
@@ -13,6 +14,7 @@ import { categoryList } from "./categoryList";
 import { categoryPage } from "./categoryPage";
 import { confirmEmailCard } from "./confirmEmailCard";
 import { guestBrowseCta } from "./guestBrowseCta";
+import { homePage } from "./homePage";
 import { loginForm } from "./loginForm";
 import { ordersPage } from "./ordersPage";
 import { productForm } from "./productForm";
@@ -27,11 +29,13 @@ import { wishlistPage } from "./wishlistPage";
 export const lv: Dictionary = {
   shopHeader,
   storeFooter,
+  homePage,
   categoryPage,
   productPage,
   wishlistPage,
   ordersPage,
   cartPage,
+  accountPage,
   authCard,
   guestBrowseCta,
   loginForm,

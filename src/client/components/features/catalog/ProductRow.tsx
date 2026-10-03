@@ -15,6 +15,9 @@ import type { AddToCartPayload } from "./ProductTile";
 
 export interface ProductRowLabels {
   maskedCta: string;
+  /** Shown instead of `maskedCta` when the viewer is already signed in but their account
+   * isn't Approved yet (Pending/Rejected) - "sign in" would be actively wrong there. */
+  restrictedCta: string;
   wishlistSave: string;
   wishlistRemove: string;
   wishlistSaved: string;
@@ -26,6 +29,7 @@ export interface ProductRowLabels {
 
 const DEFAULT_LABELS: ProductRowLabels = {
   maskedCta: "Sign in to see price",
+  restrictedCta: "Price hidden until approved",
   wishlistSave: "Save for later",
   wishlistRemove: "Remove from saved",
   wishlistSaved: "Saved",
@@ -38,6 +42,9 @@ const DEFAULT_LABELS: ProductRowLabels = {
 export interface ProductRowProps extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
   product: Product;
   masked?: boolean;
+  /** When `masked`, distinguishes "signed in but not Approved yet" from a plain guest - swaps
+   * the CTA text/icon so an already-signed-in viewer isn't told to "sign in". */
+  restricted?: boolean;
   onAdd?: (payload: AddToCartPayload) => void;
   onOpen?: (product: Product) => void;
   onSignIn?: () => void;
@@ -54,6 +61,7 @@ export interface ProductRowProps extends Omit<HTMLAttributes<HTMLElement>, "onCh
 export function ProductRow({
   product,
   masked = false,
+  restricted = false,
   onAdd,
   onOpen,
   onSignIn,
@@ -128,6 +136,8 @@ export function ProductRow({
 
   const unitOptions = units.map((u) => ({ value: u.value, label: u.label, sub: u.qty, disabled: u.available === false }));
   const addToCart = () => onAdd?.({ product, unit: unit ?? "", qty, total: total ?? 0 });
+  const maskedCta = restricted ? labels.restrictedCta : labels.maskedCta;
+  const maskedIcon = restricted ? "clock" : "lock-open";
 
   if (stacked) {
     return (
@@ -138,7 +148,7 @@ export function ProductRow({
       >
         { identity }
         <div className="flex items-center justify-between gap-2.5 mt-2.5">
-          { masked ? <PriceDisplay price={ 0 } masked maskedText={ labels.maskedCta } size="sm" /> : <PriceDisplay price={ unitPrice } unit={ active?.short } size="sm" note={ undefined } /> }
+          { masked ? <PriceDisplay price={ 0 } masked maskedText={ maskedCta } size="sm" /> : <PriceDisplay price={ unitPrice } unit={ active?.short } size="sm" note={ undefined } /> }
           { !masked && total != null ? (
             <Badge tone="brand" size="sm">
               { labels.total } { fmtEur(total) }
@@ -146,8 +156,8 @@ export function ProductRow({
           ) : null }
         </div>
         { masked ? (
-          <Button variant="secondary" pill size="md" fullWidth wrap icon="lock-open" className="mt-2.5" onClick={ onSignIn }>
-            { labels.maskedCta }
+          <Button variant="secondary" pill size="md" fullWidth wrap icon={ maskedIcon } className="mt-2.5" onClick={ onSignIn }>
+            { maskedCta }
           </Button>
         ) : (
           <>
@@ -190,7 +200,7 @@ export function ProductRow({
     >
       <td className="py-[9px] px-[var(--cell-pad-x)] min-w-[260px]">{ identity }</td>
       <td className="py-[9px] px-[var(--cell-pad-x)] whitespace-nowrap">
-        { masked ? <PriceDisplay price={ 0 } masked maskedText={ labels.maskedCta } size="sm" /> : <PriceDisplay price={ unitPrice } unit={ active?.short } size="sm" note={ undefined } /> }
+        { masked ? <PriceDisplay price={ 0 } masked maskedText={ maskedCta } size="sm" /> : <PriceDisplay price={ unitPrice } unit={ active?.short } size="sm" note={ undefined } /> }
       </td>
       <td className="py-[9px] px-[var(--cell-pad-x)]">
         { masked ? (
@@ -223,8 +233,8 @@ export function ProductRow({
       </td>
       <td className="py-[9px] px-[var(--cell-pad-x)] text-right">
         { masked ? (
-          <Button variant="secondary" pill size="sm" icon="lock-open" onClick={ onSignIn }>
-            { labels.maskedCta }
+          <Button variant="secondary" pill size="sm" icon={ maskedIcon } onClick={ onSignIn }>
+            { maskedCta }
           </Button>
         ) : (
           <Button variant="primary" size="sm" icon="shopping-cart" onClick={ addToCart }>

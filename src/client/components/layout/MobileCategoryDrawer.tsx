@@ -48,6 +48,8 @@ export interface MobileCategoryDrawerProps {
   onLogout?: () => void;
   onSaved?: () => void;
   onCart?: () => void;
+  onOrders?: () => void;
+  onAccount?: () => void;
   onAdminPanel?: () => void;
   /** CSS length for how much header chrome sits above the drawer (e.g. UtilityBar +
    * StoreHeader stacked) - the drawer starts right below it. Defaults to just
@@ -78,6 +80,8 @@ export function MobileCategoryDrawer({
   onLogout,
   onSaved,
   onCart,
+  onOrders,
+  onAccount,
   onAdminPanel,
   topOffset = "var(--store-header-h)",
   labels: labelsProp,
@@ -213,7 +217,10 @@ export function MobileCategoryDrawer({
                       { labels.adminPanel }
                     </Button>
                   ) : null }
-                  <Button size="lg" variant="secondary" icon="package" className="w-full" onClick={ onClose }>
+                  <Button size="lg" variant="secondary" icon="user" className="w-full" onClick={ onAccount }>
+                    { labels.account }
+                  </Button>
+                  <Button size="lg" variant="secondary" icon="package" className="w-full" onClick={ onOrders }>
                     { labels.orders }
                   </Button>
                   <Button size="lg" variant="secondary" icon="heart" className="w-full" onClick={ onSaved }>

@@ -10,6 +10,7 @@ import { UtilityBar, type UtilityBarLink } from "@/components/layout/UtilityBar"
 import { Icon } from "@/components/ui/Icon";
 import { IconButton } from "@/components/ui/IconButton";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { useShopCategories } from "@/hooks/useShopCategories";
 import { useWishlist } from "@/hooks/useWishlist";
 import { getAccountDisplayName, getAccountStatusLabel } from "@/lib/auth/accountDisplay";
@@ -69,6 +70,7 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
   const { user, logout } = useAuth();
   const { tree: categoryTree } = useShopCategories();
   const { ids: wishlistIds } = useWishlist();
+  const { totalQuantity: cartCount } = useCart();
   const isAdmin = user?.role === ADMIN_ROLE;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Always a defined string (never `undefined`) so the input stays a controlled component
@@ -126,9 +128,25 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
     router.push("/wishlist");
   };
 
+  const handleOrders = (): void => {
+    setMobileMenuOpen(false);
+    router.push("/orders");
+  };
+
+  const handleCart = (): void => {
+    setMobileMenuOpen(false);
+    router.push("/cart");
+  };
+
+  const handleAccount = (): void => {
+    setMobileMenuOpen(false);
+    router.push("/account");
+  };
+
   const utilityLinks: UtilityBarLink[] = [
     { label: labels.orderHelp, icon: "circle-help" },
     { label: labels.supportPhone, icon: "phone" },
+    ...(user ? [{ label: labels.orders, href: "/orders", icon: "package" } satisfies UtilityBarLink] : []),
     ...(isAdmin ? [{ label: labels.adminPanel, href: "/admin", icon: "shield-check" } satisfies UtilityBarLink] : []),
   ];
 
@@ -149,6 +167,9 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
           onLogin={ handleLogin }
           savedCount={ wishlistIds.size }
           onSaved={ handleSaved }
+          cartCount={ cartCount }
+          onCart={ handleCart }
+          onAccount={ handleAccount }
           right={ user ? <IconButton icon="log-out" label={ labels.signOut } onClick={ handleLogout } className="hidden md:inline-flex" /> : null }
           menuOpen={ mobileMenuOpen }
           onMenuToggle={ () => setMobileMenuOpen((open) => !open) }
@@ -197,8 +218,12 @@ export function ShopHeader({ labels: labelsProp }: ShopHeaderProps) {
         onLogin={ handleLogin }
         onLogout={ handleLogout }
         onAdminPanel={ handleAdminPanel }
+        onOrders={ handleOrders }
+        onAccount={ handleAccount }
         savedCount={ wishlistIds.size }
         onSaved={ handleSaved }
+        cartCount={ cartCount }
+        onCart={ handleCart }
         labels={ {
           dialogLabel: labels.categories,
           orders: labels.orders,

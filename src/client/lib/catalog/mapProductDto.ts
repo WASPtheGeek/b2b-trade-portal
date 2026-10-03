@@ -6,10 +6,20 @@ import type { ProductDetailDto, ProductListItemDto, ProductPackagingOptionDto } 
 // DTOs (numeric id, nullable/guest-masked prices, packagingOptions instead of units, category
 // filenames instead of image URLs) - these map one to the other so that UI stays unchanged.
 
-const UNIT_VALUE_BY_PACKAGING: Record<ProductPackagingOptionDto["unit"], ProductUnit["value"]> = {
+/** Also used by the reorder-to-cart flow, to find the `ProductUnit` matching an order item's
+ * original server-side packaging unit within a freshly-fetched product's current `units`. */
+export const UNIT_VALUE_BY_PACKAGING: Record<ProductPackagingOptionDto["unit"], ProductUnit["value"]> = {
   piece: "gab",
   package: "iep",
   box: "kaste",
+};
+
+/** The inverse of `UNIT_VALUE_BY_PACKAGING` - the cart needs it to translate a line's UI unit
+ * value back into the server's `PackagingUnit` string when submitting `POST /api/orders`. */
+export const PACKAGING_BY_UNIT_VALUE: Record<ProductUnit["value"], ProductPackagingOptionDto["unit"]> = {
+  gab: "piece",
+  iep: "package",
+  kaste: "box",
 };
 
 /** The display text for each packaging unit - kept out of this file (an id, not a localized

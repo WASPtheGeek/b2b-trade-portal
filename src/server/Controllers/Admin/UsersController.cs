@@ -47,7 +47,9 @@ public class UsersController : ControllerBase
         [FromQuery] PagingQuery paging,
         CancellationToken ct)
     {
-        var query = _db.Users.Include(u => u.Role).AsQueryable();
+        // An admin reviewing accounts has no reason to see their own row here - this list is
+        // for approving/rejecting other people's applications.
+        var query = _db.Users.Include(u => u.Role).Where(u => u.Id != _currentUser.UserId).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(status))
         {

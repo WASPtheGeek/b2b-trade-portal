@@ -3,6 +3,13 @@ import type { CartPageLabels } from "@/components/features/shop/CartPage";
 export const cartPage: CartPageLabels = {
   title: "Grozs",
   itemCount: "preces",
+  accountStatusNotice: {
+    pendingTitle: "Konts gaida apstiprinājumu",
+    pendingBody: "Pasūtīšana kļūs pieejama, tiklīdz administrators apstiprinās jūsu kontu.",
+    rejectedTitle: "Pieteikums netika apstiprināts",
+    rejectedReasonLabel: "Iemesls",
+    accountLinkLabel: "Skatīt kontu",
+  },
   clearCart: "Iztukšot grozu",
   removeLabel: "Noņemt no groza",
   decreaseQty: "Samazināt daudzumu",
