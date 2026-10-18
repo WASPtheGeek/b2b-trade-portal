@@ -8,9 +8,12 @@ import { AdminSidebar } from "@/components/layout/AdminSidebar";
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminGuard>
-      <div className="flex flex-col md:flex-row min-h-screen bg-white">
+      { /* Fixed-height shell: <main> and the sidebar's nav scroll on their own. With a growing
+        (min-h-screen) shell <main> never overflowed, and its overscroll-behavior: contain then
+        kept the wheel from scrolling the page either - long pages couldn't be scrolled at all. */ }
+      <div className="flex flex-col md:flex-row h-dvh bg-white">
         <AdminSidebar items={ buildAdminNavGroups(dictionary.adminNav) } labels={ dictionary.adminSidebar } footer={ <AdminSidebarFooter /> } />
-        <main className="flex-1 min-w-0 elk-scroll-y py-[18px] px-[10px] md:px-[22px]">{ children }</main>
+        <main className="flex-1 min-w-0 min-h-0 elk-scroll-y py-[18px] px-[10px] md:px-[22px]">{ children }</main>
       </div>
     </AdminGuard>
   );

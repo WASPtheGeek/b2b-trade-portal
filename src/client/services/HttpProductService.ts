@@ -1,6 +1,8 @@
 import type { HttpClient } from "@/lib/http/HttpClient";
 import type {
   ProductAdminDetail,
+  ProductBulkDeleteResult,
+  ProductBulkStatusUpdatePayload,
   ProductAdminListItem,
   ProductListQuery,
   ProductStatusUpdatePayload,
@@ -37,7 +39,15 @@ export class HttpProductService implements ProductService {
     await this.http.patch<void>(`/api/admin/products/${id}/status`, payload, { token });
   }
 
-  async deactivate(id: number, token: string): Promise<void> {
+  async updateStatusBulk(payload: ProductBulkStatusUpdatePayload, token: string): Promise<void> {
+    await this.http.patch<void>("/api/admin/products/status", payload, { token });
+  }
+
+  async deleteBulk(ids: number[], token: string): Promise<ProductBulkDeleteResult> {
+    return this.http.post<ProductBulkDeleteResult>("/api/admin/products/bulk-delete", { ids }, { token });
+  }
+
+  async delete(id: number, token: string): Promise<void> {
     await this.http.delete<void>(`/api/admin/products/${id}`, { token });
   }
 
@@ -60,6 +70,10 @@ export class HttpProductService implements ProductService {
 
     if (query.search) {
       params.set("search", query.search);
+    }
+
+    if (query.isActive !== undefined) {
+      params.set("isActive", String(query.isActive));
     }
 
     params.set("page", String(query.page ?? 1));

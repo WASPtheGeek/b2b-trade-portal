@@ -1,5 +1,6 @@
-import { AdminUnbuiltView } from "@/components/features/admin/AdminUnbuiltView";
+import { dictionary } from "@/app/_i18n";
+import { SettingsPage } from "@/components/features/admin/settings/SettingsPage";
 
 export default function AdminSettingsPage() {
-  return <AdminUnbuiltView label="Iestatījumi" />;
+  return <SettingsPage labels={ dictionary.adminSettings } />;
 }

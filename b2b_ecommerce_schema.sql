@@ -747,6 +747,26 @@ CREATE INDEX IF NOT EXISTS idx_import_logs_external_id ON import_logs(external_i
 
 
 -- =====================================================================
+-- SECTION 8b: APPLICATION SETTINGS (admin-managed, key/value)
+-- =====================================================================
+-- One row per settings group (e.g. 'import.columns', 'admin.display'), value is that
+-- group's JSON document. A missing row or missing property means "use the app's default",
+-- so new settings never need a migration. Added 2026-10-10.
+
+CREATE TABLE IF NOT EXISTS app_settings (
+    key         VARCHAR(100) PRIMARY KEY,
+    value       JSONB NOT NULL,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by  BIGINT REFERENCES users(id) ON DELETE SET NULL
+);
+
+DROP TRIGGER IF EXISTS trg_app_settings_updated_at ON app_settings;
+CREATE TRIGGER trg_app_settings_updated_at
+    BEFORE UPDATE ON app_settings
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+
+-- =====================================================================
 -- SECTION 9: SEED DATA (minimal bootstrap)
 -- =====================================================================
 
@@ -759,6 +779,26 @@ INSERT INTO vat_rates (rate, label, is_default) VALUES
     (21.00, 'Standard PVN', true),
     (0.00, 'VAT Exempt', false)
 ON CONFLICT (label) DO NOTHING;
+
+-- Default admin settings (keys camelCase, as the server reads them). Never overwrites saved ones.
+INSERT INTO app_settings (key, value) VALUES
+    ('import.columns', '{
+        "ean": "EAN",
+        "name": "Nosaukums",
+        "brand": "Zīmols",
+        "price": "Cena",
+        "soldByPiece": "gb",
+        "piecesPerPackage": "iep.",
+        "piecesPerBox": "kaste",
+        "description": "Apraksts",
+        "catalog": "Katalogs",
+        "group": "Grupa",
+        "subgroup": "apakšgrupa"
+    }'),
+    ('admin.display', '{
+        "stickyActionsColumn": true
+    }')
+ON CONFLICT (key) DO NOTHING;
 
 -- =====================================================================
 -- END OF SCHEMA

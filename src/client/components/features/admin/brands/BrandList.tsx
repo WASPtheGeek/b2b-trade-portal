@@ -12,6 +12,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Modal } from "@/components/ui/Modal";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
 import { useAdminBrandList } from "@/hooks/useAdminBrandList";
+import { useStickyActionsColumn } from "@/hooks/useStickyActionsColumn";
 import { sortRows } from "@/lib/sortRows";
 import type { Brand } from "@/types/brand";
 
@@ -63,7 +64,7 @@ export function BrandList({ labels: labelsProp, formLabels }: BrandListProps) {
   const [pendingDelete, setPendingDelete] = useState<Brand | null>(null);
   const [formTarget, setFormTarget] = useState<BrandFormTarget | null>(null);
   const [sort, setSort] = useState<DataTableSort | undefined>(undefined);
-  const [stickyActions, setStickyActions] = useState(true);
+  const { stickyActions, setStickyActions } = useStickyActionsColumn();
 
   const confirmDelete = (): void => {
     if (pendingDelete) {

@@ -25,6 +25,9 @@ export interface HttpClient {
    * can't provide. Falls back to the response array's own length if the header is absent. */
   getPaged<TResponse extends unknown[]>(path: string, options?: HttpRequestOptions): Promise<HttpPagedResponse<TResponse>>;
   post<TResponse, TBody = unknown>(path: string, body?: TBody, options?: HttpRequestOptions): Promise<TResponse>;
+  /** Like `post`, but sends `formData` as a multipart body instead of JSON - for endpoints
+   * that take an uploaded file (e.g. `IFormFile` on the server), which can't be JSON-encoded. */
+  postForm<TResponse>(path: string, formData: FormData, options?: HttpRequestOptions): Promise<TResponse>;
   put<TResponse, TBody = unknown>(path: string, body?: TBody, options?: HttpRequestOptions): Promise<TResponse>;
   patch<TResponse, TBody = unknown>(path: string, body?: TBody, options?: HttpRequestOptions): Promise<TResponse>;
   delete<TResponse = void>(path: string, options?: HttpRequestOptions): Promise<TResponse>;

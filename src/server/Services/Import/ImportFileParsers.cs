@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System.Globalization;
+using Elkaro.Server.Services.Settings;
 
 namespace Elkaro.Server.Services.Import;
 
@@ -22,8 +23,9 @@ public interface IImportFileParser
     /// Parses the provided stream and yields <see cref="RawImportRow"/> instances representing each row in the import file.
     /// </summary>
     /// <param name="stream">The stream containing the import file data.</param>
+    /// <param name="columns">The header names to read each field from (admin-configurable).</param>
     /// <returns>An enumerable of <see cref="RawImportRow"/> instances.</returns>
-    IEnumerable<RawImportRow> Parse(Stream stream);
+    IEnumerable<RawImportRow> Parse(Stream stream, ImportColumnSettings columns);
 }
 
 /// <summary>
@@ -54,8 +56,8 @@ public class ImportFileParserResolver
 
 /// <summary>
 /// Parser for CSV product import files.
-/// Expected header row (case-insensitive, exact spelling per the client's export):
-/// EAN, Nosaukums, Zīmols, Cena, gb, iep, kaste, Apraksts, Katalogs, Grupa, apakšgrupa.
+/// Header names come from the admin-configurable <see cref="ImportColumnSettings"/> (matched
+/// case-insensitively); the defaults are the client's ERP export headers.
 /// </summary>
 public class CsvProductImportFileParser : IImportFileParser
 {
@@ -64,7 +66,7 @@ public class CsvProductImportFileParser : IImportFileParser
         string.Equals(fileExtension, ".csv", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public IEnumerable<RawImportRow> Parse(Stream stream)
+    public IEnumerable<RawImportRow> Parse(Stream stream, ImportColumnSettings columns)
     {
         using var reader = new StreamReader(stream);
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -72,12 +74,19 @@ public class CsvProductImportFileParser : IImportFileParser
             HeaderValidated = null,
             MissingFieldFound = null,
             TrimOptions = TrimOptions.Trim,
-            PrepareHeaderForMatch = args => args.Header.ToLowerInvariant(),
+            // Applied to both the file's headers and the names passed to GetField, so matching is
+            // case- and whitespace-insensitive.
+            PrepareHeaderForMatch = args => args.Header.Trim().ToLowerInvariant(),
         };
         using var csv = new CsvReader(reader, config);
 
         csv.Read();
         csv.ReadHeader();
+
+        if (csv.GetFieldIndex(columns.Ean, isTryGet: true) < 0)
+        {
+            throw new InvalidOperationException($"The file has no \"{columns.Ean}\" column (the configured EAN header).");
+        }
 
         var rowNumber = 1; // header is row 0 in the file; data starts at 1
 
@@ -88,17 +97,17 @@ public class CsvProductImportFileParser : IImportFileParser
             {
                 // Field names are case-insensitive because of PrepareHeaderForMatch above.
                 RowNumber = rowNumber,
-                Ean = csv.GetField("EAN"),
-                Name = csv.GetField("Nosaukums"),
-                Brand = csv.GetField("Zīmols"),
-                PriceRaw = csv.GetField("Cena"),
-                SoldByPieceRaw = csv.GetField("gb"),
-                PiecesPerPackageRaw = csv.GetField("iep."),
-                PiecesPerBoxRaw = csv.GetField("kaste"),
-                Description = csv.GetField("Apraksts"),
-                Catalog = csv.GetField("Katalogs"),
-                Group = csv.GetField("Grupa"),
-                Subgroup = csv.GetField("apakšgrupa"),
+                Ean = csv.GetField(columns.Ean),
+                Name = csv.GetField(columns.Name),
+                Brand = csv.GetField(columns.Brand),
+                PriceRaw = csv.GetField(columns.Price),
+                SoldByPieceRaw = csv.GetField(columns.SoldByPiece),
+                PiecesPerPackageRaw = csv.GetField(columns.PiecesPerPackage),
+                PiecesPerBoxRaw = csv.GetField(columns.PiecesPerBox),
+                Description = csv.GetField(columns.Description),
+                Catalog = csv.GetField(columns.Catalog),
+                Group = csv.GetField(columns.Group),
+                Subgroup = csv.GetField(columns.Subgroup),
             };
         }
     }
@@ -106,21 +115,29 @@ public class CsvProductImportFileParser : IImportFileParser
 
 /// <summary>
 /// Parser for XLSX product import files.
-/// Expected header row (case-insensitive, exact spelling per the client's export):
-/// EAN, Nosaukums, Zīmols, Cena, gb, iep, kaste, Apraksts, Katalogs, Grupa, apakšgrupa.
+/// Header names come from the admin-configurable <see cref="ImportColumnSettings"/> (matched
+/// case-insensitively); the defaults are the client's ERP export headers.
+/// The header row doesn't have to be the first one - ERP exports may start with blank or title
+/// rows - so the first row containing an "EAN" cell is used.
 /// </summary>
 public class XlsxProductImportFileParser : IImportFileParser
 {
+    /// <summary>
+    /// How many leading rows are searched for the header row.
+    /// </summary>
+    private const int HeaderSearchRowLimit = 20;
+
     /// <inheritdoc/>
     public bool CanParse(string fileExtension) =>
         string.Equals(fileExtension, ".xlsx", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public IEnumerable<RawImportRow> Parse(Stream stream)
+    public IEnumerable<RawImportRow> Parse(Stream stream, ImportColumnSettings columns)
     {
         using var workbook = new XLWorkbook(stream);
         var sheet = workbook.Worksheets.First();
-        var headerRow = sheet.Row(1);
+        var lastRow = sheet.LastRowUsed()?.RowNumber() ?? 1;
+        var headerRow = FindHeaderRow(sheet, lastRow, columns.Ean);
         var columnByHeader = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var cell in headerRow.CellsUsed())
@@ -134,11 +151,9 @@ public class XlsxProductImportFileParser : IImportFileParser
         }
 
         string? Get(IXLRow row, string header) =>
-            columnByHeader.TryGetValue(header, out var col) ? row.Cell(col).GetString() : null;
+            columnByHeader.TryGetValue(header.Trim(), out var col) ? row.Cell(col).GetString() : null;
 
-        var lastRow = sheet.LastRowUsed()?.RowNumber() ?? 1;
-
-        for (var r = 2; r <= lastRow; r++)
+        for (var r = headerRow.RowNumber() + 1; r <= lastRow; r++)
         {
             var row = sheet.Row(r);
 
@@ -151,18 +166,46 @@ public class XlsxProductImportFileParser : IImportFileParser
             {
                 // XLSX is already case-insensitive because columnByHeader uses StringComparer.OrdinalIgnoreCase.
                 RowNumber = r,
-                Ean = Get(row, "EAN"),
-                Name = Get(row, "Nosaukums"),
-                Brand = Get(row, "Zīmols"),
-                PriceRaw = Get(row, "Cena"),
-                SoldByPieceRaw = Get(row, "gb"),
-                PiecesPerPackageRaw = Get(row, "iep."),
-                PiecesPerBoxRaw = Get(row, "kaste"),
-                Description = Get(row, "Apraksts"),
-                Catalog = Get(row, "Katalogs"),
-                Group = Get(row, "Grupa"),
-                Subgroup = Get(row, "apakšgrupa"),
+                Ean = Get(row, columns.Ean),
+                Name = Get(row, columns.Name),
+                Brand = Get(row, columns.Brand),
+                PriceRaw = Get(row, columns.Price),
+                SoldByPieceRaw = Get(row, columns.SoldByPiece),
+                PiecesPerPackageRaw = Get(row, columns.PiecesPerPackage),
+                PiecesPerBoxRaw = Get(row, columns.PiecesPerBox),
+                Description = Get(row, columns.Description),
+                Catalog = Get(row, columns.Catalog),
+                Group = Get(row, columns.Group),
+                Subgroup = Get(row, columns.Subgroup),
             };
         }
+    }
+
+    /// <summary>
+    /// Finds the header row: the first of the leading rows that has a cell reading the EAN header.
+    /// </summary>
+    /// <param name="sheet">The <see cref="IXLWorksheet"/> being imported.</param>
+    /// <param name="lastRow">The number of the sheet's last used row.</param>
+    /// <param name="eanHeader">The configured EAN header (<see cref="ImportColumnSettings.Ean"/>).</param>
+    /// <returns>The header <see cref="IXLRow"/>.</returns>
+    /// <exception cref="InvalidOperationException">No header row with an EAN column was found.</exception>
+    private static IXLRow FindHeaderRow(IXLWorksheet sheet, int lastRow, string eanHeader)
+    {
+        var searchUntil = Math.Min(lastRow, HeaderSearchRowLimit);
+
+        for (var r = 1; r <= searchUntil; r++)
+        {
+            var row = sheet.Row(r);
+            var hasEan = row.CellsUsed()
+                .Any(c => string.Equals(c.GetString().Trim(), eanHeader, StringComparison.OrdinalIgnoreCase));
+
+            if (hasEan)
+            {
+                return row;
+            }
+        }
+
+        throw new InvalidOperationException(
+            $"No header row with an \"{eanHeader}\" column (the configured EAN header) found in the first {HeaderSearchRowLimit} rows.");
     }
 }

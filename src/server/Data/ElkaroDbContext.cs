@@ -15,6 +15,8 @@ public partial class ElkaroDbContext : DbContext
     {
     }
 
+    public virtual DbSet<AppSetting> AppSettings { get; set; }
+
     public virtual DbSet<AttributeDefinition> AttributeDefinitions { get; set; }
 
     public virtual DbSet<Brand> Brands { get; set; }
@@ -225,6 +227,29 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.ValueText)
                 .HasMaxLength(255)
                 .HasColumnName("value_text");
+        });
+
+        modelBuilder.Entity<AppSetting>(entity =>
+        {
+            entity.HasKey(e => e.Key).HasName("app_settings_pkey");
+
+            entity.ToTable("app_settings");
+
+            entity.Property(e => e.Key)
+                .HasMaxLength(100)
+                .HasColumnName("key");
+            entity.Property(e => e.ValueJson)
+                .HasColumnType("jsonb")
+                .HasColumnName("value");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+
+            entity.HasOne<User>().WithMany()
+                .HasForeignKey(d => d.UpdatedBy)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("app_settings_updated_by_fkey");
         });
 
         modelBuilder.Entity<ImportBatch>(entity =>
@@ -582,8 +607,11 @@ public partial class ElkaroDbContext : DbContext
             entity.Property(e => e.ExternalId)
                 .HasMaxLength(100)
                 .HasColumnName("external_id");
+            // Sentinel matches the CLR initializer (true): without it EF treats `false` as "unset"
+            // and omits it on INSERT, so the DB default silently turns it back into true.
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
+                .HasSentinel(true)
                 .HasColumnName("is_active");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)

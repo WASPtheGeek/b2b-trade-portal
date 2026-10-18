@@ -6,6 +6,7 @@ using Elkaro.Server.Models.Constants;
 using Elkaro.Server.Models.Entities;
 using Elkaro.Server.Services;
 using Elkaro.Server.Services.Import;
+using Elkaro.Server.Services.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -114,6 +115,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IPricingService, PricingService>();
         services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
+        services.AddScoped<IAppSettingsService, AppSettingsService>();
 
         return services;
     }
@@ -125,6 +127,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddImportPipeline(this IServiceCollection services)
     {
         services.AddSingleton<IImportJobQueue, ImportJobQueue>();
+        services.AddSingleton<IImportCancellationRegistry, ImportCancellationRegistry>();
         services.AddSingleton<ImportFileParserResolver>();
         services.AddSingleton<IImportFileParser, CsvProductImportFileParser>();
         services.AddSingleton<IImportFileParser, XlsxProductImportFileParser>();

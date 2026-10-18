@@ -1,5 +1,8 @@
-import { AdminUnbuiltView } from "@/components/features/admin/AdminUnbuiltView";
+"use client";
+
+import { dictionary } from "@/app/_i18n";
+import { ImportDashboard } from "@/components/features/admin/import/ImportDashboard";
 
 export default function AdminImportPage() {
-  return <AdminUnbuiltView label="ERP imports" />;
+  return <ImportDashboard labels={ dictionary.adminImportDashboard } />;
 }

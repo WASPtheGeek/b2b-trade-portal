@@ -1,12 +1,20 @@
 using System.Globalization;
 using Ardalis.GuardClauses;
+using Elkaro.Server.Common;
 using Elkaro.Server.Data;
 using Elkaro.Server.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Elkaro.Server.Services.Import;
 
-public record RowImportResult(bool Success, bool Created, string? ErrorMessage);
+/// <summary>
+/// The outcome of importing a single row.
+/// </summary>
+/// <param name="Success">Whether the row was imported.</param>
+/// <param name="Created">Whether a new product was created (otherwise an existing one was updated).</param>
+/// <param name="ErrorMessage">Why the row failed, if it did.</param>
+/// <param name="ProductId">The ID of the created/updated product, if the row succeeded.</param>
+public record RowImportResult(bool Success, bool Created, string? ErrorMessage, long? ProductId = null);
 
 /// <summary>
 /// Product row importer, responsible for upserting products based on EAN.
@@ -18,6 +26,11 @@ public class ProductRowImporter
     private readonly ElkaroDbContext _db;
     private readonly Dictionary<string, long> _categoryCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, long> _brandCache = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Categories created since the last <see cref="TakeCreatedCategories"/> call.
+    /// </summary>
+    private readonly List<CreatedCategory> _createdCategories = [];
 
     /// <summary>
     /// Default VAT rate ID, cached for the lifetime of this importer instance.
@@ -81,6 +94,9 @@ public class ProductRowImporter
                 Sku = row.Ean!,
                 Ean = row.Ean,
                 DateAdded = DateOnly.FromDateTime(DateTime.UtcNow),
+                // Imported products need an admin review (images, categories, prices) before
+                // they're visible in the shop, so they start inactive.
+                IsActive = false,
             };
             _db.Products.Add(product);
         }
@@ -93,7 +109,8 @@ public class ProductRowImporter
         product.SoldByPiece = soldByPiece;
         product.PiecesPerPackage = piecesPerPackage;
         product.PiecesPerBox = piecesPerBox;
-        product.IsActive = true;
+        // An existing product keeps its current IsActive - re-importing must not hide (or
+        // publish) products an admin has already reviewed.
 
         await _db.SaveChangesAsync(ct); // need product.Id for the join row below
 
@@ -119,7 +136,7 @@ public class ProductRowImporter
             await _db.SaveChangesAsync(ct);
         }
 
-        return new RowImportResult(true, created, null);
+        return new RowImportResult(true, created, null, product.Id);
     }
 
     /// <summary>
@@ -222,11 +239,13 @@ public class ProductRowImporter
 
         long? parentId = null;
         long? deepestId = null;
+        var path = new List<string>();
 
         foreach (var level in new[] { catalog, group, subgroup })
         {
             if (string.IsNullOrWhiteSpace(level)) break;
-            deepestId = await GetOrCreateCategoryAsync(level.Trim(), parentId, ct);
+            path.Add(level.Trim());
+            deepestId = await GetOrCreateCategoryAsync(level.Trim(), parentId, string.Join(" › ", path), ct);
             parentId = deepestId;
         }
 
@@ -234,39 +253,88 @@ public class ProductRowImporter
     }
 
     /// <summary>
+    /// Returns the categories created since the previous call and clears the list, so the caller
+    /// can log them against the row that created them. Includes categories created by a row
+    /// that then failed - they were saved and stay in the catalog.
+    /// </summary>
+    /// <returns>The newly created categories, in creation order (parents first).</returns>
+    public IReadOnlyList<CreatedCategory> TakeCreatedCategories()
+    {
+        var created = _createdCategories.ToList();
+
+        _createdCategories.Clear();
+
+        return created;
+    }
+
+    /// <summary>
     /// Gets or creates a category by name and parent ID, caching the result for the lifetime of this importer instance.
+    /// An existing category matches by name (case-insensitive) or by slug, so a category an admin
+    /// created by hand is reused instead of duplicated. A top-level catalog the admin has moved
+    /// under another category is still found: if there is no root match, a single match anywhere
+    /// in the tree is used.
     /// </summary>
     /// <param name="name">The name of the category.</param>
     /// <param name="parentId">The ID of the parent category, or null if this is a root category.</param>
+    /// <param name="path">The category's path from the top level, recorded if it gets created.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The ID of the category.</returns>
-    private async Task<long> GetOrCreateCategoryAsync(string name, long? parentId, CancellationToken ct)
+    private async Task<long> GetOrCreateCategoryAsync(string name, long? parentId, string path, CancellationToken ct)
     {
-        var cacheKey = $"{parentId?.ToString() ?? "root"}::{name}";
+        var slug = SlugGenerator.Create(name);
+        var cacheKey = $"{parentId?.ToString() ?? "root"}::{slug}";
 
         if (_categoryCache.TryGetValue(cacheKey, out var cached))
         {
             return cached;
         }
 
-        var category = await _db.Categories
-            .FirstOrDefaultAsync(c => c.Name == name && c.ParentId == parentId, ct);
+        var category = await FindCategoryAsync(name, slug, parentId, ct);
 
         if (category is null)
         {
             category = new Category
             {
                 Name = name,
-                Slug = Slugify(name),
+                Slug = slug,
                 ParentId = parentId,
             };
             _db.Categories.Add(category);
             await _db.SaveChangesAsync(ct);
+            _createdCategories.Add(new CreatedCategory(category.Id, path));
         }
 
         _categoryCache[cacheKey] = category.Id;
 
         return category.Id;
+    }
+
+    /// <summary>
+    /// Finds an existing category matching the specified name or slug, as described on
+    /// <see cref="GetOrCreateCategoryAsync"/>.
+    /// </summary>
+    /// <param name="name">The name of the category.</param>
+    /// <param name="slug">The slug generated from <paramref name="name"/>.</param>
+    /// <param name="parentId">The ID of the parent category, or null if this is a root category.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The matching <see cref="Category"/>, or <c>null</c> if there is none.</returns>
+    private async Task<Category?> FindCategoryAsync(string name, string slug, long? parentId, CancellationToken ct)
+    {
+        var lowerName = name.ToLower();
+        var matching = _db.Categories.Where(c => c.Name.ToLower() == lowerName || c.Slug == slug);
+        var underParent = await matching
+            .Where(c => c.ParentId == parentId)
+            .OrderBy(c => c.Id)
+            .FirstOrDefaultAsync(ct);
+
+        if (underParent is not null || parentId is not null)
+        {
+            return underParent;
+        }
+
+        var anywhere = await matching.Take(2).ToListAsync(ct);
+
+        return anywhere.Count == 1 ? anywhere[0] : null;
     }
 
     /// <summary>
@@ -288,21 +356,5 @@ public class ProductRowImporter
         _defaultVatRateId = rate.Id;
 
         return rate.Id;
-    }
-
-    /// <summary>
-    /// Slugifies a category name to create a URL-friendly identifier.
-    /// </summary>
-    /// <param name="name">The name of the category.</param>
-    /// <returns>The slugified version of the category name.</returns>
-    private static string Slugify(string name)
-    {
-        var lowered = name.Trim().ToLowerInvariant();
-        var chars = lowered.Select(c => char.IsLetterOrDigit(c) ? c : '-').ToArray();
-        var slug = new string(chars);
-
-        while (slug.Contains("--")) slug = slug.Replace("--", "-");
-
-        return slug.Trim('-');
     }
 }

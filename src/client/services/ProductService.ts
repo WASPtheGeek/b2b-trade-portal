@@ -1,5 +1,7 @@
 import type {
   ProductAdminDetail,
+  ProductBulkDeleteResult,
+  ProductBulkStatusUpdatePayload,
   ProductAdminListItem,
   ProductListQuery,
   ProductStatusUpdatePayload,
@@ -13,6 +15,10 @@ export interface ProductService {
   create(payload: ProductUpsertPayload, token: string): Promise<void>;
   update(id: number, payload: ProductUpsertPayload, token: string): Promise<void>;
   updateStatus(id: number, payload: ProductStatusUpdatePayload, token: string): Promise<void>;
-  /** Soft-deletes (deactivates) a product — products are never hard-deleted. */
-  deactivate(id: number, token: string): Promise<void>;
+  /** Sets the status of several products in one request, e.g. to publish an imported batch. */
+  updateStatusBulk(payload: ProductBulkStatusUpdatePayload, token: string): Promise<void>;
+  /** Permanently deletes a product. Fails with 409 if it has been ordered - deactivate it instead. */
+  delete(id: number, token: string): Promise<void>;
+  /** Permanently deletes several products; ordered ones are skipped and reported back. */
+  deleteBulk(ids: number[], token: string): Promise<ProductBulkDeleteResult>;
 }

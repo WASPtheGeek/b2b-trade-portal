@@ -4,6 +4,8 @@ import type { BrandFormLabels } from "@/components/features/admin/brands/BrandFo
 import type { BrandListLabels } from "@/components/features/admin/brands/BrandList";
 import type { CategoryFormLabels } from "@/components/features/admin/categories/CategoryForm";
 import type { CategoryListLabels } from "@/components/features/admin/categories/CategoryList";
+import type { ImportDashboardLabels } from "@/components/features/admin/import/ImportDashboard";
+import type { SettingsPageLabels } from "@/components/features/admin/settings/SettingsPage";
 import type { ProductFormLabels } from "@/components/features/admin/products/ProductForm";
 import type { ProductListLabels } from "@/components/features/admin/products/ProductList";
 import type { UserListLabels } from "@/components/features/admin/users/UserList";
@@ -56,4 +58,6 @@ export interface Dictionary {
   brandForm: BrandFormLabels;
   adminOrderList: OrderListLabels;
   adminUserList: UserListLabels;
+  adminImportDashboard: ImportDashboardLabels;
+  adminSettings: SettingsPageLabels;
 }

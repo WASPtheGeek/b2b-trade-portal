@@ -61,11 +61,25 @@ export interface ProductStatusUpdatePayload {
   isActive: boolean;
 }
 
+/** Request body for `PATCH /api/admin/products/status` - sets several products' status at once. */
+export interface ProductBulkStatusUpdatePayload {
+  ids: number[];
+  isActive: boolean;
+}
+
+/** Response of `POST /api/admin/products/bulk-delete`. */
+export interface ProductBulkDeleteResult {
+  deletedCount: number;
+  /** Products kept because they've been ordered before - they can only be deactivated. */
+  skippedIds: number[];
+}
+
 /** Optional filters for `GET /api/admin/products`. */
 export interface ProductListQuery {
   category?: string;
   brand?: number;
   search?: string;
+  isActive?: boolean;
   page?: number;
   pageSize?: number;
 }

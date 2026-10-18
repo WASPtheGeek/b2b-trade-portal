@@ -23,6 +23,29 @@ export class FetchHttpClient implements HttpClient {
     return this.request<TResponse>("POST", path, body, options);
   }
 
+  async postForm<TResponse>(path: string, formData: FormData, options?: HttpRequestOptions): Promise<TResponse> {
+    const headers: Record<string, string> = {};
+
+    if (options?.token) {
+      headers.Authorization = `Bearer ${options.token}`;
+    }
+
+    // No "Content-Type" header here - the browser sets its own multipart boundary for a
+    // FormData body, which `buildHeaders`'s fixed "application/json" would otherwise override.
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      method: "POST",
+      headers,
+      body: formData,
+      signal: options?.signal,
+    });
+
+    if (!response.ok) {
+      await this.throwApiError(response);
+    }
+
+    return response.status === 204 ? (undefined as TResponse) : ((await response.json()) as TResponse);
+  }
+
   async put<TResponse, TBody = unknown>(path: string, body?: TBody, options?: HttpRequestOptions): Promise<TResponse> {
     return this.request<TResponse>("PUT", path, body, options);
   }

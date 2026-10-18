@@ -1,5 +1,7 @@
 import type { Dictionary } from "../Dictionary";
 import { accountPage } from "./accountPage";
+import { adminImportDashboard } from "./adminImportDashboard";
+import { adminSettings } from "./adminSettings";
 import { adminNav } from "./adminNav";
 import { adminOrderList } from "./adminOrderList";
 import { adminProductList } from "./adminProductList";
@@ -50,4 +52,6 @@ export const lv: Dictionary = {
   brandForm,
   adminOrderList,
   adminUserList,
+  adminImportDashboard,
+  adminSettings,
 };

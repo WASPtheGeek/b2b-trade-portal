@@ -13,9 +13,10 @@ public record ImportJobAcceptedDto(long JobId);
 /// <param name="Status">The current status of the import job.</param>
 /// <param name="TotalRows">The total number of rows in the import job.</param>
 /// <param name="ProcessedRows">The number of rows that have been processed.</param>
-/// <param name="CreatedCount">The number of rows that resulted in new records.</param>
-/// <param name="UpdatedCount">The number of rows that updated existing records.</param>
+/// <param name="CreatedCount">The number of rows that created a new product.</param>
+/// <param name="UpdatedCount">The number of rows that updated an existing product.</param>
 /// <param name="ErrorCount">The number of rows that encountered errors.</param>
+/// <param name="CreatedCategoryCount">The number of categories the import created.</param>
 /// <param name="StartedAt">The timestamp when the import job started.</param>
 /// <param name="FinishedAt">The timestamp when the import job finished, if applicable.</param>
 public record ImportJobStatusDto(
@@ -26,13 +27,6 @@ public record ImportJobStatusDto(
     int CreatedCount,
     int UpdatedCount,
     int ErrorCount,
+    int CreatedCategoryCount,
     DateTimeOffset StartedAt,
     DateTimeOffset? FinishedAt);
-
-/// <summary>
-/// DTO representing an error encountered during the processing of a specific row in an import job.
-/// </summary>
-/// <param name="RowNumber">The number of the row that encountered the error.</param>
-/// <param name="Ean">The EAN (European Article Number) of the row, if applicable.</param>
-/// <param name="ErrorMessage">The error message describing the issue.</param>
-public record ImportRowErrorDto(int RowNumber, string? Ean, string ErrorMessage);

@@ -34,6 +34,7 @@ public class ProductsController : ControllerBase
     /// <param name="category">Optional category slug or ID to filter products by.</param>
     /// <param name="brand">Optional brand ID to filter products by.</param>
     /// <param name="search">Optional search term to filter products by name or EAN.</param>
+    /// <param name="isActive">Optional active status to filter products by.</param>
     /// <param name="paging">Paging parameters (page number and page size).</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A paginated list of products matching the specified filters.</returns>
@@ -42,6 +43,7 @@ public class ProductsController : ControllerBase
         [FromQuery] string? category,
         [FromQuery] long? brand,
         [FromQuery] string? search,
+        [FromQuery] bool? isActive,
         [FromQuery] PagingQuery paging,
         CancellationToken ct)
     {
@@ -63,6 +65,11 @@ public class ProductsController : ControllerBase
         if (brand is not null)
         {
             query = query.Where(p => p.BrandId == brand);
+        }
+
+        if (isActive is not null)
+        {
+            query = query.Where(p => p.IsActive == isActive);
         }
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -203,22 +210,32 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes a product from the system. 
-    /// This is a soft delete operation — a product referenced by
-    /// past order_items must never be hard-deleted.
+    /// Permanently deletes a product. Its categories, images, attribute values and wishlist
+    /// entries are removed by the database's ON DELETE CASCADE. A product referenced by past
+    /// order_items is never hard-deleted - it must be deactivated instead, so order history keeps
+    /// its link to the product.
     /// </summary>
+    /// <param name="id">The ID of the product to delete.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>No content if the product was deleted.</returns>
+    /// <exception cref="ResourceNotFoundException">No product has the given ID.</exception>
+    /// <exception cref="ConflictException">The product has been ordered before.</exception>
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id, CancellationToken ct)
     {
-        var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == id, ct);
-
-        if (product is null)
+        if (!await _db.Products.AnyAsync(p => p.Id == id, ct))
         {
             throw new ResourceNotFoundException($"Produkts ar ID {id} nav atrasts.");
         }
 
-        product.IsActive = false;
-        await _db.SaveChangesAsync(ct);
+        if (await _db.OrderItems.AnyAsync(oi => oi.ProductId == id, ct))
+        {
+            throw new ConflictException(
+                "Produktu nevar dzēst, jo tas ir iekļauts pasūtījumos. Deaktivizējiet to, lai paslēptu no veikala.",
+                "Produkts ir pasūtīts");
+        }
+
+        await _db.Products.Where(p => p.Id == id).ExecuteDeleteAsync(ct);
 
         return NoContent();
     }
@@ -248,6 +265,57 @@ public class ProductsController : ControllerBase
         await _db.SaveChangesAsync(ct);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Sets the active status of several products at once, e.g. to publish a freshly imported
+    /// batch. IDs that don't match a product are ignored.
+    /// </summary>
+    /// <param name="request">The <see cref="ProductBulkStatusUpdateRequest"/> with the product IDs and new status.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>No content if the update is successful.</returns>
+    [HttpPatch("status")]
+    public async Task<IActionResult> UpdateStatusBulk(
+        ProductBulkStatusUpdateRequest request,
+        CancellationToken ct)
+    {
+        var ids = request.Ids.Distinct().ToList();
+
+        await _db.Products
+            .Where(p => ids.Contains(p.Id))
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsActive, request.IsActive), ct);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Permanently deletes several products at once, e.g. to clean up a wrong import. Products
+    /// referenced by past order_items are skipped (see <see cref="Delete"/>) and reported back,
+    /// so the rest can still be removed. IDs that don't match a product are ignored.
+    /// </summary>
+    /// <param name="request">The <see cref="ProductBulkDeleteRequest"/> with the product IDs.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A <see cref="ProductBulkDeleteResultDto"/> with the deleted count and the skipped IDs.</returns>
+    [HttpPost("bulk-delete")]
+    public async Task<ActionResult<ProductBulkDeleteResultDto>> DeleteBulk(
+        ProductBulkDeleteRequest request,
+        CancellationToken ct)
+    {
+        var ids = request.Ids.Distinct().ToList();
+
+        var orderedIds = await _db.OrderItems
+            .Where(oi => oi.ProductId != null && ids.Contains(oi.ProductId.Value))
+            .Select(oi => oi.ProductId!.Value)
+            .Distinct()
+            .ToListAsync(ct);
+
+        var deletableIds = ids.Except(orderedIds).ToList();
+
+        var deleted = await _db.Products
+            .Where(p => deletableIds.Contains(p.Id))
+            .ExecuteDeleteAsync(ct);
+
+        return Ok(new ProductBulkDeleteResultDto(deleted, orderedIds));
     }
 
     /// <summary>

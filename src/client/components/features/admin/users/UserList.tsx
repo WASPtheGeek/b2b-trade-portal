@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Tabs, type TabItem } from "@/components/ui/Tabs";
 import { TextArea } from "@/components/ui/TextArea";
 import { useAdminUserList } from "@/hooks/useAdminUserList";
+import { useStickyActionsColumn } from "@/hooks/useStickyActionsColumn";
 import { resolveErrorMessage } from "@/lib/http/resolveErrorMessage";
 import { sortRows } from "@/lib/sortRows";
 import { USER_STATUS_LABELS, USER_STATUS_TONES } from "@/lib/status-labels";
@@ -101,7 +102,7 @@ export function UserList({ labels: labelsProp }: UserListProps) {
     genericErrorMessage: labels.genericErrorMessage,
   });
   const [sort, setSort] = useState<DataTableSort | undefined>(undefined);
-  const [stickyActions, setStickyActions] = useState(true);
+  const { stickyActions, setStickyActions } = useStickyActionsColumn();
   const [rejectTarget, setRejectTarget] = useState<AdminUser | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);

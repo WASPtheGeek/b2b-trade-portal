@@ -47,6 +47,8 @@ export interface DataTableProps<T extends { id?: string | number }> {
   density?: "compact" | "default" | "relaxed";
   selectable?: boolean;
   renderSelect?: (row: T, index: number) => ReactNode;
+  /** Content of the selection column's header cell, e.g. a select-all checkbox. */
+  renderSelectAll?: () => ReactNode;
   reorderable?: boolean;
   onReorder?: (from: number, to: number) => void;
   /** Renders the whole `<tr>` for a row (e.g. a component with its own layout/columns),
@@ -83,6 +85,7 @@ export function DataTable<T extends { id?: string | number }>({
   density = "default",
   selectable = false,
   renderSelect,
+  renderSelectAll,
   reorderable = false,
   onReorder,
   renderRow,
@@ -149,7 +152,9 @@ export function DataTable<T extends { id?: string | number }>({
         <thead>
           <tr>
             { reorderable ? <th className="w-[38px] bg-surface-subtle border-b border-border-default sticky top-0" /> : null }
-            { selectable ? <th className="w-10 bg-surface-subtle border-b border-border-default sticky top-0" /> : null }
+            { selectable ? (
+              <th className="w-10 py-0 pr-0 pl-3.5 bg-surface-subtle border-b border-border-default sticky top-0">{ renderSelectAll?.() }</th>
+            ) : null }
             { columns.map((c, i) => {
               const on = sort?.key === c.key;
               const sortable = c.sortable !== false && !!onSortChange;

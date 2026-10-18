@@ -13,6 +13,7 @@ import { Modal } from "@/components/ui/Modal";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAdminCategoryList } from "@/hooks/useAdminCategoryList";
+import { useStickyActionsColumn } from "@/hooks/useStickyActionsColumn";
 import type { Category } from "@/types/category";
 
 export interface CategoryListLabels {
@@ -155,7 +156,7 @@ export function CategoryList({ labels: labelsProp, formLabels }: CategoryListPro
   const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
   const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
   const [formTarget, setFormTarget] = useState<CategoryFormTarget | null>(null);
-  const [stickyActions, setStickyActions] = useState(true);
+  const { stickyActions, setStickyActions } = useStickyActionsColumn();
 
   const confirmDelete = (): void => {
     if (pendingDelete) {
