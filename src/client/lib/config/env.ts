@@ -10,7 +10,7 @@ export interface AppConfig {
   readonly apiBaseUrl: string;
 }
 
-const DEFAULT_API_BASE_URL = "http://localhost:5001";
+const DEFAULT_API_BASE_URL = "http://localhost:8080";
 
 /**
  * Reads and normalizes the API base URL from `NEXT_PUBLIC_API_BASE_URL`.

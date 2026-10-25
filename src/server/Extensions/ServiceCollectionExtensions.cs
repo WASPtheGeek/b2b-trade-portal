@@ -6,6 +6,7 @@ using Elkaro.Server.Models.Constants;
 using Elkaro.Server.Models.Entities;
 using Elkaro.Server.Services;
 using Elkaro.Server.Services.Import;
+using Elkaro.Server.Services.Notifications;
 using Elkaro.Server.Services.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -133,6 +134,45 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IImportFileParser, XlsxProductImportFileParser>();
         services.AddScoped<ImportBatchProcessor>();
         services.AddHostedService<ImportBackgroundService>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the email notification pipeline: a background worker that drains the
+    /// trigger-populated notification_log outbox. Sends over SMTP when "Smtp:Host" is set,
+    /// otherwise only logs the emails - allowed in Development only, so a misconfigured
+    /// production server fails at startup instead of silently marking emails as sent.
+    /// </summary>
+    public static IServiceCollection AddEmailNotifications(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHostEnvironment environment)
+    {
+        services.Configure<SmtpOptions>(configuration.GetSection("Smtp"));
+        services.Configure<NotificationOptions>(configuration.GetSection("Notifications"));
+
+        if (string.IsNullOrWhiteSpace(configuration["Smtp:Host"]))
+        {
+            if (!environment.IsDevelopment())
+            {
+                throw new InvalidOperationException("Smtp:Host must be configured outside Development.");
+            }
+
+            services.AddSingleton<IEmailSender, LoggingEmailSender>();
+        }
+        else if (string.IsNullOrWhiteSpace(configuration["Smtp:FromAddress"]))
+        {
+            throw new InvalidOperationException("Smtp:FromAddress must be configured when Smtp:Host is set.");
+        }
+        else
+        {
+            services.AddSingleton<IEmailSender, SmtpEmailSender>();
+        }
+
+        services.AddScoped<INotificationEmailComposer, NotificationEmailComposer>();
+        services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+        services.AddHostedService<NotificationBackgroundService>();
 
         return services;
     }

@@ -272,7 +272,8 @@ b2b-trade-portal/
 │       ├── Models/
 │       └── Program.cs
 ├── docs/                        # Project documentation (schema, API design, decision log)
-├── docker-compose.yml
+├── docker-compose.local.yml
+├── docker-compose.prod.yml
 └── README.md
 ```
 

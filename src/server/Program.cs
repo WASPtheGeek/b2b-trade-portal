@@ -7,6 +7,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddImportPipeline();
+builder.Services.AddEmailNotifications(builder.Configuration, builder.Environment);
 builder.Services.AddWebApi();
 builder.Services.AddCorsPolicy(builder.Configuration);
 

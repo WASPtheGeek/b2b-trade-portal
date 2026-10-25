@@ -59,7 +59,7 @@ nunit-*.xml
 # React / Next.js
 node_modules/
 .next/
-.env.local
+.env*
 build/
 
 # Local application configuration
